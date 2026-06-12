@@ -7,9 +7,10 @@
 %  marked TODO for later sessions.
 %
 %  NOTE: this uses the PLOS class options and the `cite` package (numeric
-%  Vancouver citations). The bibliography style is `plos2025` -- the file
-%  plos2025.bst ships with the PLOS template and must be placed next to this
-%  .tex before compiling. The bib database is references.bib.
+%  Vancouver citations). The bibliography style is `plos2015` (the genuine PLOS
+%  Vancouver BibTeX style; the current template ships an identical file renamed
+%  plos2025.bst). plos2015.bst is committed alongside this .tex so it compiles
+%  as-is on Overleaf. The bib database is references.bib.
 % ============================================================================
 \documentclass[10pt,letterpaper]{article}
 \usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
@@ -46,7 +47,7 @@
 \usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
 \renewcommand{\figurename}{Fig}
 
-\bibliographystyle{plos2025}
+\bibliographystyle{plos2015}
 
 \makeatletter
 \renewcommand{\@biblabel}[1]{\quad#1.}

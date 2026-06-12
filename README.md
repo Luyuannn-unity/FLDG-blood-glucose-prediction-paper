@@ -10,11 +10,15 @@ a cross-country deployment and a domain-generalisation benchmark."**
   Materials and methods, Results, Discussion are marked TODO.
 - `references.bib` — bibliography. Entries tagged `%% VERIFY` need author/year
   checks before submission.
+- `plos2015.bst` — PLOS Vancouver BibTeX style, committed so the bibliography
+  builds out of the box.
 
 ## Building
-This uses the PLOS LaTeX template. Before compiling you must add **`plos2025.bst`**
-(ships with the official PLOS template) to this directory; the manuscript sets
-`\bibliographystyle{plos2025}`. On Overleaf, upload `plos2025.bst` alongside the
-source, or switch the menu compiler accordingly.
+Self-contained: BibTeX with `\bibliographystyle{plos2015}` over `references.bib`.
+On Overleaf, set `glucose_fl_paper.tex` as the main document and compile with
+pdfLaTeX; references resolve with no extra setup.
 
-Set `glucose_fl_paper.tex` as the main document in Overleaf.
+`plos2015.bst` is the genuine PLOS Vancouver style. The current PLOS template
+package ships an identical file renamed `plos2025.bst`; for final submission you
+may swap in that exact file from the official template and change the one
+`\bibliographystyle{...}` line to match.
