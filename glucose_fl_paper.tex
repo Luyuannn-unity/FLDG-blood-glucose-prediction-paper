@@ -165,35 +165,30 @@ generalisation seeks models that transfer to unseen
 distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain generalisation
 (MLDG) simulates train/test domain shift within each update so the model learns to
 generalise rather than memorise~\cite{li2018mldg}. Bringing these ideas into
-federation is an active area surveyed by Li et al.~\cite{li2024fedDGsurvey}, and
-the dominant families map onto the methods we compare. Meta-learning approaches
-adapt the model-agnostic meta-learning objective to federation, for
-communication-efficient convergence~\cite{chen2018fedmeta} or for models that
-personalise to a new client in a few gradient steps~\cite{fallah2020perfedavg}.
-Personalisation approaches keep a per-client model: APFL learns an adaptive convex
-mixture of the global and a local model~\cite{deng2020apfl}, while Ditto
-regularises each client's personal model toward the global one with a tunable
-proximal strength~\cite{li2021ditto}. Representation-alignment approaches reduce
-cross-client shift in feature space, via model-contrastive
+federation is an active area surveyed by Li et al.~\cite{li2024fedDGsurvey},
+spanning several families. Meta-learning approaches adapt the model-agnostic
+meta-learning objective to federation, for communication-efficient
+convergence~\cite{chen2018fedmeta} or for models that personalise to a new client
+in a few gradient steps~\cite{fallah2020perfedavg}. Personalisation approaches keep
+a per-client model: APFL learns an adaptive convex mixture of the global and a
+local model~\cite{deng2020apfl}, while Ditto regularises each client's personal
+model toward the global one with a tunable proximal strength~\cite{li2021ditto}.
+Other approaches instead align client representations, via model-contrastive
 objectives~\cite{li2021moon}, federated contrastive learning for multi-centre
-medical imaging~\cite{fedcl2023}, or adversarial domain alignment for federated
-generalisation~\cite{flda2023,fedadv2022}.
+medical imaging~\cite{fedcl2023}, or adversarial domain
+alignment~\cite{flda2023,fedadv2022}. Our benchmark covers the first two
+families---meta-learning (MLDG) and personalisation (APFL, Ditto)---alongside
+standard federated averaging (FedAvg, FedProx) and single-cohort local training,
+and leaves representation-alignment methods to future work.
 
 \textbf{Yet these methods are rarely compared head-to-head for glucose
-forecasting, and their evaluations can hide confounds.} They are seldom benchmarked
-against one another on a common task, and evaluations rarely separate the two
-regimes that matter clinically---accuracy on patients from the training cohorts
-(held-in) versus accuracy on entirely unseen cohorts (out of distribution, OOD).
-We find these regimes can disagree, and that strong OOD numbers can arise from a
-covariate-match artifact, in which a model trained on a cohort whose glucose
-distribution happens to coincide with the held-out one generalises well for
-reasons unrelated to its training algorithm---an effect easily mistaken for genuine
-methodological skill. We also find that the \emph{type} of personalisation matters:
-an adaptive global/local mixture can collapse toward the global model on the most
-heterogeneous cohort, whereas a structural split (a shared encoder with a
-client-specific decoder) recovers it. Closing this gap---comparing federated
-strategies on one glucose task under a shared protocol, and reporting held-in and
-OOD performance honestly---is the main focus of this paper.
+forecasting.} They are seldom benchmarked against one another on a common task, and
+evaluations rarely separate the two regimes that matter clinically---accuracy on
+patients from the training cohorts (held-in) versus accuracy on entirely unseen
+cohorts (out of distribution, OOD)---even though a method can behave quite
+differently in the two. Closing this gap---comparing federated strategies on one
+glucose task under a shared protocol, with held-in and OOD performance reported
+separately---is the main focus of this paper.
 
 A second, more practical observation is that almost all federated glucose work is
 simulated rather than deployed, with ``clients'' as partitions of one dataset on a
@@ -211,15 +206,8 @@ strategies for transformer-based glucose forecasting.} Using a common
 encoder--decoder transformer and four real T1D cohorts as federated clients, with
 additional held-out cohorts as OOD test sites, we compare single-cohort local
 training, FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and Ditto)
-under a multi-seed protocol. Our analysis shows that meta-learned federation
-(MLDG) is generally the strongest method both held-in and OOD; that federation
-clearly beats the average local model out of distribution; that an apparent OOD
-``win'' of a single small cohort is the covariate-match artifact described above
-rather than method skill, and how to detect it; that the one cohort where pooling
-hurts on its own distribution is recovered by structural rather than mixture-style
-personalisation; and that, at the 30-minute horizon, all methods operate close to
-a persistence-dominated ceiling, so the lever for further gains is exogenous
-inputs such as insulin bolus rather than larger models.
+under a multi-seed protocol, reporting held-in and OOD accuracy separately at the
+clinically actionable 30-minute horizon.
 
 \textbf{As a secondary contribution, we show that such a federation can be run for
 real, not only simulated.} We build, from scratch, a lightweight cross-site FL
