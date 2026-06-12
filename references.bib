@@ -1,0 +1,248 @@
+% ============================================================================
+%  References for: Federated + Meta-Learned Blood-Glucose Forecasting
+%  NOTE: entries marked %% VERIFY have details (authors/year/venue) that should
+%        be double-checked against the source before submission.
+% ============================================================================
+
+% ---- Clinical / diabetes background -----------------------------------------
+@misc{idf2021,
+  title        = {{IDF Diabetes Atlas}},
+  author       = {{International Diabetes Federation}},
+  edition      = {10th},
+  year         = {2021},
+  publisher    = {International Diabetes Federation},
+  address      = {Brussels, Belgium},
+  url          = {https://diabetesatlas.org}
+}
+
+@article{battelino2019tir,
+  title    = {Clinical Targets for Continuous Glucose Monitoring Data Interpretation:
+              Recommendations From the International Consensus on Time in Range},
+  author   = {Battelino, Tadej and Danne, Thomas and Bergenstal, Richard M. and others},
+  journal  = {Diabetes Care},
+  volume   = {42},
+  number   = {8},
+  pages    = {1593--1603},
+  year     = {2019}
+}
+
+@article{vettoretti2020advanced,  %% VERIFY
+  title   = {Advanced Diabetes Management Using Artificial Intelligence and
+             Continuous Glucose Monitoring Sensors},
+  author  = {Vettoretti, Martina and Cappon, Giacomo and Facchinetti, Andrea and
+             Sparacino, Giovanni},
+  journal = {Sensors},
+  volume  = {20},
+  number  = {14},
+  pages   = {3870},
+  year    = {2020}
+}
+
+@article{bekiari2018ap,  %% VERIFY
+  title    = {Artificial pancreas treatment for outpatients with type 1 diabetes:
+              systematic review and meta-analysis},
+  author   = {Bekiari, Eleni and Kitsios, Konstantinos and Thabit, Hood and others},
+  journal  = {BMJ},
+  volume   = {361},
+  pages    = {k1310},
+  year     = {2018}
+}
+
+% ---- Glucose prediction models ----------------------------------------------
+@article{martinsson2020,
+  title    = {Blood Glucose Prediction with Variance Estimation Using Recurrent Neural Networks},
+  author   = {Martinsson, John and Schliep, Alexander and Eliasson, Bj{\"o}rn and Mogren, Olof},
+  journal  = {Journal of Healthcare Informatics Research},
+  volume   = {4},
+  pages    = {1--18},
+  year     = {2020}
+}
+
+@inproceedings{marling2020ohio,  %% VERIFY
+  title     = {The {OhioT1DM} Dataset for Blood Glucose Level Prediction: Update 2020},
+  author    = {Marling, Cindy and Bunescu, Razvan},
+  booktitle = {Proc. KDH Workshop / CEUR},
+  year      = {2020}
+}
+
+@article{sergazinov2023gluformer,  %% VERIFY
+  title   = {Gluformer: Transformer-Based Personalized Glucose Forecasting with
+             Uncertainty Quantification},
+  author  = {Sergazinov, Renat and Armandpour, Mohammadreza and Gaynanova, Irina},
+  journal = {arXiv preprint arXiv:2209.04526},
+  year    = {2022}
+}
+
+@inproceedings{sergazinov2024glucobench,  %% VERIFY
+  title     = {{GlucoBench}: Curated List of Continuous Glucose Monitoring Datasets
+               with Prediction Benchmarks},
+  author    = {Sergazinov, Renat and Chun, Elizabeth and Rogovchenko, Valeriya and others},
+  booktitle = {International Conference on Learning Representations (ICLR)},
+  year      = {2024}
+}
+
+@inproceedings{vaswani2017attention,
+  title     = {Attention Is All You Need},
+  author    = {Vaswani, Ashish and Shazeer, Noam and Parmar, Niki and others},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2017}
+}
+
+@inproceedings{zhou2021informer,
+  title     = {Informer: Beyond Efficient Transformer for Long Sequence Time-Series Forecasting},
+  author    = {Zhou, Haoyi and Zhang, Shanghang and Peng, Jieqi and others},
+  booktitle = {Proc. AAAI Conference on Artificial Intelligence},
+  year      = {2021}
+}
+
+@inproceedings{wu2021autoformer,
+  title     = {Autoformer: Decomposition Transformers with Auto-Correlation for
+               Long-Term Series Forecasting},
+  author    = {Wu, Haixu and Xu, Jiehui and Wang, Jianmin and Long, Mingsheng},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2021}
+}
+
+% ---- Federated learning: core -----------------------------------------------
+@inproceedings{mcmahan2017fedavg,
+  title     = {Communication-Efficient Learning of Deep Networks from Decentralized Data},
+  author    = {McMahan, Brendan and Moore, Eider and Ramage, Daniel and
+               Hampson, Seth and Ag{\"u}era y Arcas, Blaise},
+  booktitle = {Proc. Int. Conf. on Artificial Intelligence and Statistics (AISTATS)},
+  year      = {2017}
+}
+
+@inproceedings{li2020fedprox,
+  title     = {Federated Optimization in Heterogeneous Networks},
+  author    = {Li, Tian and Sahu, Anit Kumar and Zaheer, Manzil and
+               Sanjabi, Maziar and Talwalkar, Ameet and Smith, Virginia},
+  booktitle = {Proc. Machine Learning and Systems (MLSys)},
+  year      = {2020}
+}
+
+@inproceedings{karimireddy2020scaffold,
+  title     = {{SCAFFOLD}: Stochastic Controlled Averaging for Federated Learning},
+  author    = {Karimireddy, Sai Praneeth and Kale, Satyen and Mohri, Mehryar and
+               Reddi, Sashank J. and Stich, Sebastian U. and Suresh, Ananda Theertha},
+  booktitle = {Proc. Int. Conf. on Machine Learning (ICML)},
+  year      = {2020}
+}
+
+% ---- Federated learning in healthcare ---------------------------------------
+@article{rieke2020future,
+  title   = {The future of digital health with federated learning},
+  author  = {Rieke, Nicola and Hancox, Jonny and Li, Wenqi and others},
+  journal = {npj Digital Medicine},
+  volume  = {3},
+  number  = {1},
+  pages   = {119},
+  year    = {2020}
+}
+
+@article{sheller2020federated,
+  title   = {Federated learning in medicine: facilitating multi-institutional
+             collaborations without sharing patient data},
+  author  = {Sheller, Micah J. and Edwards, Brandon and Reina, G. Anthony and others},
+  journal = {Scientific Reports},
+  volume  = {10},
+  pages   = {12598},
+  year    = {2020}
+}
+
+@article{kaissis2020secure,
+  title   = {Secure, privacy-preserving and federated machine learning in medical imaging},
+  author  = {Kaissis, Georgios A. and Makowski, Marcus R. and R{\"u}ckert, Daniel and
+             Braren, Rickmer F.},
+  journal = {Nature Machine Intelligence},
+  volume  = {2},
+  pages   = {305--311},
+  year    = {2020}
+}
+
+% ---- Domain generalization & personalization in FL --------------------------
+@inproceedings{li2018mldg,
+  title     = {Learning to Generalize: Meta-Learning for Domain Generalization},
+  author    = {Li, Da and Yang, Yongxin and Song, Yi-Zhe and Hospedales, Timothy M.},
+  booktitle = {Proc. AAAI Conference on Artificial Intelligence},
+  year      = {2018}
+}
+
+@article{deng2020apfl,
+  title   = {Adaptive Personalized Federated Learning},
+  author  = {Deng, Yuyang and Kamani, Mohammad Mahdi and Mahdavi, Mehrdad},
+  journal = {arXiv preprint arXiv:2003.13461},
+  year    = {2020}
+}
+
+@inproceedings{li2021ditto,
+  title     = {Ditto: Fair and Robust Federated Learning Through Personalization},
+  author    = {Li, Tian and Hu, Shengyuan and Beirami, Ahmad and Smith, Virginia},
+  booktitle = {Proc. Int. Conf. on Machine Learning (ICML)},
+  year      = {2021}
+}
+
+@inproceedings{li2021moon,
+  title     = {Model-Contrastive Federated Learning},
+  author    = {Li, Qinbin and He, Bingsheng and Song, Dawn},
+  booktitle = {Proc. IEEE/CVF Conference on Computer Vision and Pattern Recognition (CVPR)},
+  year      = {2021}
+}
+
+@inproceedings{fallah2020perfedavg,
+  title     = {Personalized Federated Learning: A Meta-Learning Approach},
+  author    = {Fallah, Alireza and Mokhtari, Aryan and Ozdaglar, Asuman},
+  booktitle = {Advances in Neural Information Processing Systems (NeurIPS)},
+  year      = {2020}
+}
+
+@article{chen2018fedmeta,
+  title   = {Federated Meta-Learning with Fast Convergence and Efficient Communication},
+  author  = {Chen, Fei and Luo, Mi and Dong, Zhenhua and Li, Zhenguo and He, Xiuqiang},
+  journal = {arXiv preprint arXiv:1802.07876},
+  year    = {2018}
+}
+
+@article{li2024fedDGsurvey,
+  title   = {Federated Domain Generalization: A Survey},
+  author  = {Li, Ying and Wang, Xingwei and Zeng, Rongfei and Donta, Praveen Kumar and
+             Murturi, Ilir and others},
+  journal = {arXiv preprint arXiv:2306.01334},
+  year    = {2024}
+}
+
+@article{fedcl2023,  %% VERIFY authors
+  title   = {{FedCL}: Federated contrastive learning for multi-center medical image classification},
+  author  = {others},
+  journal = {Pattern Recognition},
+  volume  = {143},
+  pages   = {109739},
+  year    = {2023}
+}
+
+@article{flda2023,  %% VERIFY authors
+  title   = {Federated multi-source domain adversarial adaptation framework for
+             machinery fault diagnosis with data privacy},
+  author  = {others},
+  journal = {Reliability Engineering and System Safety},
+  volume  = {236},
+  pages   = {109246},
+  year    = {2023}
+}
+
+@article{fedadv2022,  %% VERIFY authors
+  title   = {Federated adversarial domain generalization network: A novel machinery
+             fault diagnosis method with data privacy},
+  author  = {others},
+  journal = {Knowledge-Based Systems},
+  volume  = {256},
+  pages   = {109880},
+  year    = {2022}
+}
+
+% ---- DG (non-federated) background ------------------------------------------
+@article{zhou2022dgsurvey,  %% VERIFY
+  title   = {Domain Generalization: A Survey},
+  author  = {Zhou, Kaiyang and Liu, Ziwei and Qiao, Yu and Xiang, Tao and Loy, Chen Change},
+  journal = {IEEE Transactions on Pattern Analysis and Machine Intelligence},
+  year    = {2022}
+}
