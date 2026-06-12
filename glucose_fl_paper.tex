@@ -365,7 +365,7 @@ only strategies that yield a single deployable global model (Local-mean, FedAvg,
 FedProx, MLDG) receive an OOD score. We report root-mean-squared error (RMSE) in
 mg/dL at the 30-minute and 60-minute horizons. All runs use early stopping on
 average validation MSE (patience~5 over a maximum of 25 communication rounds),
-and every configuration is repeated over three random seeds (42, 43, 44); we
+and every configuration is repeated over 5 random seeds. We
 report the mean and standard deviation across seeds.
 
 \subsection*{Implementation and training details}
