@@ -224,7 +224,150 @@ real across institutions and borders, not just simulated.
 
 % ===========================================================================
 \section*{Materials and methods}
-% TODO: datasets, forecasting model, federated system architecture, methods compared.
+
+\subsection*{Datasets and federation setup}
+
+We use five publicly available type-1 diabetes (T1D) continuous glucose
+monitoring (CGM) datasets. Four serve as the federated clients --- HUPA-UCM,
+ABC4D, ARISES, and T1D-UOM --- with \emph{one dataset per client}. Each dataset
+originates from a distinct study, population, and device, so a per-dataset
+partition makes every client a genuinely different domain rather than an
+arbitrary shard of a pooled corpus; this is what lets the federation function as
+a test of cross-domain generalisation. The fifth dataset, ReplaceBG, is never
+seen during training and is used only as a held-out, out-of-distribution (OOD)
+test client to measure how well a federated model transfers to a cohort that
+contributed no data to training. All splits are by patient ID, so no patient
+appears in both training and evaluation.
+
+Table~\ref{tab:datasets} summarises each cohort. Mean and standard deviation of
+CGM are reported in mg/dL, and time-in-range (TIR) is the fraction of CGM
+readings in the clinical 70--180 mg/dL band.
+
+\begin{table}[!ht]
+\begin{adjustwidth}{-2.25in}{0in}
+\centering
+\caption{\bf Federated client cohorts.}
+\begin{tabular}{lrrrrr}
+\thickhline
+dataset & patients & total windows & mean CGM & sd CGM & TIR (\%) \\
+        &          &               & (mg/dL)  & (mg/dL) & 70--180  \\
+\hline
+HUPA-UCM & 22 & 291,728 & 140.9 & 56.6 & 72.2 \\
+ABC4D    & 25 & 562,043 & 155.1 & 63.4 & 65.5 \\
+ARISES   & 12 & 126,248 & 160.5 & 63.7 & 63.7 \\
+T1D-UOM  & 14 & 300,796 & 151.6 & 59.9 & 70.5 \\
+\thickhline
+\end{tabular}
+\begin{flushleft} ReplaceBG (OOD test client) is excluded from training and
+reported separately. ARISES is both the highest-glucose and the smallest cohort.
+\end{flushleft}
+\label{tab:datasets}
+\end{adjustwidth}
+\end{table}
+
+\subsection*{Preprocessing and windowing}
+
+Every cohort is resampled to a uniform 5-minute grid. We form supervised
+examples with a sliding window of 72 samples (6\,h) of CGM context to forecast
+the next 12 samples (60\,min), advancing the window one sample at a time
+(stride~1). Windows that would bridge a sensor gap longer than 6 samples
+(30\,min) are discarded, so every example is contiguous. CGM is normalised with
+a single \emph{global} mean and standard deviation ($154.04 \pm 61.00$ mg/dL)
+shared across all clients rather than per-client statistics; a common
+normalisation keeps the global model's input scale identical at every site,
+which is what allows weights aggregated across clients to be applied directly to
+the OOD cohort. Alongside CGM, each example carries a time-of-day mark encoded
+as $(\sin 2\pi\,\mathrm{frac},\ \cos 2\pi\,\mathrm{frac})$, where $\mathrm{frac}$
+is the fraction of the day, to expose circadian structure.
+
+\subsection*{Forecasting model}
+
+The forecaster is a sequence-to-sequence (encoder--decoder) Transformer that maps
+the 72-step CGM context to the 12-step horizon. It uses
+$d_{\text{model}}=128$, 8 attention heads, 6 encoder layers, 2 decoder layers,
+feed-forward width $d_{\text{ff}}=2048$, ReLU activations, and dropout~$0.05$
+($\approx 4.9$\,M parameters). The decoder predicts a single CGM channel
+($c_{\text{out}}=1$) and the model is trained with mean-squared-error (MSE) loss.
+The same architecture is used for every client and every federated strategy, so
+all comparisons differ only in how the model is trained, not in capacity.
+
+\paragraph{Bolus input variant.}
+To test whether insulin information improves forecasting, we additionally train a
+two-channel variant ($\texttt{enc\_in}=2$) in which a second encoder channel
+carries $\log(1+\mathrm{bolus}_{\mathrm{IU}})$, the log-transformed bolus insulin
+dose; bolus events are sparse (roughly 1\% of timesteps are non-zero). The
+decoder remains CGM-only. We report this variant as a delta against the
+CGM-only model.
+
+\subsection*{Federated learning system}
+
+Training is coordinated by a from-scratch, networked federated learning system
+in which one institution runs a server and each cohort runs a client. The server
+holds the global model weights but never sees any data: at round one it mints a
+single seeded set of initial weights and broadcasts them, so every client begins
+from byte-identical parameters regardless of hardware. Each round, clients fetch
+the current global weights, train locally on their own cohort, and return updated
+weights; the server aggregates them by FedAvg and advances to the next round.
+Clients communicate with the server over plain HTTP through a small task
+state-machine (train\,$\rightarrow$\,validate\,$\rightarrow$\,test), so the same
+protocol carries FedAvg, FedProx, and MLDG without modification --- the choice of
+strategy is entirely client-side, and the server always performs the same FedAvg
+aggregation. We validate the system end-to-end across two physically separate
+machines communicating over the public internet, and describe how the design
+generalises to a geographically distributed, multi-country deployment.
+
+\subsection*{Federated strategies and baselines}
+
+\textbf{Local (baseline).} Our primary comparator is local training: a separate
+model trained on a single cohort's data only, with no federation. The central
+question of the benchmark is whether federation improves on this baseline ---
+both when evaluated on the same cohorts that participated (held-in) and on the
+unseen OOD cohort. For OOD we report the mean over the four single-cohort models.
+
+\textbf{FedAvg / FedProx.} Standard federated averaging, and FedProx, which adds
+a proximal term $(\mu/2)\lVert w - w_{\text{global}}\rVert^2$ to each client's
+objective ($\mu=0.05$) to limit client drift.
+
+\textbf{MLDG.} Meta-learning for domain generalisation, adapted to the federated
+setting: at each client step the patient domains are split into meta-train and
+meta-test partitions, and the model is updated with a second-order meta-gradient
+(the inner step reuses the outer Adam optimiser state). MLDG and FedProx alter
+only client-side training; the server still FedAvg-aggregates.
+
+\textbf{Personalised FL (PFL).} APFL learns a per-client mixture
+$\alpha v_i + (1-\alpha)w$ of a personal model $v_i$ and the global model $w$
+with an adaptively updated $\alpha$ (initial $0.25$, $\alpha$ learning
+rate~$0.1$); we also include a decoupled APFL variant. Ditto trains a personal
+model pulled toward the global one by a proximal term ($\mu\in\{0.01,0.1,1.0\}$).
+These methods produce one personalised model per client and \emph{no} single
+global model, so --- like the local baseline's per-cohort models --- they are
+evaluated held-in only and cannot be applied to the OOD cohort.
+
+\subsection*{Evaluation protocol and metrics}
+
+We evaluate every strategy in two regimes. \emph{Held-in} performance is measured
+on each participating cohort's own held-out patients, isolating predictive
+accuracy at the contributing sites. \emph{OOD} performance is measured on
+ReplaceBG, which contributed no training data, isolating cross-domain transfer;
+only strategies that yield a single deployable global model (Local-mean, FedAvg,
+FedProx, MLDG) receive an OOD score. We report root-mean-squared error (RMSE) in
+mg/dL at the 30-minute and 60-minute horizons. All runs use early stopping on
+average validation MSE (patience~5 over a maximum of 25 communication rounds),
+and every configuration is repeated over three random seeds (42, 43, 44); we
+report the mean and standard deviation across seeds.
+
+\subsection*{Implementation and training details}
+
+All models are trained with the Adam optimiser (learning rate~$10^{-4}$, weight
+decay~$10^{-3}$, batch size~256, one local epoch per communication round); we use
+Adam rather than AdamW throughout for parity with the MLDG meta-update. The
+federated system is implemented in Python using only the standard library for
+networking (no third-party FL framework). Each client runs on a single GPU; the
+local demonstration co-locates all four clients on one GPU, while the real
+deployment places one client per machine.
+
+% TODO: data availability + ethics statement (public de-identified datasets);
+% architecture figure for the FL system.
 
 \section*{Results}
 % TODO
