@@ -228,8 +228,9 @@ real across institutions and borders, not just simulated.
 \subsection*{Datasets and federation setup}
 
 We use five publicly available type-1 diabetes (T1D) continuous glucose
-monitoring (CGM) datasets. Four serve as the federated clients --- HUPA-UCM,
-ABC4D, ARISES, and T1D-UOM --- with \emph{one dataset per client}. Each dataset
+monitoring (CGM) datasets. Four serve as the federated clients --- HUPA-UCM
+\cite{hidalgo2024hupaucm}, ABC4D, ARISES, and T1D-UOM
+\cite{alsuhaymi2025t1duom} --- with \emph{one dataset per client}. Each dataset
 originates from a distinct study, population, and device, so a per-dataset
 partition makes every client a genuinely different domain rather than an
 arbitrary shard of a pooled corpus; this is what lets the federation function as
@@ -239,14 +240,26 @@ test client to measure how well a federated model transfers to a cohort that
 contributed no data to training. All splits are by patient ID, so no patient
 appears in both training and evaluation.
 
+Two of the four client cohorts, HUPA-UCM and T1D-UOM, together with the held-out
+ReplaceBG cohort, are obtained through MetaboNet
+\cite{wolff2026metabonet}, a recently released resource that consolidates many
+public T1D datasets into a single harmonised schema with a common 5-minute grid
+and unified CGM, insulin, and carbohydrate fields. Drawing these cohorts from
+MetaboNet ensures their variables are already aligned to a shared format; the
+remaining two cohorts, ABC4D and ARISES, are converted into the same schema
+from their original releases. We do not adopt MetaboNet's own train/test split,
+which allows the same patient to appear in both partitions; instead we pool the
+data and re-split strictly by patient.
+
 Table~\ref{tab:datasets} summarises each cohort. Mean and standard deviation of
 CGM are reported in mg/dL, and time-in-range (TIR) is the fraction of CGM
 readings in the clinical 70--180 mg/dL band.
 
 \begin{table}[!ht]
-\begin{adjustwidth}{-2.25in}{0in}
 \centering
+\captionsetup{justification=centering,singlelinecheck=on}
 \caption{\bf Federated client cohorts.}
+\label{tab:datasets}
 \begin{tabular}{lrrrrr}
 \thickhline
 dataset & patients & total windows & mean CGM & sd CGM & TIR (\%) \\
@@ -258,11 +271,10 @@ ARISES   & 12 & 126,248 & 160.5 & 63.7 & 63.7 \\
 T1D-UOM  & 14 & 300,796 & 151.6 & 59.9 & 70.5 \\
 \thickhline
 \end{tabular}
-\begin{flushleft} ReplaceBG (OOD test client) is excluded from training and
-reported separately. ARISES is both the highest-glucose and the smallest cohort.
-\end{flushleft}
-\label{tab:datasets}
-\end{adjustwidth}
+\begin{center}
+{\small ReplaceBG (OOD test client) is excluded from training and reported
+separately. ARISES is both the highest-glucose and the smallest cohort.}
+\end{center}
 \end{table}
 
 \subsection*{Preprocessing and windowing}
