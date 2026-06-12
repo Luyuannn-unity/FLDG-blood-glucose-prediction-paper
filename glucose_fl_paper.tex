@@ -71,7 +71,7 @@
 % Title must be 250 characters or less. Sentence case.
 \begin{flushleft}
 {\Large
-\textbf{Federated and meta-learned blood-glucose forecasting across sites: a cross-country deployment and a domain-generalisation benchmark}
+\textbf{Federated and meta-learned blood-glucose forecasting across sites: a domain-generalisation benchmark and a cross-country deployment}
 }
 \newline
 \\
@@ -128,130 +128,113 @@ much of the early evaluation~\cite{marling2020ohio}. The
 transformer~\cite{vaswani2017attention} and its long-horizon time-series
 variants~\cite{zhou2021informer,wu2021autoformer} have since been adapted to
 glucose, with personalised, uncertainty-aware transformer forecasters reporting
-state-of-the-art accuracy~\cite{sergazinov2023gluformer}, and the curation of
-multiple public CGM datasets into shared prediction
-benchmarks~\cite{sergazinov2024glucobench} has exposed how strongly measured
-performance depends on the cohort and the evaluation protocol. A clinically
-important caveat runs through this literature: at short horizons glucose is
-highly autocorrelated, so a naive persistence predictor is a deceptively strong
-baseline, and apparent differences between sophisticated models can be small
-once that floor is accounted for. Crucially, almost all of this work assumes
-centrally pooled data and a single training distribution, leaving open how such
-models behave when training must be distributed across heterogeneous,
-privacy-siloed cohorts.
+state-of-the-art accuracy~\cite{sergazinov2023gluformer,sergazinov2024glucobench}.
+These models are accurate when trained and evaluated on the same cohort, but how
+well they transfer across cohorts is an open question~\cite{ghimire2024generalize}:
+glucose dynamics, demographics, and devices differ from site to site, and a model
+can degrade on populations it did not see in training~\cite{farahmand2025glumind}.
+A model that has only seen one cohort therefore has little reason to generalise to
+the next; robust generalisation instead calls for training over large, diverse
+populations spanning many sites.
 
-That assumption is the field's central practical obstacle. Deep forecasters are
-data-hungry, and their accuracy and---more importantly---their ability to
-generalise to new patients depend on training over large, diverse populations.
-Yet CGM traces are sensitive personal health records, fragmented across
-hospitals, clinical trials, device manufacturers, and national registries, and
-bound by data-protection regimes such as the GDPR and HIPAA that make pooling
-raw records across institutions, let alone across borders, legally and ethically
-fraught. The data that models need (large, heterogeneous corpora) and the data
-that exist (many small, governed silos) are mismatched. Federated learning (FL)
-was introduced to resolve exactly this tension~\cite{mcmahan2017fedavg}:
-participating sites train on their own data and exchange only model updates, so a
-shared model can be learned without any raw record leaving its institution. FL
-has been embraced as a foundational technology for collaborative medical machine
-learning~\cite{rieke2020future,sheller2020federated,kaissis2020secure}.
-Statistical heterogeneity across sites is its central difficulty: plain
-federated averaging degrades when client distributions diverge, motivating
-proximal regularisation~\cite{li2020fedprox} and control-variate variance
-reduction~\cite{karimireddy2020scaffold} to stabilise aggregation. This body of
-work, however, is evaluated almost entirely in simulation, where ``clients'' are
-partitions of one dataset on a single machine.
+Large, diverse training data is exactly what is hardest to assemble. CGM traces
+are sensitive personal health records, fragmented across hospitals, clinical
+trials, device manufacturers, and national registries, and governed by
+data-protection regimes such as the GDPR and HIPAA that restrict moving raw
+records between institutions, let alone across borders. The data that improve
+generalisation and the data that exist are thus mismatched: large, heterogeneous
+corpora are what is needed, but what is available is many small, governed silos.
+Federated learning (FL) addresses this tension~\cite{mcmahan2017fedavg}: sites
+train on their own data and exchange only model updates, so a shared model is
+learned without any raw record leaving its institution. On this basis FL has been
+widely adopted for collaborative medical machine
+learning~\cite{rieke2020future,sheller2020federated,kaissis2020secure}. Its
+central difficulty is statistical heterogeneity: plain federated averaging
+degrades when client distributions diverge, motivating proximal
+regularisation~\cite{li2020fedprox} and control-variate variance
+reduction~\cite{karimireddy2020scaffold}. Most of this work, however, is evaluated
+in simulation, where ``clients'' are partitions of one dataset on a single
+machine.
 
-\textbf{This exposes a first gap: federated glucose models are almost never
-deployed, only simulated.} Simulation elides the problems that actually arise
-when sites are real, physically separate, and internationally distributed:
-establishing connectivity across institutional firewalls without exposing public
-ports; ensuring that clients with mismatched hardware, operating systems, and
-numerical-library versions produce mutually compatible updates; agreeing on a
-byte-identical model initialisation across heterogeneous machines; and
-synchronising rounds when participants come and go. These are not incidental
-engineering details---they determine whether a federation can run at all, and
-they constrain which algorithms are admissible. The gap between a simulated
-federation and a deployed one is the gap between a result and a usable system.
-
-Real CGM cohorts also differ in device generation, demographics, treatment
-protocols, and glycaemic regime, and these differences widen across countries. A
-federated model must therefore cope with substantial domain shift: it should
-generalise to patients, and even whole cohorts, it never trained on (domain
+Even with federation, real CGM cohorts differ in device generation, demographics,
+treatment protocols, and glycaemic regime, and these differences widen across
+countries. A federated model must therefore cope with substantial domain shift: it
+should generalise to patients, and even whole cohorts, it never trained on (domain
 generalisation), and/or specialise to each site (personalisation). Domain
 generalisation seeks models that transfer to unseen
-distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain
-generalisation (MLDG) simulates train/test domain shift within each update so the
-model learns to generalise rather than memorise~\cite{li2018mldg}. Bringing these
-ideas into federation is an active area surveyed by Li et
-al.~\cite{li2024fedDGsurvey}, and the dominant families map onto the methods we
-compare. Meta-learning approaches adapt the model-agnostic meta-learning
-objective to federation, for communication-efficient
-convergence~\cite{chen2018fedmeta} or for models that personalise to a new client
-in a few gradient steps~\cite{fallah2020perfedavg}. Personalisation approaches
-keep a per-client model: APFL learns an adaptive convex mixture of the global and
-a local model~\cite{deng2020apfl}, while Ditto regularises each client's personal
-model toward the global one with a tunable proximal
-strength~\cite{li2021ditto}. Representation-alignment approaches reduce
+distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain generalisation
+(MLDG) simulates train/test domain shift within each update so the model learns to
+generalise rather than memorise~\cite{li2018mldg}. Bringing these ideas into
+federation is an active area surveyed by Li et al.~\cite{li2024fedDGsurvey}, and
+the dominant families map onto the methods we compare. Meta-learning approaches
+adapt the model-agnostic meta-learning objective to federation, for
+communication-efficient convergence~\cite{chen2018fedmeta} or for models that
+personalise to a new client in a few gradient steps~\cite{fallah2020perfedavg}.
+Personalisation approaches keep a per-client model: APFL learns an adaptive convex
+mixture of the global and a local model~\cite{deng2020apfl}, while Ditto
+regularises each client's personal model toward the global one with a tunable
+proximal strength~\cite{li2021ditto}. Representation-alignment approaches reduce
 cross-client shift in feature space, via model-contrastive
 objectives~\cite{li2021moon}, federated contrastive learning for multi-centre
 medical imaging~\cite{fedcl2023}, or adversarial domain alignment for federated
 generalisation~\cite{flda2023,fedadv2022}.
 
-\textbf{This exposes a second gap: the methods that handle cross-site
-heterogeneity are rarely compared head-to-head, and their evaluation hides
-confounds.} These methods are seldom benchmarked on a common glucose-forecasting
-task, and evaluations rarely separate the two regimes that matter
-clinically---accuracy on patients from training cohorts (held-in) versus accuracy
-on entirely unseen cohorts (out of distribution, OOD). We find these regimes can
-disagree, and that strong OOD numbers can arise from a covariate-match
-artifact, in which a model trained on a cohort whose glucose distribution happens
-to coincide with the held-out one generalises well for reasons unrelated to its
-training algorithm---an effect easily mistaken for genuine methodological skill.
-We also find that the \emph{type} of personalisation matters: an adaptive
-global/local mixture can collapse toward the global model on the most
+\textbf{Yet these methods are rarely compared head-to-head for glucose
+forecasting, and their evaluations can hide confounds.} They are seldom benchmarked
+against one another on a common task, and evaluations rarely separate the two
+regimes that matter clinically---accuracy on patients from the training cohorts
+(held-in) versus accuracy on entirely unseen cohorts (out of distribution, OOD).
+We find these regimes can disagree, and that strong OOD numbers can arise from a
+covariate-match artifact, in which a model trained on a cohort whose glucose
+distribution happens to coincide with the held-out one generalises well for
+reasons unrelated to its training algorithm---an effect easily mistaken for genuine
+methodological skill. We also find that the \emph{type} of personalisation matters:
+an adaptive global/local mixture can collapse toward the global model on the most
 heterogeneous cohort, whereas a structural split (a shared encoder with a
-client-specific decoder) recovers it.
+client-specific decoder) recovers it. Closing this gap---comparing federated
+strategies on one glucose task under a shared protocol, and reporting held-in and
+OOD performance honestly---is the main focus of this paper.
 
-Finally, a smaller body of work treats FL as a deployed system rather than an
-algorithm, addressing client--server communication, fault tolerance, and the
-heterogeneity of real participating devices. Production frameworks exist, but they
-carry substantial dependencies and assumptions that can be ill-suited to a small
-clinical consortium that simply wants a handful of sites, one cohort each, to
-train together. To our knowledge, an end-to-end, networked, cross-site federation
-for CGM forecasting---validated on physically separate machines and designed for
-multi-country operation---has not previously been reported.
+A second, more practical observation is that almost all federated glucose work is
+simulated rather than deployed, with ``clients'' as partitions of one dataset on a
+single machine. Running a federation for real additionally requires networked,
+physically separate sites to exchange updates and to start from a common model;
+production FL frameworks can do this but carry substantial dependencies and
+assumptions that can be ill-suited to a small clinical consortium that simply wants
+a handful of sites, one cohort each, to train together. We therefore also ask a
+feasibility question: whether a lightweight cross-site federation for CGM
+forecasting can be built and run across real machines with minimal tooling.
 
-This paper addresses both gaps with two co-equal contributions. First, we build,
-from scratch, a real cross-site FL system for CGM forecasting and validate it on
-physically separate machines rather than in a simulator. It comprises a stateless
-aggregation server that holds the global model but no data, and lightweight
-clients that each wrap one institution's cohort; communication uses only the
-standard library over HTTP, so a participating site can be handed a single
-bundle, install one requirements file, and join with one command. The server
-mints and broadcasts the initial weights so that every client begins
-byte-identical regardless of hardware, and the same protocol carries FedAvg,
-FedProx, and meta-learned (MLDG) training with the choice made entirely
-client-side. We report an end-to-end run across two physically distinct machines
-connected over the public internet through a reverse SSH tunnel, and describe the
-design that extends this to a geographically distributed, multi-country
-deployment. Second, we contribute a controlled domain-generalisation benchmark of
-federated strategies for transformer-based glucose forecasting. Using a common
-encoder--decoder transformer and four real T1D cohorts as federated clients, plus
-held-out cohorts as OOD test sites, we compare single-cohort local training,
-FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and Ditto) under a
-multi-seed protocol. Our analysis shows that meta-learned federation (MLDG) is
-generally the strongest method both held-in and OOD; that federation clearly
-beats the average local model out of distribution; that the apparent OOD ``win''
-of a single small cohort is the covariate-match artifact described above rather
-than method skill, and how to detect it; that the one cohort where pooling hurts
-on its own distribution is recovered by structural rather than mixture-style
+This paper makes one primary contribution and one secondary one. \textbf{Our
+primary contribution is a controlled domain-generalisation benchmark of federated
+strategies for transformer-based glucose forecasting.} Using a common
+encoder--decoder transformer and four real T1D cohorts as federated clients, with
+additional held-out cohorts as OOD test sites, we compare single-cohort local
+training, FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and Ditto)
+under a multi-seed protocol. Our analysis shows that meta-learned federation
+(MLDG) is generally the strongest method both held-in and OOD; that federation
+clearly beats the average local model out of distribution; that an apparent OOD
+``win'' of a single small cohort is the covariate-match artifact described above
+rather than method skill, and how to detect it; that the one cohort where pooling
+hurts on its own distribution is recovered by structural rather than mixture-style
 personalisation; and that, at the 30-minute horizon, all methods operate close to
 a persistence-dominated ceiling, so the lever for further gains is exogenous
 inputs such as insulin bolus rather than larger models.
 
-Taken together, the system shows that federated glucose forecasting can be run,
-not just simulated, across institutions and borders, and the benchmark shows
-which federated strategy to run and how to evaluate it honestly.
+\textbf{As a secondary contribution, we show that such a federation can be run for
+real, not only simulated.} We build, from scratch, a lightweight cross-site FL
+system for CGM forecasting: a stateless aggregation server that holds the global
+model but no data, and clients that each wrap one institution's cohort,
+communicating over HTTP using only the Python standard library. The server
+broadcasts the initial weights so every client starts from an identical model, and
+the same protocol carries FedAvg, FedProx, and MLDG training. We validate it
+end-to-end across two physically separate machines connected over the public
+internet, and describe how the design extends to a geographically distributed,
+multi-country deployment.
+
+Taken together, the benchmark shows which federated strategy to run and how to
+evaluate it honestly, while the system shows that such a federation can be run for
+real across institutions and borders, not just simulated.
 
 % ===========================================================================
 \section*{Materials and methods}
