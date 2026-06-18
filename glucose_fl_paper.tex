@@ -371,12 +371,9 @@ report the mean and standard deviation across seeds.
 \subsection*{Implementation and training details}
 
 All models are trained with the Adam optimiser (learning rate~$10^{-4}$, weight
-decay~$10^{-3}$, batch size~256, one local epoch per communication round); we use
-Adam rather than AdamW throughout for parity with the MLDG meta-update. The
+decay~$10^{-3}$, batch size~256, one local epoch per communication round). The
 federated system is implemented in Python using only the standard library for
-networking (no third-party FL framework). Each client runs on a single GPU; the
-local demonstration co-locates all four clients on one GPU, while the real
-deployment places one client per machine.
+networking.
 
 % TODO: data availability + ethics statement (public de-identified datasets);
 % architecture figure for the FL system.
