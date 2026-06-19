@@ -104,15 +104,15 @@ Name1 Surname\textsuperscript{1*}
 % ===========================================================================
 \section*{Introduction}
 
-Type~1 diabetes (T1D) affects an estimated nine million people worldwide and its
-incidence is rising in every region~\cite{idf2021}. People living with T1D must
+Type~1 diabetes (T1D) affects an estimated 8.4~million people worldwide and its
+incidence is rising in many regions~\cite{idf2021,gregory2022t1dindex}. People living with T1D must
 continually balance insulin, food, and activity to keep blood glucose within a
 narrow target range; sustained excursions above or below that range drive both
 the acute dangers of hypoglycaemia and the long-term microvascular and
 cardiovascular complications of hyperglycaemia. Continuous glucose monitoring
-(CGM), which reports interstitial glucose every five minutes, is now the
-standard of care and the basis on which clinical outcomes such as time in range
-are defined~\cite{battelino2019tir}. The same dense data stream makes
+(CGM), which reports interstitial glucose roughly every five minutes, is now
+central to diabetes care; it underpins clinical outcomes such as time in range,
+for which international consensus targets have been defined~\cite{battelino2019tir}. The same dense data stream makes
 short-horizon glucose \emph{forecasting} clinically valuable: a reliable
 prediction of where glucose will be in 30--60 minutes can trigger preemptive
 alerts, inform bolus and snack decisions, and close the loop in automated
@@ -120,7 +120,7 @@ insulin-delivery systems~\cite{vettoretti2020advanced,bekiari2018ap}.
 
 Short-horizon CGM forecasting has progressed from autoregressive and classical
 machine-learning models to deep sequence models. Recurrent architectures with
-calibrated uncertainty established strong baselines on benchmark
+predictive variance estimation established strong baselines on benchmark
 cohorts~\cite{martinsson2020}, and standardised datasets and challenges shaped
 much of the early evaluation~\cite{marling2020ohio}. The
 transformer~\cite{vaswani2017attention} and its long-horizon time-series
@@ -163,7 +163,7 @@ generalisation seeks models that transfer to unseen
 distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain generalisation
 (MLDG) simulates train/test domain shift within each update so the model learns to
 generalise rather than memorise~\cite{li2018mldg}. Bringing these ideas into
-federation is an active area surveyed by Li et al.~\cite{li2024fedDGsurvey},
+federation is an active area surveyed by Li et al.~\cite{li2025fedDGsurvey},
 spanning several families. Meta-learning approaches adapt the model-agnostic
 meta-learning objective to federation, for communication-efficient
 convergence~\cite{chen2018fedmeta} or for models that personalise to a new client
@@ -227,6 +227,11 @@ real across institutions and borders, not just simulated.
 
 \subsection*{Datasets and federation setup}
 
+% REVIEW (citation check 2026-06-19): Table~\ref{tab:datasets} patient counts
+% disagree with the source dataset papers -- HUPA-UCM is 22 here vs 25 in
+% Hidalgo et al. 2024; T1D-UOM is 14 here vs 17 in Alsuhaymi et al. 2025 (21
+% enrolled, 4 withdrew). These are presumably our usable post-filtering subsets;
+% either reconcile the numbers or state the filtering criterion explicitly.
 We use five publicly available type-1 diabetes (T1D) continuous glucose
 monitoring (CGM) datasets. Four serve as the federated clients --- HUPA-UCM
 \cite{hidalgo2024hupaucm}, ABC4D, ARISES, and T1D-UOM
@@ -563,6 +568,122 @@ adaptation of finetuning, so that the global model and its local specialisations
 are trained jointly rather than in sequence. As populations and devices drift over
 time, continual and adaptive federation --- updating the shared model as cohorts
 evolve --- is a further direction this framework is positioned to support.
+
+% ###########################################################################
+% #  TEMPORARY SECTION -- NOT FOR SUBMISSION                                 #
+% #  Scratch summary of prior published results on our four cohorts, to see  #
+% #  where they sit relative to our numbers (Table~\ref{tab:main}).          #
+% #  Plain-text citations (these refs are not yet in references.bib).        #
+% #  DELETE before submission, or migrate the comparable rows into Results/  #
+% #  Discussion with proper \cite keys.                                      #
+% ###########################################################################
+\clearpage
+\section*{[TEMP] Prior published results on our cohorts}
+
+\textbf{Read the protocol column before comparing.} Our benchmark uses a strict
+\emph{by-patient} split, a 5-minute grid, and reports RMSE in mg/dL at the
+30-minute horizon as mean\,$\pm$\,sd \emph{across 5 seeds}. Almost every paper
+below differs on at least one of these axes --- most use a \emph{by-time}
+(chronological within-patient) split, which is an easier task because the test
+patients are seen during training, and several report sd \emph{across patients}
+rather than seeds. Numbers are therefore \emph{indicative}, not head-to-head.
+
+\begin{table}[!ht]
+\centering
+\captionsetup{justification=centering,singlelinecheck=on}
+\caption{\bf [TEMP] External results on HUPA-UCM, ABC4D, ARISES, T1D-UOM.}
+\label{tab:prior}
+\begin{tabular}{lllll}
+\thickhline
+study (best model) & cohort & RMSE@30 (mg/dL) & split & sd over \\
+\hline
+\multicolumn{5}{l}{\emph{Comparable horizon/metric (RMSE @ 30\,min)}} \\
+GlucoFM-Bench (LSTM, full-shot) & HUPA-UCM & 16.71 (4.82) & by-time 80/20 & patients \\
+GlucoFM-Bench (LSTM, full-shot) & T1D-UOM  & 20.81 (4.26) & by-time 80/20 & patients \\
+FCNN (Zhu, evidential+meta)     & ARISES   & 20.23 $\pm$ 3.38 & by-time 64/16/20 & patients \\
+FCNN (Zhu, evidential+meta)     & ABC4D    & 20.25 $\pm$ 2.60 & by-time 64/16/20 & patients \\
+\hline
+\multicolumn{5}{l}{\emph{Not directly comparable (see notes)}} \\
+Tan \& McBeth (Transformer-evid.) & HUPA-UCM & MARD 4.14\% & by-time 60/20/20 & --- \\
+AEGIS (XGBoost)                   & T1D-UOM  & 0.52 mmol/L @15\,min & by-patient (LOPO) & --- \\
+Manchanda (aggregated LSTM)       & HUPA-UCM & 20.50 (5.66)$^\dagger$ & by-time 60/20/20 & patients \\
+Kolev (LightGBM-SDE)              & HUPA-UCM$^\ddagger$ & 28.74 $\pm$ 9.4 & by-time 80/20 & patients \\
+\thickhline
+\end{tabular}
+\begin{center}
+{\small Our by-patient RMSE@30 for reference (Table~\ref{tab:main}, best global
+strategy MLDG): HUPA-UCM 18.46, ABC4D 19.68, ARISES 22.30, T1D-UOM 19.53 mg/dL.
+$^\dagger$Manchanda's figure is a 0--60\,min \emph{window-averaged} RMSE (12-step
+output), not a 30- or 60-min point error, so it is not a horizon-specific number.
+$^\ddagger$Kolev ran on \emph{synthetic} Bergman-model data, not the real
+HUPA-UCM recordings, and pooled it with a synthetic D1NAMO cohort.}
+\end{center}
+\end{table}
+
+\paragraph{GlucoFM-Bench (Lu et al., 2026) --- HUPA-UCM, T1D-UOM.} A benchmark of
+time-series foundation models (Chronos-2, Moirai~2.0, Timer, TimesFM~2.5, plus
+LSTM/Transformer baselines and TimeLLM/CALF) for \emph{univariate} CGM
+forecasting across 15 datasets. \emph{Split:} chronological per-participant
+(first 80\% train / last 20\% test), explicitly chosen to avoid the variance of
+participant-level splits --- i.e.\ the opposite choice to ours. \emph{Features:}
+CGM only, no insulin/carbs/covariates, 12\,h context, 15-min grid.
+\emph{Best RMSE@30 (full-shot):} a lightweight LSTM, HUPA-UCM 16.71 (4.82),
+T1D-UOM 20.81 (4.26) mg/dL; sd is across patients. These are the most directly
+relevant external numbers, but the by-time split makes them an easier task than
+ours; their HUPA-UCM 16.7 vs our by-patient 18.5 is consistent with that.
+
+\paragraph{FCNN (Zhu et al., IEEE TBME 2023) --- ARISES, ABC4D.} A personalised
+forecaster: bidirectional-GRU + attention, with evidential regression for
+uncertainty and MAML/Reptile meta-learning for fast per-subject adaptation;
+baselines SVR, RFR, ARIMA, Bi-LSTM, Transformer, CRNN. \emph{Split:} two-step
+chronological per-subject (64/16/20). \emph{Features:} CGM + meal carbohydrate +
+bolus insulin (5-min). \emph{Best RMSE@30 (FCNN):} ARISES 20.23\,$\pm$\,3.38,
+ABC4D 20.25\,$\pm$\,2.60 mg/dL; sd across subjects, single run (no seed
+variation). Note this is the same ARISES/ABC4D source (Imperial College) we use;
+our by-patient ARISES (MLDG 22.30, Ditto 21.98) and FCNN's by-time 20.23 differ
+in the expected direction given the harder split and the extra insulin/carb
+inputs they use.
+
+\paragraph{Tan \& McBeth (2026) --- HUPA-UCM, MARD only.} Uncertainty-aware
+LSTM/GRU/Transformer with MC-dropout and deep evidential regression. \emph{Split:}
+chronological per-patient 60/20/20. \emph{Features:} CGM + bolus + carbs + one of
+\{heart rate, steps, calories, basal\}. Reports \emph{no RMSE} --- accuracy is
+MARD and DTS error-grid zone-A; best model (Transformer-evidential) reaches MARD
+4.14\% and zone-A 96.8\% at 30\,min with heart-rate input. Useful only as a
+qualitative MARD point.
+
+\paragraph{AEGIS (Pansheriya \& Asadinia, IEEE CCWC 2026) --- T1D-UOM.} An
+end-to-end prediction + risk-classification + bolus-advice pipeline; prediction by
+MLP vs XGBoost (XGBoost best). \emph{Split:} \emph{leave-one-patient-out} --- the
+only external paper that, like us, evaluates on unseen patients. But it forecasts
+only 10/15\,min (explicitly abandoned $>$30\,min for ``inadequate data density''),
+reports in mmol/L, and gives no sd. XGBoost @15\,min RMSE 0.517 mmol/L
+($\approx$9.3 mg/dL). \emph{Features:} CGM + bolus + carbs + activity (MET/steps)
++ circadian, 14 engineered features. Same by-patient philosophy as ours but a much
+shorter horizon, so not directly comparable on RMSE@30.
+
+\paragraph{Lower-value comparisons.} \emph{Manchanda et al.\ (Diabetology 2025)}
+trains individualised vs aggregated LSTMs on HUPA-UCM (CGM + carbs + bolus + basal,
+chronological 60/20/20); its headline 20.50 (5.66) mg/dL is a 0--60\,min
+window-averaged RMSE over a 12-step output, \emph{not} a horizon-specific number,
+so it should not be cited as a 30- or 60-min result. \emph{Kolev et al.\ (Appl.\
+Sci.\ 2026)} benchmarks 10 ML methods (best: a hybrid LightGBM + stochastic Bergman
+model, 28.74\,$\pm$\,9.4 mg/dL @30\,min) but ran entirely on \emph{synthetic} data
+(the real HUPA-UCM server returned HTTP~403) pooled with synthetic D1NAMO, so it
+does not constitute a real-data baseline.
+
+\paragraph{Takeaway for positioning.} On HUPA-UCM and T1D-UOM the only strong
+real-data RMSE@30 baselines are GlucoFM-Bench's, and on ARISES/ABC4D they are
+FCNN's --- but all four use by-time splits, so our by-patient numbers are not
+expected to beat them and should not be framed as doing so. The honest framing is
+that our results are in the same 17--22 mg/dL range as prior work \emph{under a
+strictly harder (by-patient) protocol}, and that no prior paper reports all four
+cohorts, separates held-in from OOD, or evaluates across-patient generalisation as
+we do.
+
+% ###########################################################################
+% #  END TEMPORARY SECTION                                                   #
+% ###########################################################################
 
 % ===========================================================================
 % Compile references.bib with the plos2025.bst style (ships with PLOS template).
