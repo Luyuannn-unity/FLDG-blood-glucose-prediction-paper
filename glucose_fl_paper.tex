@@ -307,7 +307,10 @@ feed-forward width $d_{\text{ff}}=2048$, ReLU activations, and dropout~$0.05$
 The same architecture is used for every client and every federated strategy, so
 all comparisons differ only in how the model is trained, not in capacity.
 
-\paragraph{Bolus input variant.}
+\paragraph{Bolus input variant}
+
+Not quite sure if I should include this. It is somewhat irrelevant?
+
 To test whether insulin information improves forecasting, we additionally train a
 two-channel variant ($\texttt{enc\_in}=2$) in which a second encoder channel
 carries $\log(1+\mathrm{bolus}_{\mathrm{IU}})$, the log-transformed bolus insulin
@@ -316,6 +319,8 @@ decoder remains CGM-only. We report this variant as a delta against the
 CGM-only model.
 
 \subsection*{Federated learning system}
+
+TO DO: Add details about where training takes place physically.
 
 Training is coordinated by a from-scratch, networked federated learning system
 in which one institution runs a server and each cohort runs a client. The server
@@ -442,22 +447,8 @@ OOD. The personalised methods do not change the held-in picture --- their
 averages cluster around FedAvg's ($20.1$--$20.4$) --- and by construction they
 cannot be deployed on the OOD cohort.
 
-\paragraph{The hardest cohort benefits most from personalisation.} ARISES, the
-smallest and highest-glucose cohort, is the hardest client for every strategy
-($\approx 22$ mg/dL). It is the one client where the global strategies are
-\emph{not} best: Ditto ($\mu{=}0.01$, $21.98$) and the dedicated ARISES-only
-model ($22.04$) edge out FedAvg and MLDG, indicating that a small, distinctive
-cohort gains from a personalised or dedicated model in-domain --- the same
-dedicated model that, as noted above, generalises worst of all out-of-domain.
-
-\paragraph{Adding bolus insulin does not improve forecasting.} The two-channel
-CGM\,+\,bolus variant matches the CGM-only model to within seed noise and is, if
-anything, marginally worse. The held-in averages are essentially unchanged
-(MLDG $20.05$ vs.\ $19.99$; FedAvg $20.15$ vs.\ $20.09$ mg/dL) and the OOD scores
-are within $0.1$ mg/dL (MLDG $21.34$ in both; FedAvg $21.48$ vs.\ $21.43$). The
-ranking of strategies is identical in both input regimes. With bolus events
-non-zero at only $\approx 1\%$ of timesteps, the sparse insulin signal adds no
-measurable forecasting value at the 30-minute horizon over CGM history alone.
+\paragraph{Finetuning with replaceBG} 
+So FL + finetuning works better on replace BG. Experiment still running so will report on that later.
 
 \section*{Discussion}
 % TODO
