@@ -451,7 +451,118 @@ cannot be deployed on the OOD cohort.
 So FL + finetuning works better on replace BG. Experiment still running so will report on that later.
 
 \section*{Discussion}
-% TODO
+
+\paragraph{Principal findings.} Across four real T1D cohorts federated as
+distinct domains, with a fifth never-seen cohort as an out-of-distribution (OOD)
+test, federation matched single-cohort local training in-domain and transferred
+substantially better out of it. Held-in, the global FedAvg and MLDG models were
+on par with cohort-specific local training (average RMSE $20.09$ and $19.99$
+vs.\ $20.15$ mg/dL at the 30-minute horizon); OOD, both improved on the mean
+single-cohort model (ReplaceBG $21.43$ and $21.34$ vs.\ $23.54$ mg/dL) and did
+so far more reliably. Among the strategies that yield a single deployable global
+model, MLDG was the strongest both held-in and OOD. Beyond the benchmark, we
+showed that the federation runs for real: the same protocol trains FedAvg,
+FedProx, and MLDG across physically separate machines communicating over the
+public internet, with no raw data leaving any site.
+
+\paragraph{Federation as a robustness guarantee, not only an accuracy gain.} The
+clearest message of the benchmark is not that federation is marginally more
+accurate in-domain --- the held-in gap over local training is small --- but that
+it removes a deployment risk that single-cohort training cannot. A model trained
+on one cohort can transfer catastrophically: the ARISES-only model, accurate on
+its own patients ($22.04$ mg/dL), collapsed on ReplaceBG ($28.51 \pm 6.85$ mg/dL)
+and drove most of the local baseline's high OOD variance (sd $1.65$ mg/dL). The
+difficulty is that one cannot know in advance which site's model will be the one
+that fails. Federation removes this gamble: every global model we trained
+generalised to the unseen cohort, and none collapsed. For a clinical setting in
+which distribution shift is inevitable --- new patients, new device generations,
+changing treatment protocols --- this robustness is itself the deployment
+argument, independent of any in-domain accuracy difference.
+
+\paragraph{Generalisation versus personalisation, and how to have both.} Our
+results expose a genuine tension. The personalised strategies (Ditto, APFL) and
+dedicated single-cohort models were the \emph{only} approaches that beat the
+federated models on the hardest and smallest in-domain cohort: on ARISES, Ditto
+($\mu{=}0.01$, $21.98$ mg/dL) and the dedicated ARISES model ($22.04$ mg/dL) edged
+MLDG ($22.30$). Yet these same methods produce no single global model and so
+cannot serve the OOD cohort at all --- exactly the regime in which the global
+models are most valuable. The two objectives pull in opposite directions:
+specialising to a site helps that site but forfeits transfer; generalising across
+sites transfers but leaves per-site accuracy on the table. The way to obtain both
+is to treat the generalised global model as a foundation and adapt it locally,
+rather than choosing one regime outright.
+
+\paragraph{Finetuning a federated model for a new site.}
+% TODO (finetuning experiment in progress): report finetuning the global federated
+% model on ReplaceBG vs.\ training a model on ReplaceBG from scratch. Expected
+% message: the federated model is not only a better zero-shot OOD predictor but
+% also a better \emph{starting point} --- finetuning it on a new site's data beats
+% local-only training there, so a newly joining centre benefits twice (a robust
+% global model out of the box, then a personalised model that exceeds what its own
+% data could train alone). Fill in numbers and the delta over local once the runs
+% complete.
+[Finetuning results to be added once the experiment completes.]
+
+\paragraph{Why meta-learning helps.} That MLDG was the best global strategy, both
+held-in on average and OOD, is consistent with its objective: by splitting each
+client's patient domains into meta-train and meta-test partitions and updating so
+that progress on one transfers to the other, MLDG optimises directly for the
+cross-domain transfer we evaluate, rather than for in-distribution fit alone. The
+effect is real but modest --- MLDG's margin over plain FedAvg is small relative to
+the gap between any federated method and single-cohort training. The dominant
+effect is federation itself; the choice of federated strategy is a second-order
+refinement, with MLDG the best-supported default and FedProx the weakest of the
+three here.
+
+\paragraph{Implications for a clinical consortium.} These findings give a small
+group of institutions a concrete reason to federate and a recipe for doing so.
+A participating centre loses nothing in-domain, gains a model that will not
+collapse under distribution shift, and --- once finetuning is accounted for ---
+can adapt the shared model to outperform what its own data could train in
+isolation. Because no raw record leaves any institution, this collaboration is
+compatible with data-protection regimes that would otherwise forbid pooling, and
+our cross-machine deployment shows the necessary tooling is light enough for a
+consortium without dedicated federated-learning infrastructure. The benefit also
+compounds: each additional cohort makes the shared model more representative, so
+the incentive to join strengthens as the federation grows.
+
+\paragraph{Strengths.} Three features distinguish this study from prior federated
+glucose work. First, it compares local training, FedAvg, FedProx, MLDG, and two
+personalised-FL families head-to-head on one task under a shared protocol, rather
+than reporting a single method in isolation. Second, it separates held-in from
+OOD performance, a distinction that prior evaluations rarely make explicit but
+that proves decisive: the strategies are nearly indistinguishable in-domain yet
+differ sharply in transfer. Third, the cohorts are partitioned strictly by
+patient and normalised with a single shared statistic, and the federation is run
+across real, physically separate machines rather than simulated as shards of one
+dataset on one host.
+
+\paragraph{Limitations.} Several constraints bound these conclusions. Our
+strongest claim --- robust OOD transfer --- rests on a single held-out cohort
+(ReplaceBG); a larger panel of OOD cohorts is needed to establish how broadly the
+generalisation holds. A small number of seeds are missing (the OOD run for FedAvg
+and FedProx at one seed; one T1D-UOM seed), and we report seed means and standard
+deviations without a formal significance test, so the smaller margins --- notably
+MLDG over FedAvg --- should be read as suggestive rather than definitive. We
+report the 30-minute horizon here and leave the 60-minute horizon to a fuller
+analysis. Privacy in our system means that raw data never moves, but we provide no
+formal guarantee: we do not add secure aggregation or differential privacy, and a
+determined adversary could in principle attack the exchanged updates. Finally, all
+five cohorts are adult T1D populations, leaving paediatric and type-2 transfer
+untested, and we deliberately scope the benchmark to meta-learning and
+personalisation, leaving representation-alignment federated methods to future
+work.
+
+\paragraph{Future work.} The natural next steps follow directly from these
+limitations: evaluating against more OOD cohorts and, ultimately, a true
+multi-country deployment; adding secure aggregation and differential privacy to
+turn the no-data-movement property into a formal guarantee; extending to longer
+horizons and to event-aware inputs such as insulin and carbohydrate information;
+and systematically combining the generalisation of MLDG with the per-site
+adaptation of finetuning, so that the global model and its local specialisations
+are trained jointly rather than in sequence. As populations and devices drift over
+time, continual and adaptive federation --- updating the shared model as cohorts
+evolve --- is a further direction this framework is positioned to support.
 
 % ===========================================================================
 % Compile references.bib with the plos2025.bst style (ships with PLOS template).
