@@ -483,9 +483,7 @@ APFL variant. Ditto trains a personal model pulled toward the global one by a
 proximal term ($\mu\in\{0.01,0.1,1.0\}$). These methods produce one personalised
 model per client and \emph{no} single global model, so --- like the local
 baseline's per-cohort models --- they are evaluated held-in only and cannot be
-applied to the OOD cohorts. We flag that the APFL mixing weight may not have moved
-far from its initial value in our runs; its numbers should therefore be read as a
-lower bound on what a fully tuned APFL could achieve.
+applied to the OOD cohorts.
 
 \subsection*{Evaluation protocol and metrics}
 
@@ -503,15 +501,18 @@ main tables readable we use 30 minutes throughout and confine the longer horizon
 to a single summary table. Neither figure is a window average over the forecast
 horizon; both are the error at that specific step.
 
-\emph{OOD test sets.} Each held-out cohort is split by patient in the same way as
-the clients, and we score OOD performance on its held-out \emph{test} patients
-only. For ReplaceBG this is a 21-patient test split. We use that split rather than
-the whole cohort deliberately: it is the same set of patients on which the
-ReplaceBG-from-scratch and the finetuned models are evaluated (see below), so the
-zero-shot, from-scratch, and finetuned arms are all compared on an identical test
-set. Because no ReplaceBG patient contributes to federated training, these test
-patients are unseen in the strong sense --- unseen cohort \emph{and} unseen
-individual. All runs use early stopping on average validation MSE (patience~5 over a
+\emph{OOD test sets.} No patient from any held-out cohort contributes to federated
+training, so every OOD test patient is unseen in the strong sense --- unseen
+cohort \emph{and} unseen individual. BrisT1D and Flair are used purely as test
+cohorts, and we score on all of their patients. ReplaceBG is treated differently
+because it additionally serves the adaptation experiment: we split it by patient
+and score OOD performance on its 21-patient held-out \emph{test} split only. That
+is deliberate --- those are the same patients on which the ReplaceBG-from-scratch
+and finetuned models are evaluated, so the zero-shot, from-scratch and finetuned
+arms are compared on an identical test set. The consequence is that the ReplaceBG
+OOD figure is computed over fewer patients than the BrisT1D and Flair figures;
+absolute errors should therefore be compared \emph{within} a cohort, not across
+them. All runs use early stopping on average validation MSE (patience~5 over a
 maximum of 25 communication rounds), and every configuration is repeated over 5
 random seeds (42, 43, 44, 46, 47; seed 45 was not run). We report the mean and
 standard deviation across seeds; the global and single-cohort runs are complete
@@ -663,6 +664,24 @@ held-in and on all three OOD cohorts), but it was run at a single untuned $\mu$,
 so this is not a tuned ranking. The personalised methods do not change the
 held-in picture --- their averages cluster around FedAvg's ($20.1$--$20.4$) ---
 and by construction cannot be deployed on the OOD cohorts.
+
+\paragraph{The personalised methods converge back toward the global model.} The
+personalised strategies do more than fail to beat federation --- given the freedom
+to choose how much to personalise, they largely choose not to. APFL deploys a
+mixture $\alpha v_i + (1-\alpha) w$ of a personal model $v_i$ and the global model
+$w$ with $\alpha$ learned during training. Starting from $\alpha = 0.25$, the
+learned $\alpha$ falls to $0.02$--$0.08$ by the final round in every seed
+(mean over clients), so the deployed model ends up roughly $95\%$ global: APFL's
+own adaptive weighting concludes that the personal model is not worth much on this
+task. Ditto tells the same story from the opposite direction. Its proximal
+strength $\mu$ controls how hard the personal model is pulled toward the global
+one, and the configuration with the \emph{strongest} pull ($\mu = 1.0$) gives the
+best held-in average ($20.09$ mg/dL, matching FedAvg), whereas the most personal
+setting ($\mu = 0.01$) wins only on ARISES ($21.98$) --- the smallest and hardest
+cohort. Personalisation therefore buys something only where a cohort is small and
+idiosyncratic, and even there the margin is a few tenths of a mg/dL; on average,
+these methods migrate back to the global solution while forfeiting the
+out-of-distribution transfer that is federation's main benefit.
 
 \paragraph{A federated model is a competitive starting point for a new site.} We
 next asked whether the federated model helps a \emph{new} site that does
@@ -1094,7 +1113,8 @@ Seed sd also reflects one fixed patient split and understates patient-sampling
 uncertainty. \emph{(iv) Baselines.} We include no persistence or
 simple learned baseline in the main table, so we cannot fully attribute accuracy
 to the transformer versus the training scheme; FedProx used a single untuned
-$\mu$, and APFL may be under-tuned. \emph{(v) Horizon.} We report the 30- and
+$\mu$. (APFL, by contrast, is not under-tuned: its mixing weight is learned, and
+we report where it converges to.) \emph{(v) Horizon.} We report the 30- and
 60-minute horizons; the model does not forecast beyond 60 minutes, so the 90- and
 120-minute horizons reported by some comparators are out of scope. Our parity with
 in-distribution models on ReplaceBG holds at 30 minutes but not at 60, where
