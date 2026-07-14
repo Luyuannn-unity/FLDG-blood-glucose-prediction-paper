@@ -11,7 +11,6 @@ specific claims in the paper. Ordered by what would sink the paper first.
 |---|---|---|
 | 1 | **Sync the 5-seed runs** (you said done, not synced) | I'll re-verify every table against the synced data. Until then the tables rest on the current export. |
 | 2 | **Exact MLDG update spec** — inner learning rate; whether the 2nd-order term is really computed (`create_graph`); what happens to Adam's moment buffers in the inner step | Methods currently says "the exact inner update… will be released with the code." Reviewer 2 called the current description non-reproducible. This is the one method we name in the title. |
-| 3 | **Global normalisation scope** — was the constant (154.04 ± 61.00) computed on the **4 training cohorts only**? | I *assert* in Methods that "the held-out OOD cohort does not contribute to it, so no OOD information enters preprocessing." If that's false, it's a data-leak claim that is wrong, and the whole OOD result is contaminated. **Highest-risk single item.** |
 | 4 | **Sanity-check the GPFormer framing** (Intro para + Methods) | GPFormer (Zhu 2024) already did Transformer+MLDG+zero-shot glucose DG. I reposition us as "same objective, but without pooling, across institutions." If that framing is wrong, a reviewer reads the paper as re-doing GPFormer. |
 | 5 | **Patient-count filtering rule** — HUPA-UCM 22 (vs 25 published), T1D-UOM 14 (vs 17) | Need the explicit inclusion/exclusion criterion. A silent patient drop reads as bias risk. |
 | 6 | **Author names, affiliations, corresponding email** | Still `Name1 Surname` / `correspondingauthor@institute.edu`. |
@@ -29,6 +28,20 @@ specific claims in the paper. Ordered by what would sink the paper first.
 ---
 
 ## ✅ RESOLVED (answered by you)
+
+- **Normalisation constant is clean — NO OOD LEAK.** Confirmed by you and verified in the
+  logs: `mean=154.04, std=61.00` is the *only* normalisation value used anywhere in the run
+  backing the paper (`logs_gpformer_arises_bolus`, 1861 occurrences, no others). It is
+  computed on the four training cohorts, and the held-out cohorts are scored under that same
+  shipped constant — which is also the deployment-realistic setting. The Methods claim
+  ("no OOD information enters preprocessing") is accurate as written.
+  *(Red herring for the record: `mean=159.9, std=61.2` appears in `logs_gpformer_v1`, an
+  obsolete April run — it is a descriptive log of BrisT1D's raw statistics at
+  window-extraction time, not a normalisation being applied.)*
+  ▸ Minor residual: I could not confirm which constant the **ReplaceBG-from-scratch** arm
+  used. If it used ReplaceBG's own statistics, that would *advantage* the from-scratch
+  baseline — making our finetuning win conservative rather than inflated. Worth a one-line
+  check when you sync, but it cannot hurt the claim.
 
 - **ReplaceBG OOD = 21-patient test split** — deliberately the same patients the from-scratch and finetuned arms are tested on. Now stated in Methods.
 - **BrisT1D + Flair = test-only** (all patients scored). Now stated, with the note that ReplaceBG's OOD figure is over fewer patients, so compare *within* cohort, not across.
