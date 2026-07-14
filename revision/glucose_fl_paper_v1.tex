@@ -1,0 +1,707 @@
+% ============================================================================
+%  Federated and meta-learned blood-glucose forecasting across sites
+%  PLOS Digital Health submission (PLOS template v3.8 Apr 2026)
+%
+%  STATUS: Full coherent draft. Abstract, Author summary, Introduction,
+%  Materials and methods, Results (incl. finetuning), and Discussion (incl.
+%  external-comparison subsection) written. Under reviewer-style revision.
+%
+%  NOTE: this uses the PLOS class options and the `cite` package (numeric
+%  Vancouver citations). The bibliography style is `plos2015` (the genuine PLOS
+%  Vancouver BibTeX style; the current template ships an identical file renamed
+%  plos2025.bst). plos2015.bst is committed alongside this .tex so it compiles
+%  as-is on Overleaf. The bib database is references.bib.
+% ============================================================================
+\documentclass[10pt,letterpaper]{article}
+\usepackage[top=0.85in,left=2.75in,footskip=0.75in]{geometry}
+
+\usepackage{amsmath,amssymb}
+\usepackage{changepage}
+\usepackage{textcomp,marvosym}
+\usepackage{cite}
+\usepackage{nameref,hyperref}
+\usepackage[right]{lineno}
+\usepackage[nopatch=eqnum]{microtype}
+\DisableLigatures[f]{encoding = *, family = * }
+\usepackage[table]{xcolor}
+\usepackage{array}
+
+\newcolumntype{+}{!{\vrule width 2pt}}
+\newlength\savedwidth
+\newcommand\thickcline[1]{%
+  \noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+  \cline{#1}%
+  \noalign{\vskip\arrayrulewidth}%
+  \noalign{\global\arrayrulewidth\savedwidth}%
+}
+\newcommand\thickhline{\noalign{\global\savedwidth\arrayrulewidth\global\arrayrulewidth 2pt}%
+\hline
+\noalign{\global\arrayrulewidth\savedwidth}}
+
+% Text layout
+\raggedright
+\setlength{\parindent}{0.5cm}
+\textwidth 5.25in
+\textheight 8.75in
+
+\usepackage[aboveskip=1pt,labelfont=bf,labelsep=period,justification=raggedright,singlelinecheck=off]{caption}
+\renewcommand{\figurename}{Fig}
+
+\bibliographystyle{plos2015}
+
+\makeatletter
+\renewcommand{\@biblabel}[1]{\quad#1.}
+\makeatother
+
+% Header and Footer with logo
+\usepackage{lastpage,fancyhdr,graphicx}
+\usepackage{epstopdf}
+\pagestyle{fancy}
+\fancyhf{}
+\rfoot{\thepage/\pageref{LastPage}}
+\renewcommand{\headrulewidth}{0pt}
+\renewcommand{\footrule}{\hrule height 2pt \vspace{2mm}}
+\fancyheadoffset[L]{2.25in}
+\fancyfootoffset[L]{2.25in}
+\lfoot{\today}
+
+\begin{document}
+\vspace*{0.2in}
+
+% Title must be 250 characters or less. Sentence case.
+\begin{flushleft}
+{\Large
+\textbf{Federated and meta-learned blood-glucose forecasting across sites: a domain-generalisation benchmark and a cross-country deployment}
+}
+\newline
+\\
+Name1 Surname\textsuperscript{1*}
+\\
+\bigskip
+\textbf{1} Affiliation Dept/Program/Center, Institution Name, City, State, Country
+\\
+\bigskip
+
+* correspondingauthor@institute.edu
+
+\end{flushleft}
+
+% Please keep the abstract below 300 words
+\section*{Abstract}
+Short-horizon continuous glucose monitoring (CGM) forecasting can trigger
+preemptive alerts and inform insulin decisions in type~1 diabetes (T1D), but
+deep models that are accurate on their training cohort often transfer poorly to
+new populations, devices, and sites. The diverse, multi-site data that would
+improve generalisation are exactly the data that privacy regulation keeps
+siloed. Federated learning (FL) offers a way to train across sites without
+moving raw records, yet for glucose forecasting the leading federated strategies
+have rarely been compared head-to-head, evaluations seldom separate accuracy on
+the training cohorts (held-in) from accuracy on entirely unseen cohorts
+(out-of-distribution, OOD), and almost all such work is simulated rather than
+run across real machines. We address all three gaps. Using a common
+encoder--decoder transformer and four real T1D cohorts as federated clients ---
+with a fifth, never-seen cohort (ReplaceBG) as an OOD test set --- we benchmark
+single-cohort local training, FedAvg, FedProx, meta-learning for domain
+generalisation (MLDG), and two personalised-FL methods (APFL, Ditto) under a
+strict by-patient split and a five-seed protocol, reporting held-in and OOD RMSE
+separately at the clinically actionable 30-minute horizon. Federation matched
+local training in-domain (held-in average $\approx$20 mg/dL) and transferred
+substantially better out of it: FedAvg (21.4 mg/dL) and MLDG (21.3 mg/dL)
+improved on the mean single-cohort model (23.5 mg/dL) and, unlike it, never
+collapsed on the unseen cohort. MLDG was the strongest deployable global
+strategy, and finetuning the federated model on a new site outperformed training
+there from scratch. To show the approach is not merely a simulation, we built a
+lightweight cross-site FL system --- a stateless server plus per-cohort clients
+communicating over HTTP with only the Python standard library --- and ran it
+end-to-end across two physically separate machines over the public internet.
+Federation thus offers T1D forecasting a robustness guarantee against
+distribution shift, deployable by a small clinical consortium without dedicated
+infrastructure.
+
+% Author Summary: 150-200 words, first person.
+\section*{Author summary}
+People with type~1 diabetes rely increasingly on algorithms that predict where
+their glucose will be in the next half hour. These predictors work well for the
+patients they were trained on but can fail when applied to a different clinic,
+device, or population --- and the varied data that would make them robust are
+scattered across institutions that, for privacy reasons, cannot pool raw
+records. Federated learning lets those institutions train a shared model while
+each keeps its own data in-house. We asked which federated method to use, and
+whether the approach works outside a simulation. Treating four separate
+diabetes studies as collaborating sites, we compared the main federated
+strategies and tested each on a fifth study that contributed no training data.
+We found that federation was as accurate as training on a single cohort for
+patients from the participating sites, and markedly more reliable on the unseen
+cohort: a model trained on one cohort alone sometimes failed badly on new
+patients, whereas every federated model transferred safely. We also built a
+minimal system and ran the training for real across two computers in different
+locations. Our results give a small group of clinics a practical, privacy-
+preserving recipe for building glucose predictors that hold up on patients they
+have never seen.
+
+\clearpage
+\newgeometry{top=0.85in,left=1in,right=1in,footskip=0.75in}
+\linenumbers
+
+% ===========================================================================
+\section*{Introduction}
+
+Type~1 diabetes (T1D) affects an estimated 8.4~million people worldwide and its
+incidence is rising in many regions~\cite{idf2021,gregory2022t1dindex}. People living with T1D must
+continually balance insulin, food, and activity to keep blood glucose within a
+narrow target range; sustained excursions above or below that range drive both
+the acute dangers of hypoglycaemia and the long-term microvascular and
+cardiovascular complications of hyperglycaemia. Continuous glucose monitoring
+(CGM), which reports interstitial glucose roughly every five minutes, is now
+central to diabetes care; it underpins clinical outcomes such as time in range,
+for which international consensus targets have been defined~\cite{battelino2019tir}. The same dense data stream makes
+short-horizon glucose \emph{forecasting} clinically valuable: a reliable
+prediction of where glucose will be in 30--60 minutes can trigger preemptive
+alerts, inform bolus and snack decisions, and close the loop in automated
+insulin-delivery systems~\cite{vettoretti2020advanced,bekiari2018ap}.
+
+Short-horizon CGM forecasting has progressed from autoregressive and classical
+machine-learning models to deep sequence models. Recurrent architectures with
+predictive variance estimation established strong baselines on benchmark
+cohorts~\cite{martinsson2020}, and standardised datasets and challenges shaped
+much of the early evaluation~\cite{marling2020ohio}. The
+transformer~\cite{vaswani2017attention} and its long-horizon time-series
+variants~\cite{zhou2021informer,wu2021autoformer} have since been adapted to
+glucose, with personalised, uncertainty-aware transformer forecasters reporting
+state-of-the-art accuracy~\cite{sergazinov2023gluformer,sergazinov2024glucobench}.
+These models are accurate when trained and evaluated on the same cohort, but how
+well they transfer across cohorts is an open question~\cite{ghimire2024generalize}:
+glucose dynamics, demographics, and devices differ from site to site, and a model
+can degrade on populations it did not see in training~\cite{farahmand2025glumind}.
+A model that has only seen one cohort therefore has little reason to generalise to
+the next; robust generalisation instead calls for training over large, diverse
+populations spanning many sites.
+
+Large, diverse training data is exactly what is hardest to assemble. CGM traces
+are sensitive personal health records, fragmented across hospitals, clinical
+trials, device manufacturers, and national registries, and governed by
+data-protection regimes such as the GDPR and HIPAA that restrict moving raw
+records between institutions, let alone across borders. The data that improve
+generalisation and the data that exist are thus mismatched: large, heterogeneous
+corpora are what is needed, but what is available is many small, governed silos.
+Federated learning (FL) addresses this tension~\cite{mcmahan2017fedavg}: sites
+train on their own data and exchange only model updates, so a shared model is
+learned without any raw record leaving its institution. On this basis FL has been
+widely adopted for collaborative medical machine
+learning~\cite{rieke2020future,sheller2020federated,kaissis2020secure}. Its
+central difficulty is statistical heterogeneity: plain federated averaging
+degrades when client distributions diverge, motivating proximal
+regularisation~\cite{li2020fedprox} and control-variate variance
+reduction~\cite{karimireddy2020scaffold}. Most of this work, however, is evaluated
+in simulation, where ``clients'' are partitions of one dataset on a single
+machine.
+
+Even with federation, real CGM cohorts differ in device generation, demographics,
+treatment protocols, and glycaemic regime, and these differences widen across
+countries. A federated model must therefore cope with substantial domain shift: it
+should generalise to patients, and even whole cohorts, it never trained on (domain
+generalisation), and/or specialise to each site (personalisation). Domain
+generalisation seeks models that transfer to unseen
+distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain generalisation
+(MLDG) simulates train/test domain shift within each update so the model learns to
+generalise rather than memorise~\cite{li2018mldg}. Bringing these ideas into
+federation is an active area surveyed by Li et al.~\cite{li2025fedDGsurvey},
+spanning several families. Meta-learning approaches adapt the model-agnostic
+meta-learning objective to federation, for communication-efficient
+convergence~\cite{chen2018fedmeta} or for models that personalise to a new client
+in a few gradient steps~\cite{fallah2020perfedavg}. Personalisation approaches keep
+a per-client model: APFL learns an adaptive convex mixture of the global and a
+local model~\cite{deng2020apfl}, while Ditto regularises each client's personal
+model toward the global one with a tunable proximal strength~\cite{li2021ditto}.
+Other approaches instead align client representations, via model-contrastive
+objectives~\cite{li2021moon}, federated contrastive learning for multi-centre
+medical imaging~\cite{fedcl2023}, or adversarial domain
+alignment~\cite{flda2023,fedadv2022}. Our benchmark covers the first two
+families---meta-learning (MLDG) and personalisation (APFL, Ditto)---alongside
+standard federated averaging (FedAvg, FedProx) and single-cohort local training,
+and leaves representation-alignment methods to future work.
+
+\textbf{Yet these methods are rarely compared head-to-head for glucose
+forecasting.} They are seldom benchmarked against one another on a common task, and
+evaluations rarely separate the two regimes that matter clinically---accuracy on
+patients from the training cohorts (held-in) versus accuracy on entirely unseen
+cohorts (out of distribution, OOD)---even though a method can behave quite
+differently in the two. Closing this gap---comparing federated strategies on one
+glucose task under a shared protocol, with held-in and OOD performance reported
+separately---is the main focus of this paper.
+
+A second, more practical observation is that almost all federated glucose work is
+simulated rather than deployed, with ``clients'' as partitions of one dataset on a
+single machine. Running a federation for real additionally requires networked,
+physically separate sites to exchange updates and to start from a common model;
+production FL frameworks can do this but carry substantial dependencies and
+assumptions that can be ill-suited to a small clinical consortium that simply wants
+a handful of sites, one cohort each, to train together. We therefore also ask a
+feasibility question: whether a lightweight cross-site federation for CGM
+forecasting can be built and run across real machines with minimal tooling.
+
+This paper makes one primary contribution and one secondary one. \textbf{Our
+primary contribution is a controlled domain-generalisation benchmark of federated
+strategies for transformer-based glucose forecasting.} Using a common
+encoder--decoder transformer and four real T1D cohorts as federated clients, with
+additional held-out cohorts as OOD test sites, we compare single-cohort local
+training, FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and Ditto)
+under a multi-seed protocol, reporting held-in and OOD accuracy separately at the
+clinically actionable 30-minute horizon.
+
+\textbf{As a secondary contribution, we show that such a federation can be run for
+real, not only simulated.} We build, from scratch, a lightweight cross-site FL
+system for CGM forecasting: a stateless aggregation server that holds the global
+model but no data, and clients that each wrap one institution's cohort,
+communicating over HTTP using only the Python standard library. The server
+broadcasts the initial weights so every client starts from an identical model, and
+the same protocol carries FedAvg, FedProx, and MLDG training. We validate it
+end-to-end across two physically separate machines connected over the public
+internet, and describe how the design extends to a geographically distributed,
+multi-country deployment.
+
+Taken together, the benchmark shows which federated strategy to run and how to
+evaluate it honestly, while the system shows that such a federation can be run for
+real across institutions and borders, not just simulated.
+
+% ===========================================================================
+\section*{Materials and methods}
+
+\subsection*{Datasets and federation setup}
+
+% REVIEW (citation check 2026-06-19): Table~\ref{tab:datasets} patient counts
+% disagree with the source dataset papers -- HUPA-UCM is 22 here vs 25 in
+% Hidalgo et al. 2024; T1D-UOM is 14 here vs 17 in Alsuhaymi et al. 2025 (21
+% enrolled, 4 withdrew). These are presumably our usable post-filtering subsets;
+% either reconcile the numbers or state the filtering criterion explicitly.
+We use five publicly available type-1 diabetes (T1D) continuous glucose
+monitoring (CGM) datasets. Four serve as the federated clients --- HUPA-UCM
+\cite{hidalgo2024hupaucm}, ABC4D, ARISES, and T1D-UOM
+\cite{alsuhaymi2025t1duom} --- with \emph{one dataset per client}. Each dataset
+originates from a distinct study, population, and device, so a per-dataset
+partition makes every client a genuinely different domain rather than an
+arbitrary shard of a pooled corpus; this is what lets the federation function as
+a test of cross-domain generalisation. The fifth dataset, ReplaceBG
+\cite{aleppo2017replacebg}, is never seen during training and is used only as a
+held-out, out-of-distribution (OOD) test client to measure how well a federated model transfers to a cohort that
+contributed no data to training. Within each client, we partition patients
+into disjoint train, validation, and test groups, splitting strictly by
+patient ID so that no patient contributes data to more than one group. Every
+window in the validation and test sets therefore comes from a patient never
+seen during training, and reported performance measures generalisation to
+unseen patients rather than to unseen windows of patients already observed.
+
+Two of the four client cohorts, HUPA-UCM and T1D-UOM, together with the held-out
+ReplaceBG cohort, are obtained through MetaboNet
+\cite{wolff2026metabonet}, a recently released resource that consolidates many
+public T1D datasets into a single harmonised schema with a common 5-minute grid
+and unified CGM, insulin, and carbohydrate fields. Drawing these cohorts from
+MetaboNet ensures their variables are already aligned to a shared format; the
+remaining two cohorts, ABC4D and ARISES, are converted into the same schema
+from their original releases. We do not adopt MetaboNet's own train/test split,
+which allows the same patient to appear in both partitions; instead we pool the
+data and re-split strictly by patient.
+
+Table~\ref{tab:datasets} summarises each cohort. Mean and standard deviation of
+CGM are reported in mg/dL, and time-in-range (TIR) is the fraction of CGM
+readings in the clinical 70--180 mg/dL band.
+
+\begin{table}[!ht]
+\centering
+\captionsetup{justification=centering,singlelinecheck=on}
+\caption{\bf Federated client cohorts.}
+\label{tab:datasets}
+\begin{tabular}{lrrrrr}
+\thickhline
+dataset & patients & total windows & mean CGM & sd CGM & TIR (\%) \\
+        &          &               & (mg/dL)  & (mg/dL) & 70--180  \\
+\hline
+HUPA-UCM & 22 & 291,728 & 140.9 & 56.6 & 72.2 \\
+ABC4D    & 25 & 562,043 & 155.1 & 63.4 & 65.5 \\
+ARISES   & 12 & 126,248 & 160.5 & 63.7 & 63.7 \\
+T1D-UOM  & 14 & 300,796 & 151.6 & 59.9 & 70.5 \\
+\thickhline
+\end{tabular}
+\begin{center}
+{\small ReplaceBG (OOD test client) is excluded from training and reported
+separately. ARISES is both the highest-glucose and the smallest cohort.}
+\end{center}
+\end{table}
+
+\subsection*{Preprocessing and windowing}
+
+Every cohort is resampled to a uniform 5-minute grid. We form supervised
+examples with a sliding window of 72 samples (6\,h) of CGM context to forecast
+the next 12 samples (60\,min), advancing the window one sample at a time
+(stride~1). Windows that would bridge a sensor gap longer than 6 samples
+(30\,min) are discarded, so every example is contiguous. CGM is normalised with
+a single \emph{global} mean and standard deviation ($154.04 \pm 61.00$ mg/dL)
+shared across all clients rather than per-client statistics; a common
+normalisation keeps the global model's input scale identical at every site,
+which is what allows weights aggregated across clients to be applied directly to
+the OOD cohort. Alongside CGM, each example carries a time-of-day mark encoded
+as $(\sin 2\pi\,\mathrm{frac},\ \cos 2\pi\,\mathrm{frac})$, where $\mathrm{frac}$
+is the fraction of the day, to expose circadian structure.
+
+\subsection*{Forecasting model}
+
+The forecaster is a sequence-to-sequence (encoder--decoder) Transformer that maps
+the 72-step CGM context to the 12-step horizon. It uses
+$d_{\text{model}}=128$, 8 attention heads, 6 encoder layers, 2 decoder layers,
+feed-forward width $d_{\text{ff}}=2048$, ReLU activations, and dropout~$0.05$
+($\approx 4.9$\,M parameters). The decoder predicts a single CGM channel
+($c_{\text{out}}=1$) and the model is trained with mean-squared-error (MSE) loss.
+The same architecture is used for every client and every federated strategy, so
+all comparisons differ only in how the model is trained, not in capacity.
+
+\paragraph{Bolus input variant}
+As a secondary analysis, we test whether adding an exogenous input improves
+forecasting. We train a two-channel variant ($\texttt{enc\_in}=2$) in which a
+second encoder channel carries $\log(1+\mathrm{bolus}_{\mathrm{IU}})$, the
+log-transformed bolus insulin dose; bolus events are sparse (roughly 1\% of
+timesteps are non-zero). The decoder remains CGM-only. Because bolus fields are
+harmonised only across a subset of the cohorts and the effect proves small
+relative to seed-to-seed variation, we treat this as a preliminary sensitivity
+check and report it as a delta against the CGM-only model rather than as a main
+result.
+
+\subsection*{Federated learning system}
+
+Training is coordinated by a from-scratch, networked federated learning system
+in which one institution runs a server and each cohort runs a client. The server
+holds the global model weights but never sees any data: at round one it mints a
+single seeded set of initial weights and broadcasts them, so every client begins
+from byte-identical parameters regardless of hardware. Each round, clients fetch
+the current global weights, train locally on their own cohort, and return updated
+weights; the server aggregates them by FedAvg and advances to the next round.
+Clients communicate with the server over plain HTTP through a small task
+state-machine (train\,$\rightarrow$\,validate\,$\rightarrow$\,test), so the same
+protocol carries FedAvg, FedProx, and MLDG without modification --- the choice of
+strategy is entirely client-side, and the server always performs the same FedAvg
+aggregation. We validate the system end-to-end across two physically separate
+machines communicating over the public internet, and describe how the design
+generalises to a geographically distributed, multi-country deployment.
+
+\subsection*{Federated strategies and baselines}
+
+\textbf{Local (baseline).} Our primary comparator is local training: a separate
+model trained on a single cohort's data only, with no federation. The central
+question of the benchmark is whether federation improves on this baseline ---
+both when evaluated on the same cohorts that participated (held-in) and on the
+unseen OOD cohort. For OOD we report the mean over the four single-cohort models.
+
+\textbf{FedAvg / FedProx.} Standard federated averaging, and FedProx, which adds
+a proximal term $(\mu/2)\lVert w - w_{\text{global}}\rVert^2$ to each client's
+objective ($\mu=0.05$) to limit client drift.
+
+\textbf{MLDG.} Meta-learning for domain generalisation, adapted to the federated
+setting: at each client step the patient domains are split into meta-train and
+meta-test partitions, and the model is updated with a second-order meta-gradient
+(the inner step reuses the outer Adam optimiser state). MLDG and FedProx alter
+only client-side training; the server still FedAvg-aggregates.
+
+\textbf{Personalised FL (PFL).} APFL learns a per-client mixture
+$\alpha v_i + (1-\alpha)w$ of a personal model $v_i$ and the global model $w$
+with an adaptively updated $\alpha$ (initial $0.25$, $\alpha$ learning
+rate~$0.1$); we also include a decoupled APFL variant. Ditto trains a personal
+model pulled toward the global one by a proximal term ($\mu\in\{0.01,0.1,1.0\}$).
+These methods produce one personalised model per client and \emph{no} single
+global model, so --- like the local baseline's per-cohort models --- they are
+evaluated held-in only and cannot be applied to the OOD cohort.
+
+\subsection*{Evaluation protocol and metrics}
+
+We evaluate every strategy in two regimes. \emph{Held-in} performance is measured
+on each participating cohort's own held-out patients, isolating predictive
+accuracy at the contributing sites. \emph{OOD} performance is measured on
+ReplaceBG, which contributed no training data, isolating cross-domain transfer;
+only strategies that yield a single deployable global model (Local-mean, FedAvg,
+FedProx, MLDG) receive an OOD score. We report root-mean-squared error (RMSE) in
+mg/dL at the 30-minute and 60-minute horizons. All runs use early stopping on
+average validation MSE (patience~5 over a maximum of 25 communication rounds),
+and every configuration is repeated over 5 random seeds. We
+report the mean and standard deviation across seeds.
+
+\subsection*{Implementation and training details}
+
+All models are trained with the Adam optimiser (learning rate~$10^{-4}$, weight
+decay~$10^{-3}$, batch size~256, one local epoch per communication round). The
+federated system is implemented in Python using only the standard library for
+networking.
+
+\subsection*{Data and ethics}
+
+All five cohorts are publicly available, de-identified secondary datasets, used
+here under their respective terms of access; no new human-subjects data were
+collected for this study. HUPA-UCM \cite{hidalgo2024hupaucm}, T1D-UOM
+\cite{alsuhaymi2025t1duom}, and ReplaceBG \cite{aleppo2017replacebg} are obtained
+via MetaboNet \cite{wolff2026metabonet}; ABC4D and ARISES are used from their
+original releases. Code for the federated system and the analysis is available
+from the authors.
+% NOTE (author): add a public repository/DOI link and confirm each dataset's
+% access route and licence before submission; add an FL-architecture figure.
+
+\section*{Results}
+
+Table~\ref{tab:main} reports held-in RMSE on each client's unseen test patients
+and OOD RMSE on ReplaceBG, at the 30-minute horizon, for the CGM-only model.
+% TODO: add 60-minute-horizon numbers once the corresponding metrics are exported.
+
+\begin{table}[!ht]
+\centering
+\captionsetup{justification=centering,singlelinecheck=on}
+\caption{\bf CGM-only RMSE (mg/dL) at the 30-minute horizon.}
+\label{tab:main}
+\begin{tabular}{lrrrrrr}
+\thickhline
+ & \multicolumn{5}{c}{held-in (per client)} & OOD \\
+\cline{2-6}
+strategy & HUPA-UCM & ABC4D & ARISES & T1D-UOM & avg & ReplaceBG \\
+\hline
+Local (per cohort) & 18.81 & 19.95 & 22.04 & 19.80 & 20.15 & 23.54 \\
+\hline
+FedAvg  & 18.64 & 19.80 & 22.38 & 19.53 & 20.09 & 21.43 \\
+FedProx & 18.89 & 19.94 & 22.60 & 19.67 & 20.28 & 21.57 \\
+MLDG    & \textbf{18.46} & \textbf{19.68} & 22.30 & 19.53 & \textbf{19.99} & \textbf{21.34} \\
+\hline
+APFL          & 19.11 & 19.88 & 22.53 & 19.61 & 20.28 & --- \\
+APFL-decoupled & 19.37 & 19.90 & 22.47 & 19.73 & 20.37 & --- \\
+Ditto ($\mu{=}0.01$) & 18.90 & 19.90 & \textbf{21.98} & 19.64 & 20.11 & --- \\
+Ditto ($\mu{=}0.1$)  & 18.90 & 19.93 & 22.28 & 19.66 & 20.19 & --- \\
+Ditto ($\mu{=}1.0$)  & 18.74 & 19.77 & 22.35 & \textbf{19.50} & 20.09 & --- \\
+\thickhline
+\end{tabular}
+\begin{center}
+{\small Mean over 5 random seeds (4 where a run is missing). \emph{avg} is the
+mean of the four held-in client means. Local held-in is each cohort's own
+single-cohort model; Local OOD (23.54) is the mean of the four single-cohort
+models on ReplaceBG. Personalised strategies (APFL, Ditto) yield no single
+global model and so receive no OOD score. Best value per column in bold.}
+\end{center}
+\end{table}
+
+\paragraph{Federation matches local accuracy held-in and transfers far better
+out-of-distribution.} On the contributing cohorts, the global FedAvg and MLDG
+models are on par with cohort-specific local training (held-in average $20.09$
+and $19.99$ vs.\ $20.15$ mg/dL): pooling four heterogeneous cohorts through
+federation does not cost in-domain accuracy despite each client seeing only the
+shared global weights. The decisive difference is out-of-distribution. On the
+never-seen ReplaceBG cohort, FedAvg ($21.43$) and MLDG ($21.34$) improve on the
+mean single-cohort model ($23.54$) by more than $2$ mg/dL, and they do so far
+more reliably: the local baseline's OOD error is both higher and much noisier
+across seeds (sd $1.65$ mg/dL), driven by the ARISES-only model, which collapses
+on ReplaceBG ($28.51 \pm 6.85$). A model trained on a single cohort can transfer
+catastrophically; the federated model never does.
+
+\paragraph{MLDG is the strongest global strategy.} Among the strategies that
+produce a deployable global model, MLDG is best on the held-in average and best
+OOD, and is the top method on two of the four clients (HUPA-UCM, ABC4D). FedProx
+is consistently the weakest of the three global strategies here, both held-in and
+OOD. The personalised methods do not change the held-in picture --- their
+averages cluster around FedAvg's ($20.1$--$20.4$) --- and by construction they
+cannot be deployed on the OOD cohort.
+
+\paragraph{A federated model is a better starting point than local-only
+training.} We next asked whether the federated model helps a \emph{new} site
+that does contribute data, by finetuning the global model on ReplaceBG's own
+training patients and comparing against a model trained on ReplaceBG from
+scratch. Finetuning any of the three global models reached a lower RMSE on
+ReplaceBG's held-out patients (FedProx$\rightarrow$finetune $20.98 \pm 0.06$,
+FedAvg$\rightarrow$finetune $21.04 \pm 0.04$, MLDG$\rightarrow$finetune
+$21.04 \pm 0.07$ mg/dL) than training on ReplaceBG alone
+($21.38 \pm 0.09$ mg/dL). The from-scratch model does not even improve on the
+best zero-shot federated model ($21.34$ mg/dL for MLDG), so the federated model
+is both a better out-of-the-box predictor for the new site and a better
+initialisation for adapting to it. A newly joining centre therefore benefits
+twice: a robust global model immediately, then a personalised model that
+exceeds what its own data could train in isolation.
+
+\section*{Discussion}
+
+\paragraph{Principal findings.} Across four real T1D cohorts federated as
+distinct domains, with a fifth never-seen cohort as an out-of-distribution (OOD)
+test, federation matched single-cohort local training in-domain and transferred
+substantially better out of it. Held-in, the global FedAvg and MLDG models were
+on par with cohort-specific local training (average RMSE $20.09$ and $19.99$
+vs.\ $20.15$ mg/dL at the 30-minute horizon); OOD, both improved on the mean
+single-cohort model (ReplaceBG $21.43$ and $21.34$ vs.\ $23.54$ mg/dL) and did
+so far more reliably. Among the strategies that yield a single deployable global
+model, MLDG was the strongest both held-in and OOD. Beyond the benchmark, we
+showed that the federation runs for real: the same protocol trains FedAvg,
+FedProx, and MLDG across physically separate machines communicating over the
+public internet, with no raw data leaving any site.
+
+\paragraph{Federation as a robustness guarantee, not only an accuracy gain.} The
+clearest message of the benchmark is not that federation is marginally more
+accurate in-domain --- the held-in gap over local training is small --- but that
+it removes a deployment risk that single-cohort training cannot. A model trained
+on one cohort can transfer catastrophically: the ARISES-only model, accurate on
+its own patients ($22.04$ mg/dL), collapsed on ReplaceBG ($28.51 \pm 6.85$ mg/dL)
+and drove most of the local baseline's high OOD variance (sd $1.65$ mg/dL). The
+difficulty is that one cannot know in advance which site's model will be the one
+that fails. Federation removes this gamble: every global model we trained
+generalised to the unseen cohort, and none collapsed. For a clinical setting in
+which distribution shift is inevitable --- new patients, new device generations,
+changing treatment protocols --- this robustness is itself the deployment
+argument, independent of any in-domain accuracy difference.
+
+\paragraph{Generalisation versus personalisation, and how to have both.} Our
+results expose a genuine tension. The personalised strategies (Ditto, APFL) and
+dedicated single-cohort models were the \emph{only} approaches that beat the
+federated models on the hardest and smallest in-domain cohort: on ARISES, Ditto
+($\mu{=}0.01$, $21.98$ mg/dL) and the dedicated ARISES model ($22.04$ mg/dL) edged
+MLDG ($22.30$). Yet these same methods produce no single global model and so
+cannot serve the OOD cohort at all --- exactly the regime in which the global
+models are most valuable. The two objectives pull in opposite directions:
+specialising to a site helps that site but forfeits transfer; generalising across
+sites transfers but leaves per-site accuracy on the table. The way to obtain both
+is to treat the generalised global model as a foundation and adapt it locally,
+rather than choosing one regime outright.
+
+\paragraph{Finetuning a federated model for a new site.} The finetuning
+experiment makes this concrete and resolves the tension above in favour of the
+``foundation-then-adapt'' recipe. Finetuning the global federated model on
+ReplaceBG's own patients reached $20.98$--$21.04$ mg/dL, better than either the
+zero-shot federated model ($21.34$ mg/dL) or a model trained on ReplaceBG from
+scratch ($21.38$ mg/dL). Two points are worth drawing out. First, a site's own
+data trained in isolation did \emph{not} beat the federated model even on that
+site's own patients, underscoring how much the shared model contributes.
+Second, the gains from the three global strategies converge once finetuned
+(FedProx, which was weakest zero-shot, is marginally best after finetuning),
+which suggests the choice of federated strategy matters most for zero-shot
+transfer and washes out once local data are available. The practical
+implication is a two-stage protocol: federate to obtain a robust global model,
+then finetune per site --- giving each centre a personalised model that no
+single-cohort training could match, without ever pooling raw data.
+
+\paragraph{Why meta-learning helps.} That MLDG was the best global strategy, both
+held-in on average and OOD, is consistent with its objective: by splitting each
+client's patient domains into meta-train and meta-test partitions and updating so
+that progress on one transfers to the other, MLDG optimises directly for the
+cross-domain transfer we evaluate, rather than for in-distribution fit alone. The
+effect is real but modest --- MLDG's margin over plain FedAvg is small relative to
+the gap between any federated method and single-cohort training. The dominant
+effect is federation itself; the choice of federated strategy is a second-order
+refinement, with MLDG the best-supported default and FedProx the weakest of the
+three here.
+
+\paragraph{Implications for a clinical consortium.} These findings give a small
+group of institutions a concrete reason to federate and a recipe for doing so.
+A participating centre loses nothing in-domain, gains a model that will not
+collapse under distribution shift, and --- once finetuning is accounted for ---
+can adapt the shared model to outperform what its own data could train in
+isolation. Because no raw record leaves any institution, this collaboration is
+compatible with data-protection regimes that would otherwise forbid pooling, and
+our cross-machine deployment shows the necessary tooling is light enough for a
+consortium without dedicated federated-learning infrastructure. The benefit also
+compounds: each additional cohort makes the shared model more representative, so
+the incentive to join strengthens as the federation grows.
+
+\paragraph{Strengths.} Three features distinguish this study from prior federated
+glucose work. First, it compares local training, FedAvg, FedProx, MLDG, and two
+personalised-FL families head-to-head on one task under a shared protocol, rather
+than reporting a single method in isolation. Second, it separates held-in from
+OOD performance, a distinction that prior evaluations rarely make explicit but
+that proves decisive: the strategies are nearly indistinguishable in-domain yet
+differ sharply in transfer. Third, the cohorts are partitioned strictly by
+patient and normalised with a single shared statistic, and the federation is run
+across real, physically separate machines rather than simulated as shards of one
+dataset on one host.
+
+\paragraph{Positioning against prior results on these cohorts.} Our per-cohort
+accuracy is competitive with previously published results on the same datasets,
+which is notable because we evaluate under a strictly harder protocol. The
+distinction is the train/test split. Almost all prior work splits each
+patient's series chronologically --- the first portion for training, the last
+portion for testing (a \emph{by-time} split) --- so every test window comes from
+a patient the model has already seen; the model need only extrapolate forward in
+time for a familiar individual. We instead split \emph{by patient}: test patients
+are disjoint from training patients, so every reported number measures
+generalisation to people the model has never seen. By-patient evaluation is the
+harder task and the one that matches deployment, where a predictor meets new
+patients, but it typically yields higher error than a by-time split on the same
+cohort. Table~\ref{tab:prior} collects the closest comparable external results.
+On HUPA-UCM and T1D-UOM, the strongest real-data RMSE@30 baselines are from
+GlucoFM-Bench \cite{lu2026glucofmbench} (a benchmark of time-series foundation
+models, univariate CGM, by-time split): HUPA-UCM 16.71 and T1D-UOM 20.81 mg/dL.
+On ARISES and ABC4D they are from the personalised evidential meta-learning
+forecaster of Zhu et al.\ \cite{zhu2023fcnn} (CGM plus carbohydrate and insulin,
+by-time split): 20.23 and 20.25 mg/dL. Our by-patient figures for the best
+global strategy (MLDG; HUPA-UCM 18.46, ABC4D 19.68, ARISES 22.30, T1D-UOM 19.53
+mg/dL) sit in the same 17--22 mg/dL range despite the harder split and, on
+HUPA-UCM/T1D-UOM, despite using CGM alone against models that also consume
+insulin and carbohydrate inputs. We therefore do not claim to beat these numbers
+--- a by-patient result is not expected to --- but to match them under an
+evaluation that better reflects deployment. To our knowledge no prior paper
+reports all four of these cohorts, separates held-in from out-of-distribution
+performance, or evaluates across-patient generalisation as we do; the one prior
+work that also splits by patient (AEGIS \cite{pansheriya2026aegis}, on T1D-UOM
+via leave-one-patient-out) forecasts only to 15 minutes and so is not comparable
+at our 30-minute horizon.
+
+\begin{table}[!ht]
+\centering
+\captionsetup{justification=centering,singlelinecheck=on}
+\caption{\bf Published RMSE@30 on our cohorts, with split protocol.}
+\label{tab:prior}
+\begin{tabular}{lllll}
+\thickhline
+study (best model) & cohort & RMSE@30 (mg/dL) & split & sd over \\
+\hline
+GlucoFM-Bench \cite{lu2026glucofmbench} (LSTM) & HUPA-UCM & 16.71 (4.82) & by-time & patients \\
+GlucoFM-Bench \cite{lu2026glucofmbench} (LSTM) & T1D-UOM  & 20.81 (4.26) & by-time & patients \\
+Zhu et al.\ \cite{zhu2023fcnn} (FCNN)          & ARISES   & 20.23 (3.38) & by-time & patients \\
+Zhu et al.\ \cite{zhu2023fcnn} (FCNN)          & ABC4D    & 20.25 (2.60) & by-time & patients \\
+\hline
+\textbf{Ours} (MLDG, global)            & HUPA-UCM & \textbf{18.46 (0.15)} & \textbf{by-patient} & seeds \\
+\textbf{Ours} (MLDG, global)            & ABC4D    & \textbf{19.68} & \textbf{by-patient} & seeds \\
+\textbf{Ours} (MLDG, global)            & ARISES   & \textbf{22.30} & \textbf{by-patient} & seeds \\
+\textbf{Ours} (MLDG, global)            & T1D-UOM  & \textbf{19.53} & \textbf{by-patient} & seeds \\
+\thickhline
+\end{tabular}
+\begin{center}
+{\small A \emph{by-time} split tests on later windows of patients seen during
+training; a \emph{by-patient} split tests on entirely unseen patients and is the
+harder, deployment-relevant task. External sd is across patients; ours is across
+5 seeds. Numbers are indicative, not head-to-head, because the split (and, for
+Zhu et al., the input features) differ. Other papers on these cohorts report
+non-comparable metrics or horizons: Tan \& McBeth \cite{tan2026uncertainty}
+(MARD only), AEGIS \cite{pansheriya2026aegis} (15-min horizon, mmol/L),
+Manchanda et al.\ \cite{manchanda2025lstm} (window-averaged RMSE), and Kolev
+et al.\ \cite{kolev2026benchmark} (synthetic data only).}
+\end{center}
+\end{table}
+
+\paragraph{Limitations.} Several constraints bound these conclusions. Our
+strongest claim --- robust OOD transfer --- rests on a single held-out cohort
+(ReplaceBG); a larger panel of OOD cohorts is needed to establish how broadly the
+generalisation holds. A small number of seeds are missing (the OOD run for FedAvg
+and FedProx at one seed; one T1D-UOM seed), and we report seed means and standard
+deviations without a formal significance test, so the smaller margins --- notably
+MLDG over FedAvg --- should be read as suggestive rather than definitive. We
+report the 30-minute horizon here and leave the 60-minute horizon to a fuller
+analysis. Privacy in our system means that raw data never moves, but we provide no
+formal guarantee: we do not add secure aggregation or differential privacy, and a
+determined adversary could in principle attack the exchanged updates. Finally, all
+five cohorts are adult T1D populations, leaving paediatric and type-2 transfer
+untested, and we deliberately scope the benchmark to meta-learning and
+personalisation, leaving representation-alignment federated methods to future
+work.
+
+\paragraph{Future work.} The natural next steps follow directly from these
+limitations: evaluating against more OOD cohorts and, ultimately, a true
+multi-country deployment; adding secure aggregation and differential privacy to
+turn the no-data-movement property into a formal guarantee; extending to longer
+horizons and to event-aware inputs such as insulin and carbohydrate information;
+and systematically combining the generalisation of MLDG with the per-site
+adaptation of finetuning, so that the global model and its local specialisations
+are trained jointly rather than in sequence. As populations and devices drift over
+time, continual and adaptive federation --- updating the shared model as cohorts
+evolve --- is a further direction this framework is positioned to support.
+
+
+% ===========================================================================
+% Compile references.bib with the plos2025.bst style (ships with PLOS template).
+\bibliography{references}
+
+\end{document}
