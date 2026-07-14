@@ -218,27 +218,9 @@ generalisation), and/or specialise to each site (personalisation). Domain
 generalisation seeks models that transfer to unseen
 distributions~\cite{zhou2022dgsurvey}, and meta-learning for domain generalisation
 (MLDG) simulates train/test domain shift within each update so the model learns to
-generalise rather than memorise~\cite{li2018mldg}.
-
-These ideas have already reached glucose forecasting in the \emph{centralised}
-setting, and one line of work is a direct precursor to ours. Zhu et al.\ propose
-GPFormer~\cite{zhu2024gpformer}, a Transformer trained with MLDG on a single large
-cohort (REPLACE-BG) and evaluated zero-shot on external cohorts; the same group
-subsequently showed that a language-model backbone with insulin and
-electronic-health-record inputs improves in-cohort accuracy
-further~\cite{zhu2026glullm}. GPFormer establishes that meta-learned domain
-generalisation is the right objective for cross-population glucose forecasting,
-and we adopt both its architecture and its MLDG objective rather than reinventing
-them. What it does \emph{not} address is the constraint that motivates this
-paper: GPFormer is trained centrally, on pooled data from one cohort, which is
-precisely what data-protection regimes prevent a multi-institution consortium
-from doing. Our question is therefore what happens when that objective must be
-optimised \emph{without pooling} --- across several institutions that each hold a
-different cohort and cannot exchange raw records --- and how the federated
-alternatives compare with one another under that constraint.
-
-Bringing domain generalisation into federation is an active area surveyed by Li
-et al.~\cite{li2025fedDGsurvey}, spanning several families. Meta-learning approaches adapt the model-agnostic
+generalise rather than memorise~\cite{li2018mldg}. Bringing these ideas into
+federation is an active area surveyed by Li et al.~\cite{li2025fedDGsurvey},
+spanning several families. Meta-learning approaches adapt the model-agnostic
 meta-learning objective to federation, for communication-efficient
 convergence~\cite{chen2018fedmeta} or for models that personalise to a new client
 in a few gradient steps~\cite{fallah2020perfedavg}. Personalisation approaches keep
@@ -384,10 +366,8 @@ is the fraction of the day, to expose circadian structure.
 
 \subsection*{Forecasting model}
 
-The forecaster is GPFormer \cite{zhu2024gpformer}, a sequence-to-sequence
-(encoder--decoder) Transformer for glucose prediction that maps the 72-step CGM
-context to the 12-step horizon. We adopt its architecture unchanged so that our
-comparison isolates the \emph{training} strategy rather than the model. It uses
+The forecaster is a sequence-to-sequence (encoder--decoder) Transformer that maps
+the 72-step CGM context to the 12-step horizon. It uses
 $d_{\text{model}}=128$, 8 attention heads, 6 encoder layers, 2 decoder layers,
 feed-forward width $d_{\text{ff}}=2048$, ReLU activations, and dropout~$0.05$
 ($\approx 4.9$\,M parameters). Decoding is single-shot rather than
@@ -905,82 +885,6 @@ et al.\ \cite{kolev2026benchmark} (synthetic data only).}
 \end{center}
 \end{table}
 
-\paragraph{Zero-shot transfer is competitive with models trained on the target
-cohort.} The comparison above concerns the cohorts we trained on. The sharper test
-is the opposite one: how does our model do on a cohort it has \emph{never seen},
-against models developed directly on that cohort? ReplaceBG allows exactly this
-comparison, because two studies report 30-minute RMSE on it under the same
-protocol we use --- a by-patient hold-out, on a 5-minute grid, as a point error at
-the 30-minute horizon --- so the only difference is that they trained on ReplaceBG
-and we did not (Table~\ref{tab:oodprior}). Our federated MLDG model reaches
-$21.34$ mg/dL on ReplaceBG having never seen a single one of its patients. That
-places it inside the field of models developed on the cohort: better than an
-in-distribution Bi-LSTM ($21.7$), GRU ($22.1$), ARIMA ($28.1$) and SVR ($37.4$),
-level with N-BEATS ($21.2$), TCN ($21.3$) and Crossformer ($21.1$), and behind
-only GluLLM ($20.6$, which additionally consumes insulin and electronic-health-record
-features we do not use) and GPFormer itself ($19.2$) --- the same architecture we
-train, but trained centrally on ReplaceBG rather than federated across four other
-cohorts. The $2.1$ mg/dL gap to GPFormer is, in effect, the price of never seeing
-the target cohort and never pooling raw data, and it is smaller than the spread
-among the in-distribution baselines themselves. Two honest caveats: the published
-studies evaluate on a 46-subject hold-out from within ReplaceBG whereas every
-ReplaceBG patient is unseen to us, so the test sets are not identical (ours is
-arguably the harder setting, but it is not the same one); and reported ReplaceBG
-results vary widely with protocol --- one study reports $9.3$ mg/dL
-\cite{jaloli2023cnnlstm}, but on a 15-minute grid and with a rolling split that
-re-admits test patients to training, which is not comparable to any of the numbers
-here.
-
-\begin{table}[!ht]
-\centering
-\captionsetup{justification=centering,singlelinecheck=on}
-\caption{\bf Our zero-shot result on ReplaceBG against models trained on ReplaceBG.}
-\label{tab:oodprior}
-\begin{tabular}{llcc}
-\thickhline
-model & inputs & trained on ReplaceBG & RMSE@30 \\
-\hline
-GPFormer \cite{zhu2024gpformer}    & CGM                & yes & $19.2$ \\
-GluLLM \cite{zhu2026glullm}        & CGM + insulin + EHR & yes & $20.6$ \\
-Crossformer \cite{zhu2026glullm}   & CGM + insulin + EHR & yes & $21.1$ \\
-N-BEATS \cite{zhu2024gpformer}     & CGM                & yes & $21.2$ \\
-TCN \cite{zhu2026glullm}           & CGM + insulin + EHR & yes & $21.3$ \\
-\textbf{Ours --- MLDG (federated)} & \textbf{CGM}       & \textbf{no} & $\mathbf{21.34}$ \\
-\textbf{Ours --- FedAvg}           & \textbf{CGM}       & \textbf{no} & $\mathbf{21.43}$ \\
-\textbf{Ours --- FedProx}          & \textbf{CGM}       & \textbf{no} & $\mathbf{21.57}$ \\
-Bi-LSTM \cite{zhu2024gpformer}     & CGM                & yes & $21.7$ \\
-GRU \cite{zhu2026glullm}           & CGM + insulin + EHR & yes & $22.1$ \\
-ARIMA \cite{zhu2024gpformer}       & CGM                & yes & $28.1$ \\
-SVR \cite{zhu2024gpformer}         & CGM                & yes & $37.4$ \\
-\thickhline
-\end{tabular}
-\begin{center}
-{\small RMSE (mg/dL) at the 30-minute horizon on ReplaceBG. All rows use a
-by-patient hold-out on a 5-minute grid and report a point error at 30 minutes.
-Every published row was \emph{trained on ReplaceBG}; our three rows were trained
-on four entirely different cohorts and never saw ReplaceBG, so they are zero-shot.
-Published values are read from \cite{zhu2024gpformer,zhu2026glullm}; the two
-sources evaluate on the same 46-subject hold-out, while our models are evaluated
-on ReplaceBG patients all of whom are unseen.}
-\end{center}
-\end{table}
-
-\paragraph{BrisT1D and Flair are, to our knowledge, previously unbenchmarked.} We
-report $26.31$ and $25.05$ mg/dL on these two cohorts, but we deliberately make no
-comparative claim. We could find no published 30-minute-horizon RMSE in mg/dL on
-either. The BrisT1D Kaggle competition \cite{kaggle2024brist1d} targets a
-\emph{60-minute} horizon in mmol/L and is therefore not comparable, and the
-published models that use BrisT1D report errors on a normalised scale. For Flair
-we found no glucose-forecasting benchmark at all. We therefore offer these two
-numbers as zero-shot reference points for future work rather than as wins. One
-property of Flair deserves flagging: it is a hybrid closed-loop (automated
-insulin delivery) cohort \cite{bergenstal2021flair}, and automated delivery
-suppresses glycaemic variability, which tends to make forecasting easier; its
-lower error relative to BrisT1D should be read partly as a property of the cohort
-rather than of the model. The value of these two cohorts here is not that we beat
-anyone on them --- it is that the federated models behave consistently on three
-independent unseen populations while a single-cohort model collapses on all three.
-
 \paragraph{Limitations.} Several constraints bound these conclusions. \emph{(i)
 Evaluation metric.} We report a single aggregate error (RMSE at 30 min). This is
 behind the norm of the comparator literature, which reports clinical error grids
@@ -991,15 +895,11 @@ predictive uncertainty. Whether federation's small advantage survives on
 clinically stratified and event-detection metrics is only partly tested (we
 report time-in-range agreement and prediction lag, below) and a full error-grid
 analysis remains the most important gap for a clinical reading of this work.
-\emph{(ii) OOD breadth and composition.} Our transfer claim rests on three
-held-out cohorts (ReplaceBG, BrisT1D, Flair) --- a replicated rather than single
-observation --- but none stresses paediatric or type-2 populations, and the three
-are not equivalent tests: Flair is a hybrid closed-loop (automated insulin
-delivery) cohort of adolescents and young adults, whose suppressed glycaemic
-variability makes forecasting comparatively easier, whereas BrisT1D is a small
-(24-participant) open-loop young-adult cohort. Absolute errors are therefore not
-comparable \emph{across} the three cohorts; only the within-cohort ranking of
-strategies is. A leave-one-cohort-out design would probe transfer further still. \emph{(iii) Statistical power.} Margins among federated strategies
+\emph{(ii) OOD breadth.} Our transfer claim rests on three held-out cohorts
+(ReplaceBG, BrisT1D, Flair) --- a replicated rather than single observation ---
+but all are adult cohorts and none stresses paediatric, type-2, or a markedly
+different device regime; a leave-one-cohort-out design would probe transfer
+further still. \emph{(iii) Statistical power.} Margins among federated strategies
 ($\le 0.1$ mg/dL) are within seed standard deviation and a paired test at five
 seeds does not reach significance, so we do not claim a ranking; MLDG's
 consistency (best in every comparison, 4/5 seeds) is suggestive but underpowered.

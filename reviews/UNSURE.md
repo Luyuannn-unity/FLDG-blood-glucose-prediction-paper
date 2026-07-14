@@ -194,6 +194,35 @@ Kolev number, added issue/pages to several). Remaining things to confirm at subm
     The ~20-min lag on a 30-min forecast is worth a sanity check from you — it means
     the model leans on recent values. Confirm you're comfortable stating this.
 
+## H. Iteration 4 — new open items (IMPORTANT)
+
+32. **ReplaceBG OOD evaluation subset.** For the new zero-shot comparison table
+    (`tab:oodprior`) I need to know exactly which ReplaceBG patients we evaluate on.
+    `REPORT.md` lists ReplaceBG as 166/21/21 patients with 984,447 test windows. Since
+    we never train on ReplaceBG, is our OOD score computed over **all ~208 patients**, or
+    only the **21 test-split patients**? The published comparators (GPFormer, GluLLM)
+    evaluate on a **46-subject hold-out**. Either way all our test patients are unseen —
+    but I want the sentence in the paper to be exactly right. Please confirm.
+
+33. **Novelty framing vs GPFormer — please read.** GPFormer (Zhu et al., IEEE JBHI 2024)
+    already did Transformer + MLDG + zero-shot glucose domain generalisation on
+    REPLACE-BG, CGM-only. Our model *is* that architecture. I have rewritten the intro to
+    credit it and reposition our contribution as "the same objective, but optimised
+    **without pooling**, across institutions." **Please sanity-check that framing** — it
+    is the single most important positioning decision in the paper, and if we get it wrong
+    a reviewer will read the work as re-doing GPFormer.
+
+34. **Do we want to cite MetaboNet-Bench?** (Jeffries et al., arXiv 2606.18640.) It
+    benchmarks all three of our OOD cohorts — but only as a **pooled 13-dataset aggregate**
+    with no per-dataset breakdown, and **its training pool includes HUPA-UCM and T1D-UOM**
+    (two of our four training cohorts), so it is *not* an independent comparator. I added
+    the bib entry but did not cite it. Say the word and I'll add it with that caveat.
+
+35. **GPFormer's reciprocal data point.** GPFormer reports zero-shot RMSE@30 = **22.9 on
+    ABC4D** — one of *our training* cohorts (we get 19.68 held-in there). That's a nice
+    symmetric comparison (they transfer into our cohort; we transfer into theirs). Want it
+    in the paper?
+
 31. **Bolus is now a full rerun, not preliminary.** Given `output_arises_bolus/bolus`
     has all methods/seeds, I upgraded the bolus text from "preliminary 2-seed" to a
     full sensitivity analysis with the synthesis that **bolus damps the single-ARISES
