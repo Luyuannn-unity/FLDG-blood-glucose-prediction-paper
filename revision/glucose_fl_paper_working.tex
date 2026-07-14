@@ -301,25 +301,13 @@ arbitrary shard of a pooled corpus; this is what lets the federation function as
 a test of cross-domain generalisation. The remaining three datasets ---
 ReplaceBG \cite{aleppo2017replacebg}, BrisT1D, and Flair --- are never seen
 during training and are used only as held-out, out-of-distribution (OOD) test
-cohorts, so that transfer is measured on three independent populations that
-contributed no data to training rather than on a single held-out cohort. Within
+cohorts. Within
 each client, we partition patients
 into disjoint train, validation, and test groups, splitting strictly by
 patient ID so that no patient contributes data to more than one group. Every
 window in the validation and test sets therefore comes from a patient never
 seen during training, and reported performance measures generalisation to
 unseen patients rather than to unseen windows of patients already observed.
-
-Two of the four client cohorts, HUPA-UCM and T1D-UOM, together with the three
-held-out OOD cohorts (ReplaceBG, BrisT1D, Flair), are obtained through MetaboNet
-\cite{wolff2026metabonet}, a recently released resource that consolidates many
-public T1D datasets into a single harmonised schema with a common 5-minute grid
-and unified CGM, insulin, and carbohydrate fields. Drawing these cohorts from
-MetaboNet ensures their variables are already aligned to a shared format; the
-remaining two client cohorts, ABC4D and ARISES, are converted into the same
-schema from their original releases. We do not adopt MetaboNet's own train/test split,
-which allows the same patient to appear in both partitions; instead we pool the
-data and re-split strictly by patient.
 
 Table~\ref{tab:datasets} summarises each cohort. Mean and standard deviation of
 CGM are reported in mg/dL, and time-in-range (TIR) is the fraction of CGM
@@ -358,12 +346,11 @@ the next 12 samples (60\,min), advancing the window one sample at a time
 (stride~1). Windows that would bridge a sensor gap longer than 6 samples
 (30\,min) are discarded, so every example is contiguous. CGM is normalised with
 a single \emph{global} mean and standard deviation ($154.04 \pm 61.00$ mg/dL)
-computed from the four training cohorts only --- the held-out OOD cohort does not
-contribute to it, so no OOD information enters preprocessing --- and shared
+computed from the four training cohorts only and shared
 across all clients rather than using per-client statistics. A common
 normalisation keeps the global model's input scale identical at every site,
 which is what allows weights aggregated across clients to be applied directly to
-the OOD cohorts; it is shipped with the model as a fixed constant. Alongside CGM,
+the OOD cohorts. Alongside CGM,
 each example carries a time-of-day mark encoded
 as $(\sin 2\pi\,\mathrm{frac},\ \cos 2\pi\,\mathrm{frac})$, where $\mathrm{frac}$
 is the fraction of the day, to expose circadian structure.
@@ -390,9 +377,7 @@ second encoder channel carries $\log(1+\mathrm{bolus}_{\mathrm{IU}})$, the
 log-transformed bolus insulin dose; bolus events are sparse (roughly 1\% of
 timesteps are non-zero). The decoder remains CGM-only. We rerun the full
 multi-seed sweep in this two-channel configuration and report it as a delta
-against the CGM-only model (Results); because the effect on the global models
-proves small relative to seed-to-seed variation, we treat it as a sensitivity
-check rather than a main result.
+against the CGM-only model.
 
 \subsection*{Federated learning system}
 
