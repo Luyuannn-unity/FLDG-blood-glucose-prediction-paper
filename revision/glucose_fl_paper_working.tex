@@ -227,12 +227,13 @@ cohort (REPLACE-BG) and evaluated zero-shot on external cohorts; the same group
 subsequently showed that a language-model backbone with insulin and
 electronic-health-record inputs improves in-cohort accuracy
 further~\cite{zhu2026glullm}. GPFormer establishes that meta-learned domain
-generalisation is the right objective for cross-population glucose forecasting,
-and we adopt both its architecture and its MLDG objective rather than reinventing
-them. What it does \emph{not} address is the constraint that motivates this
-paper: GPFormer is trained centrally, on pooled data from one cohort, which is
-precisely what data-protection regimes prevent a multi-institution consortium
-from doing. Our question is therefore what happens when that objective must be
+generalisation is a productive objective for cross-population glucose forecasting,
+and we take that objective, and broadly that architecture, as our starting point
+rather than reinventing them (our forecaster uses full rather than sparse
+attention; see Methods). What GPFormer does \emph{not} address is the constraint
+that motivates this paper: it is trained centrally, on pooled data from a single
+cohort, which is precisely what data-protection regimes prevent a
+multi-institution consortium from doing. Our question is therefore what happens when that objective must be
 optimised \emph{without pooling} --- across several institutions that each hold a
 different cohort and cannot exchange raw records --- and how the federated
 alternatives compare with one another under that constraint.
@@ -384,10 +385,16 @@ is the fraction of the day, to expose circadian structure.
 
 \subsection*{Forecasting model}
 
-The forecaster is GPFormer \cite{zhu2024gpformer}, a sequence-to-sequence
-(encoder--decoder) Transformer for glucose prediction that maps the 72-step CGM
-context to the 12-step horizon. We adopt its architecture unchanged so that our
-comparison isolates the \emph{training} strategy rather than the model. It uses
+The forecaster is a sequence-to-sequence (encoder--decoder) Transformer that maps
+the 72-step CGM context to the 12-step horizon. Its layout follows GPFormer
+\cite{zhu2024gpformer} --- the meta-learned glucose forecaster we take as our
+starting point --- with one deliberate simplification: we use \emph{full}
+(dense) scaled dot-product attention, whereas GPFormer uses a sparse attention
+variant. Our forecaster is therefore a standard Informer-style transformer rather
+than GPFormer proper, and we do not attribute any of our results to sparse
+attention. Holding this architecture fixed across every client and every federated
+strategy is what lets our comparisons isolate the \emph{training} strategy rather
+than the model. It uses
 $d_{\text{model}}=128$, 8 attention heads, 6 encoder layers, 2 decoder layers,
 feed-forward width $d_{\text{ff}}=2048$, ReLU activations, and dropout~$0.05$
 ($\approx 4.9$\,M parameters). Decoding is single-shot rather than
@@ -918,18 +925,20 @@ places it inside the field of models developed on the cohort: better than an
 in-distribution Bi-LSTM ($21.7$), GRU ($22.1$), ARIMA ($28.1$) and SVR ($37.4$),
 level with N-BEATS ($21.2$), TCN ($21.3$) and Crossformer ($21.1$), and behind
 only GluLLM ($20.6$, which additionally consumes insulin and electronic-health-record
-features we do not use) and GPFormer itself ($19.2$) --- the same architecture we
-train, but trained centrally on ReplaceBG rather than federated across four other
-cohorts. The $2.1$ mg/dL gap to GPFormer is, in effect, the price of never seeing
-the target cohort and never pooling raw data, and it is smaller than the spread
-among the in-distribution baselines themselves. Two honest caveats: the published
-studies evaluate on a 46-subject hold-out from within ReplaceBG whereas every
-ReplaceBG patient is unseen to us, so the test sets are not identical (ours is
-arguably the harder setting, but it is not the same one); and reported ReplaceBG
-results vary widely with protocol --- one study reports $9.3$ mg/dL
-\cite{jaloli2023cnnlstm}, but on a 15-minute grid and with a rolling split that
-re-admits test patients to training, which is not comparable to any of the numbers
-here.
+features we do not use) and GPFormer ($19.2$), which was trained centrally on
+ReplaceBG itself. Three caveats keep this honest. First, the $2.1$ mg/dL gap to
+GPFormer conflates two differences, not one: GPFormer both trained on the target
+cohort \emph{and} uses sparse attention, whereas our forecaster uses full
+attention (Methods), so the gap is not a clean measure of the cost of federation
+alone. Second, the published studies evaluate on a 46-subject hold-out from within
+ReplaceBG, whereas every ReplaceBG patient is unseen to us --- the test sets are
+not identical, and ours is arguably the harder setting, but it is not the same
+one. Third, reported ReplaceBG results vary widely with protocol: one study
+reports $9.3$ mg/dL \cite{jaloli2023cnnlstm}, but on a 15-minute grid and with a
+rolling split that re-admits test patients to training, which is not comparable to
+any of the numbers here. With those caveats stated, the substantive point stands:
+a model that never saw ReplaceBG, and never pooled raw data from anywhere, lands
+inside the field of models developed on it.
 
 \begin{table}[!ht]
 \centering
@@ -956,12 +965,15 @@ SVR \cite{zhu2024gpformer}         & CGM                & yes & $37.4$ \\
 \end{tabular}
 \begin{center}
 {\small RMSE (mg/dL) at the 30-minute horizon on ReplaceBG. All rows use a
-by-patient hold-out on a 5-minute grid and report a point error at 30 minutes.
-Every published row was \emph{trained on ReplaceBG}; our three rows were trained
-on four entirely different cohorts and never saw ReplaceBG, so they are zero-shot.
-Published values are read from \cite{zhu2024gpformer,zhu2026glullm}; the two
-sources evaluate on the same 46-subject hold-out, while our models are evaluated
-on ReplaceBG patients all of whom are unseen.}
+by-patient hold-out on a 5-minute grid and report a \emph{point} error at 30
+minutes (not a window average). Every published row was \emph{trained on
+ReplaceBG}; our three rows were trained on four entirely different cohorts and
+never saw ReplaceBG, so they are zero-shot. Published values are read from
+\cite{zhu2024gpformer,zhu2026glullm}; those two sources evaluate on the same
+46-subject hold-out, whereas our models are evaluated on ReplaceBG patients all of
+whom are unseen. Note that GPFormer additionally uses sparse attention while our
+forecaster uses full attention, so the GPFormer--ours gap reflects architecture as
+well as training regime.}
 \end{center}
 \end{table}
 
