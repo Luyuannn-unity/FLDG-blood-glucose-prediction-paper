@@ -17,12 +17,6 @@ specific claims in the paper. Ordered by what would sink the paper first.
 | 7 | **Data availability**: code repo DOI/URL, per-dataset access route + licence + accession, IRB/consent statement for secondary use | PLOS will not accept "available from the authors." Desk-reject risk. |
 | 8 | **ARISES citation author list** (I added Zhu et al., npj Digit Med 2022, DOI 10.1038/s41746-022-00626-5); and **ABC4D**: registry (NCT02053051) or a journal paper? | I could confirm the DOI/trial but not the full author order. |
 
-## 🟠 OPEN — consistency check created by the finetuning tables
-
-| # | What I need | Why |
-|---|---|---|
-| 14 | **Confirm the zero-shot Flair/BrisT1D numbers in `tab:ood` (25.05, 26.31) are on the same held-out test split the finetuning experiments use.** | The finetuning table's from-scratch vs finetune rows are both on the target's test split (clean). But the caption also says finetuning improves over *zero-shot* (25.05→24.21, 26.31→25.57), and my earlier Methods text said Flair/BrisT1D zero-shot was scored on *all* their patients. Phase D (MLDG Flair 25.09, BrisT1D 26.35) suggests the difference is <0.05 mg/dL, so this is almost certainly fine — but if the finetuning carved out a train split, the honest thing is for `tab:ood` zero-shot to be recomputed on that same test split. Confirm and I'll reconcile (likely a ≤0.05 mg/dL change). |
-
 ## 🟡 OPEN — decisions, not blockers
 
 | # | Decision | My recommendation |
@@ -49,8 +43,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
   baseline — making our finetuning win conservative rather than inflated. Worth a one-line
   check when you sync, but it cannot hurt the claim.
 
-- **ReplaceBG OOD = 21-patient test split** — deliberately the same patients the from-scratch and finetuned arms are tested on. Now stated in Methods.
-- **BrisT1D + Flair = test-only** (all patients scored). Now stated, with the note that ReplaceBG's OOD figure is over fewer patients, so compare *within* cohort, not across.
+- **All OOD scoring is on held-out test patients only** (ReplaceBG = 21-patient split) — so zero-shot, from-scratch and finetuned arms share an identical per-cohort test set. Methods, tab:ood and tab:oodprior all now say this consistently. (Corrected an earlier draft error that claimed BrisT1D/Flair were scored on all patients.)
 - **RMSE@30 is a point forecast**, not a window average. This is what makes the GPFormer/GluLLM comparison valid; stated in the table caption.
 - **We use full attention, not GPFormer's sparse attention** — verified in code. Methods/Intro/comparison corrected; the gap to GPFormer now explicitly attributed to architecture *and* training regime.
 - **APFL α is not frozen** — I checked `apfl_alpha_log.csv`: α decays 0.23 → 0.02–0.08 in every seed. Better than a "failure mode": APFL *learns* to deploy ~95% global model. Now a Results finding, and it supplies the missing explanation for the personalised-FL family.

@@ -504,16 +504,16 @@ horizon; both are the error at that specific step.
 
 \emph{OOD test sets.} No patient from any held-out cohort contributes to federated
 training, so every OOD test patient is unseen in the strong sense --- unseen
-cohort \emph{and} unseen individual. BrisT1D and Flair are used purely as test
-cohorts, and we score on all of their patients. ReplaceBG is treated differently
-because it additionally serves the adaptation experiment: we split it by patient
-and score OOD performance on its 21-patient held-out \emph{test} split only. That
-is deliberate --- those are the same patients on which the ReplaceBG-from-scratch
-and finetuned models are evaluated, so the zero-shot, from-scratch and finetuned
-arms are compared on an identical test set. The consequence is that the ReplaceBG
-OOD figure is computed over fewer patients than the BrisT1D and Flair figures;
-absolute errors should therefore be compared \emph{within} a cohort, not across
-them. All runs use early stopping on average validation MSE (patience~5 over a
+cohort \emph{and} unseen individual. Each held-out cohort is split by patient in
+the same way as the clients, and we score OOD performance on its held-out
+\emph{test} patients only (a 21-patient test split for ReplaceBG). Scoring on the
+test split rather than the whole cohort is what lets the zero-shot, from-scratch,
+and finetuned arms be compared on an identical set of patients per cohort
+(Tables~\ref{tab:ood},~\ref{tab:finetune}). Absolute errors still differ across
+cohorts for reasons unrelated to our models --- device generation, treatment
+regimen, and, for Flair, automated insulin delivery (see Discussion) --- so OOD
+errors should be compared \emph{within} a cohort, across strategies, not across
+cohorts. All runs use early stopping on average validation MSE (patience~5 over a
 maximum of 25 communication rounds), and every configuration is repeated over 5
 random seeds (42, 43, 44, 46, 47; seed 45 was not run). We report the mean and
 standard deviation across seeds; the global and single-cohort runs are complete
@@ -1070,10 +1070,11 @@ ReplaceBG itself. Three caveats keep this honest. First, the $2.1$ mg/dL gap to
 GPFormer conflates two differences, not one: GPFormer both trained on the target
 cohort \emph{and} uses sparse attention, whereas our forecaster uses full
 attention (Methods), so the gap is not a clean measure of the cost of federation
-alone. Second, the published studies evaluate on a 46-subject hold-out from within
-ReplaceBG, whereas every ReplaceBG patient is unseen to us --- the test sets are
-not identical, and ours is arguably the harder setting, but it is not the same
-one. Third, reported ReplaceBG results vary widely with protocol: one study
+alone. Second, the test sets are not identical: the published studies evaluate on
+a 46-subject hold-out from a model \emph{trained on the rest of ReplaceBG}, whereas
+we evaluate on a 21-patient test split from a model that never saw \emph{any}
+ReplaceBG patient. Both test on unseen individuals, but only ours also faces an
+unseen cohort --- arguably the harder setting, though not the same one. Third, reported ReplaceBG results vary widely with protocol: one study
 reports $9.3$ mg/dL \cite{jaloli2023cnnlstm}, but on a 15-minute grid and with a
 rolling split that re-admits test patients to training, which is not comparable to
 any of the numbers here. With those caveats stated, the substantive point stands:
@@ -1126,8 +1127,9 @@ minutes (not a window average). Every published row was \emph{trained on
 ReplaceBG}; our three rows were trained on four entirely different cohorts and
 never saw ReplaceBG, so they are zero-shot. Published values are read from
 \cite{zhu2024gpformer,zhu2026glullm}; those two sources evaluate on the same
-46-subject hold-out, whereas our models are evaluated on ReplaceBG patients all of
-whom are unseen. Note that GPFormer additionally uses sparse attention while our
+46-subject hold-out of ReplaceBG, whereas our models are evaluated on a 21-patient
+test split of ReplaceBG that, like all ReplaceBG patients, was never seen in
+training. Note that GPFormer additionally uses sparse attention while our
 forecaster uses full attention, so the GPFormer--ours gap reflects architecture as
 well as training regime.}
 \end{center}
