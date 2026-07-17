@@ -17,6 +17,12 @@ specific claims in the paper. Ordered by what would sink the paper first.
 | 7 | **Data availability**: code repo DOI/URL, per-dataset access route + licence + accession, IRB/consent statement for secondary use | PLOS will not accept "available from the authors." Desk-reject risk. |
 | 8 | **ARISES citation author list** (I added Zhu et al., npj Digit Med 2022, DOI 10.1038/s41746-022-00626-5); and **ABC4D**: registry (NCT02053051) or a journal paper? | I could confirm the DOI/trial but not the full author order. |
 
+## 🟠 OPEN — consistency check created by the finetuning tables
+
+| # | What I need | Why |
+|---|---|---|
+| 14 | **Confirm the zero-shot Flair/BrisT1D numbers in `tab:ood` (25.05, 26.31) are on the same held-out test split the finetuning experiments use.** | The finetuning table's from-scratch vs finetune rows are both on the target's test split (clean). But the caption also says finetuning improves over *zero-shot* (25.05→24.21, 26.31→25.57), and my earlier Methods text said Flair/BrisT1D zero-shot was scored on *all* their patients. Phase D (MLDG Flair 25.09, BrisT1D 26.35) suggests the difference is <0.05 mg/dL, so this is almost certainly fine — but if the finetuning carved out a train split, the honest thing is for `tab:ood` zero-shot to be recomputed on that same test split. Confirm and I'll reconcile (likely a ≤0.05 mg/dL change). |
+
 ## 🟡 OPEN — decisions, not blockers
 
 | # | Decision | My recommendation |
