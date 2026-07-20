@@ -275,19 +275,41 @@ a handful of sites, one cohort each, to train together. We therefore also ask a
 feasibility question: whether a lightweight cross-site federation for CGM
 forecasting can be built and run across real machines with minimal tooling.
 
-This paper makes one primary contribution and one secondary one. \textbf{Our
-primary contribution is a controlled domain-generalisation benchmark of federated
+This paper makes three contributions.
+
+\textbf{First, a controlled domain-generalisation benchmark of federated
 strategies for transformer-based glucose forecasting.} Using a common
 encoder--decoder transformer and four real adult T1D cohorts as federated
 clients, with three held-out cohorts as OOD test sites, we compare single-cohort
 local training, FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and
 Ditto) under a multi-seed protocol, reporting held-in and OOD accuracy separately
-at the 30-minute horizon --- a horizon commonly used for preemptive glucose
-alerts. All cohorts are adult T1D populations, so our findings should not be
-assumed to extend to paediatric or type-2 diabetes.
+at the 30- and 60-minute horizons --- 30 minutes being the horizon most commonly
+used for preemptive glucose alerts. Two choices make this a stricter test than is
+usual in this literature. We split strictly \emph{by patient}, so every reported
+error measures generalisation to people the model has never seen, rather than the
+by-time split that most prior work on these cohorts uses; and we hold the
+architecture fixed across every strategy, so the comparison isolates the training
+strategy rather than model capacity. Under that protocol our zero-shot federated
+model reaches an error on ReplaceBG that sits inside the field of models developed
+\emph{on} ReplaceBG, without having seen any of its patients --- though this parity
+holds at 30 minutes and not at 60, where cohort-specific behaviour matters more.
+All cohorts are adult T1D populations, so our findings should not be assumed to
+extend to paediatric or type-2 diabetes.
 
-\textbf{As a secondary contribution, we run this federation for real across four
-institutions, rather than simulating it.} We build, from scratch, a lightweight
+\textbf{Second, a recipe for onboarding a new site: federate, then adapt.} The
+benchmark identifies a tension --- generalising across sites transfers well but
+leaves per-site accuracy on the table, while specialising to a site forfeits that
+transfer --- and we show it can be resolved by treating the federated model as a
+foundation rather than a finished product. Finetuning the global model on a new
+cohort's own patients beats training there from scratch on all three held-out
+cohorts, by $0.3$--$0.7$ mg/dL, and needs as little as $10\%$ of that cohort's
+patients to do so: seventeen individuals on the largest held-out cohort, two on
+the smallest. A centre joining after training can therefore reach, and exceed,
+local-only performance without a large local data-collection effort, which is what
+turns the benchmark into usable deployment advice.
+
+\textbf{Third, we run this federation for real across four institutions, rather
+than simulating it.} We build, from scratch, a lightweight
 cross-site FL system for CGM forecasting: a stateless aggregation server that
 holds the global model but no data, and clients that each wrap one institution's
 cohort, communicating over HTTP using only the Python standard library. The server
@@ -307,7 +329,8 @@ federation is untested. Those are engineering and governance gaps, not
 architectural ones, and we return to them in the Discussion.
 
 Taken together, the benchmark shows how to evaluate federated glucose forecasting
-honestly and what such an evaluation reveals, while the deployment shows that a
+honestly and what such an evaluation reveals, the finetuning results show what a
+new site should do with the resulting model, and the deployment shows that a
 federation of this kind runs across four real institutions, not only in
 simulation.
 
