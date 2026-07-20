@@ -142,9 +142,9 @@ strategies and tested each on three further studies that contributed no training
 data.
 We found that federation was about as accurate as training on a single cohort
 for patients from the participating sites, and more reliable on the unseen
-cohort: a model trained on one cohort alone sometimes failed badly on new
-patients, whereas the federated models did not, on the three held-out cohorts we
-tested. The accuracy differences are
+cohorts: a model trained on one cohort alone sometimes failed badly on new
+patients, whereas the federated models did not, on any of the three held-out
+cohorts we tested. The accuracy differences are
 small, so the main benefit is lower risk of a bad surprise on a new population
 rather than a large accuracy gain. We also built a minimal system and ran the
 training for real --- not as a simulation --- across four universities, with each
@@ -279,7 +279,7 @@ This paper makes one primary contribution and one secondary one. \textbf{Our
 primary contribution is a controlled domain-generalisation benchmark of federated
 strategies for transformer-based glucose forecasting.} Using a common
 encoder--decoder transformer and four real adult T1D cohorts as federated
-clients, with a held-out cohort as an OOD test site, we compare single-cohort
+clients, with three held-out cohorts as OOD test sites, we compare single-cohort
 local training, FedAvg, FedProx, MLDG, and two personalised-FL methods (APFL and
 Ditto) under a multi-seed protocol, reporting held-in and OOD accuracy separately
 at the 30-minute horizon --- a horizon commonly used for preemptive glucose
@@ -455,7 +455,7 @@ channel (see Limitations).
 model trained on a single cohort's data only, with no federation. The central
 question of the benchmark is whether federation improves on this baseline ---
 both when evaluated on the same cohorts that participated (held-in) and on the
-unseen OOD cohort. For OOD we report the mean over the four single-cohort models.
+unseen OOD cohorts. For OOD we report the mean over the four single-cohort models.
 
 \textbf{FedAvg / FedProx.} Standard federated averaging, and FedProx, which adds
 a proximal term $(\mu/2)\lVert w - w_{\text{global}}\rVert^2$ to each client's
@@ -920,9 +920,9 @@ is to treat the generalised global model as a foundation and adapt it locally,
 rather than choosing one regime outright.
 
 \paragraph{Finetuning a federated model for a new site.} The finetuning
-experiments make the ``foundation-then-adapt'' recipe concrete, and --- unlike in
-our earlier analysis of a single cohort --- it now holds across all three held-out
-cohorts (Table~\ref{tab:finetune}). On every target, finetuning a federated model
+experiments make the ``foundation-then-adapt'' recipe concrete, and the pattern
+holds across all three held-out cohorts rather than resting on any one of them
+(Table~\ref{tab:finetune}). On every target, finetuning a federated model
 beats training on that target from scratch, by $0.3$--$0.7$ mg/dL, and it also
 improves on zero-shot transfer, most where zero-shot was weakest. Two points
 carry. First, a site's own data trained in isolation did not beat the finetuned
