@@ -9,7 +9,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | What I need | Why it matters / what it blocks |
 |---|---|---|
-| 1 | **Download the remote training LOGS for the 7 recovered seed_46 arms** (`apfl`, `decoupled`, `ditto_mu0.01/0.1/1.0`, `single_ABC4D`, `single_HUPA-UCM`) — the same place the outputs came from | You synced the seed_46 *outputs* (2026-08-11) and all 30-min tables are now full 5-seed and verified. But the 60-min numbers are parsed from training logs (`rmse_60=`), and the local logs for these 7 arms are empty stubs (the real runs happened remotely). Until the logs arrive, `tab:h60`'s Local cells (which need single_HUPA-UCM/ABC4D at 60 min) rest on 4 seeds while the caption says 5. With the logs I'll recompute those cells. |
+| ~~1~~ | ~~seed_46 outputs + logs~~ | **FULLY RESOLVED 2026-08-11.** Outputs and remote logs both synced. Every table (30-min and 60-min) is now full 5-seed, recomputed and verified; log-vs-CSV cross-check confirms the logs belong to the same runs. |
 | 4 | **Sanity-check the GPFormer framing** (Intro para + Methods) | GPFormer (Zhu 2024) already did Transformer+MLDG+zero-shot glucose DG. I reposition us as "same objective, but without pooling, across institutions." If that framing is wrong, a reviewer reads the paper as re-doing GPFormer. |
 | 6 | **Author names, affiliations, corresponding email** | Still `Name1 Surname` / `correspondingauthor@institute.edu`. Corresponding author also needs an ORCID iD in the PLOS system. |
 | 7 | **Data availability**: code repo DOI/URL, per-dataset access route + licence + accession, IRB/consent statement for secondary use | PLOS will not accept "available from the authors." Desk-reject risk. |

@@ -22,9 +22,9 @@ guidelines (https://journals.plos.org/digitalhealth/s/submission-guidelines).
 - [x] ~~Seed 46 outputs for 7 arms~~ **Synced + applied 2026-08-11.** All 30-min
   tables now full 5-seed; tab:main, tab:ood, and prose updated and re-verified
   cell-by-cell from CSVs.
-- [ ] **Remaining: download the remote training logs for those 7 arms** so
-  tab:h60's Local cells (single_HUPA-UCM/ABC4D at 60 min) can go from 4 to 5
-  seeds — the 60-min values only exist in logs. (REQUIRED_FROM_YOU #1)
+- [x] ~~Remote training logs for those 7 arms~~ **Synced + applied 2026-08-11.**
+  tab:h60 Local cells recomputed at 5 seeds (34.29 / 38.30 / 45.46 / 41.92);
+  every number in the paper is now full 5-seed and traced to disk.
 - [x] ~~MLDG exact update spec in Methods~~ **Done 2026-08-11** — spec verified in
   code + training logs and written into Methods (second-order, patient-disjoint
   split, inner SGD at 1e-4, equal-weight outer loss, Adam untouched).

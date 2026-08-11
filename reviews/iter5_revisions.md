@@ -74,11 +74,16 @@ Numbers updated in the working draft (v11), all recomputed from CSVs at 5 seeds:
   ARISES best 21.98→21.95; evaluation-protocol 4-seed caveat removed.
 - Bold markers unchanged (same winners in every column).
 
-Not yet updatable: `tab:h60` Local cells — the 60-min values are parsed from
-training logs, and the local logs for the 7 recovered arms are stubs (0
-`rmse_60` lines). Author to download the remote logs (REQUIRED #1); the new
-outputs do include `best_global_model.pt` checkpoints for every arm, so 60-min
-(and clinical) metrics are also recomputable by inference if the logs are gone.
+Second addendum: the author then also synced the remote logs
+(`20260618_122726_cgm_s46_*.log`, 7 files). Provenance check passed — each log's
+final held-in rmse_30 equals the synced CSV value, and re-deriving the old table
+with mixed 4/5-seed means reproduced 34.26 / 38.29 / 45.45 / 41.90 exactly.
+`tab:h60` Local cells updated to full 5-seed: held-in avg 34.29, OOD
+ReplaceBG 38.30, BrisT1D 45.46, Flair 41.92 (prose 34.26→34.29). ARISES and
+global rows unchanged (already 5-seed). Every number in the paper is now
+5-seed and traced to disk. Parser: scratchpad `h60_recompute.py` (mirrors
+`build_rmse60_fig.py`). The new outputs also include `best_global_model.pt`
+for every arm, so clinical metrics are recomputable by inference later.
 
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
