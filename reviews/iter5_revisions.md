@@ -114,6 +114,28 @@ Author decided to include the convergence-matched Phase F baseline. Changes:
   paper's convention; NEW_FINDINGS' ± are population sd). ⚠️ Outputs not yet on
   this disk — author to sync `output_centralized_shuffled/` (REQUIRED #12 note).
 
+## Fourth addendum: GPFormer precursor framing removed (v14)
+
+Author decision (resolves REQUIRED #4 and closes #10): stop presenting GPFormer
+as the paper's antecedent/starting point.
+
+- **Intro**: the "one line of work is a direct precursor to ours… we take that
+  objective, and broadly that architecture, as our starting point" passage
+  rewritten. The gap argument stays, with the same citations, but GPFormer is no
+  longer named: "a Transformer trained with MLDG on a single large cohort
+  transfers zero-shot to external cohorts [zhu2024gpformer]…".
+- **Methods**: "Its layout follows GPFormer — the meta-learned glucose
+  forecaster we take as our starting point — …not GPFormer proper" replaced by a
+  plain description: standard Informer-style transformer with full attention.
+  Per the author's instruction, the decoder time-of-day-token convention now
+  carries the one intended attribution: "as in GPFormer \cite{zhu2024gpformer}".
+- **Comparison subsection / tab:oodprior: deliberately KEPT.** GPFormer there is
+  an external comparator (best published ReplaceBG model, same source as the
+  N-BEATS/Bi-LSTM/ARIMA/SVR rows); removing that row while keeping its siblings
+  would read as hiding the closest competitor. One "(Methods)" cross-reference
+  to the deleted sparse-attention discussion removed; the caption's
+  self-contained sparse-vs-full note stays.
+
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
 - Persistence / clinical-metrics comparison: **not reported** (author).

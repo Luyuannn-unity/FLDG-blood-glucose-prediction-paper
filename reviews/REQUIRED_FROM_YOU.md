@@ -10,7 +10,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 | # | What I need | Why it matters / what it blocks |
 |---|---|---|
 | ~~1~~ | ~~seed_46 outputs + logs~~ | **FULLY RESOLVED 2026-08-11.** Outputs and remote logs both synced. Every table (30-min and 60-min) is now full 5-seed, recomputed and verified; log-vs-CSV cross-check confirms the logs belong to the same runs. |
-| 4 | **Sanity-check the GPFormer framing** (Intro para + Methods) | GPFormer (Zhu 2024) already did Transformer+MLDG+zero-shot glucose DG. I reposition us as "same objective, but without pooling, across institutions." If that framing is wrong, a reviewer reads the paper as re-doing GPFormer. |
+| ~~4~~ | ~~GPFormer framing~~ | **RESOLVED 2026-08-11 (author decision): precursor framing removed entirely.** GPFormer is no longer presented as our starting point. It remains in exactly three roles: (a) an unnamed Intro citation motivating the gap ("centralised MLDG glucose DG exists"); (b) "as in GPFormer" on the decoder time-of-day-token convention (Methods); (c) an external comparator in the comparison subsection and `tab:oodprior` (kept — deleting the best published ReplaceBG row while keeping its sibling rows from the same source would read as hiding the closest competitor). This also closes old item 10 (reciprocal data point: no). |
 | 6 | **Author names, affiliations, corresponding email** | Still `Name1 Surname` / `correspondingauthor@institute.edu`. Corresponding author also needs an ORCID iD in the PLOS system. |
 | 7 | **Data availability**: code repo DOI/URL, per-dataset access route + licence + accession, IRB/consent statement for secondary use | PLOS will not accept "available from the authors." Desk-reject risk. |
 | 8 | **ARISES citation author list** (I added Zhu et al., npj Digit Med 2022, DOI 10.1038/s41746-022-00626-5); and **ABC4D**: registry (NCT02053051) or a journal paper? | I could confirm the DOI/trial but not the full author order. |
@@ -19,7 +19,6 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | Decision | My recommendation |
 |---|---|---|
-| 10 | Include **GPFormer's reciprocal data point** — it scores 22.9 zero-shot on ABC4D, one of *our* training cohorts (we get 19.68 held-in) | Nice symmetry (they transfer into our cohort, we transfer into theirs). Your call. |
 | ~~12~~ | ~~Centralised baseline in paper~~ | **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. |
 
 ---

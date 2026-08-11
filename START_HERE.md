@@ -74,11 +74,12 @@ re-check before renaming.
 - **Cohorts.** Clients: HUPA-UCM, ABC4D, ARISES, T1D-UOM. Held-out OOD: ReplaceBG,
   BrisT1D, Flair. All adult T1D. Splits are **by patient** (test patients unseen).
 - **Model.** Encoder–decoder transformer, ~4.9M params, seq_len 72 (6h), pred_len 12
-  (60min), full attention. It follows **GPFormer** (Zhu et al., IEEE JBHI 2024) but
-  uses **full attention, not GPFormer's sparse attention** — so it is Informer-style,
-  *not* GPFormer proper. GPFormer must stay cited as the antecedent (it did
-  Transformer+MLDG+zero-shot glucose DG first, centrally); our novelty is doing it
-  **federated, without pooling, across institutions**.
+  (60min), **full attention** (Informer-style; GPFormer uses sparse — ours is *not*
+  GPFormer proper). **GPFormer framing REMOVED by author decision 2026-08-11**: no
+  longer presented as our precursor/starting point. It survives only as (a) an
+  unnamed Intro citation for "centralised MLDG glucose DG exists", (b) "as in
+  GPFormer" on the decoder time-token convention, (c) a comparator in
+  `tab:oodprior`. Don't re-add the precursor narrative.
 - **Decoder** = Informer-style warm-up: last `label_len=6` context steps + 12 zeros.
   Not a learned start token.
 - **Normalisation** = single global constant **154.04 ± 61.00 mg/dL**, computed on the
