@@ -136,6 +136,21 @@ as the paper's antecedent/starting point.
   to the deleted sparse-attention discussion removed; the caption's
   self-contained sparse-vs-full note stays.
 
+## Fifth addendum: data/code availability placeholders (v15–v16)
+
+- Availability subsection rewritten: code at a placeholder GitHub URL
+  (`github.com/PLACEHOLDER/fldg-glucose` — author to replace, ideally + Zenodo
+  DOI); **five cohorts public via MetaboNet (HUPA-UCM, T1D-UOM, ReplaceBG,
+  BrisT1D, Flair** — author corrected that BrisT1D/Flair are MetaboNet too);
+  ABC4D and ARISES proprietary under data-sharing arrangements, not
+  redistributable. Methods data-source paragraph updated to match ("five of the
+  seven cohorts… through MetaboNet; ABC4D and ARISES converted from their
+  original releases").
+- Ripple fix: Methods opener no longer claims "seven publicly available"
+  datasets (false for ABC4D/ARISES); points to the availability section.
+- Still owed (REQUIRED #7): real repo URL/DOI, accessions, ABC4D/ARISES access
+  route + justification, IRB/consent statement.
+
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
 - Persistence / clinical-metrics comparison: **not reported** (author).

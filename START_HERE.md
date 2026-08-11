@@ -26,7 +26,7 @@ Oxford), not simulated on one host.
 | **LIVE draft (edit this)** | `revision/glucose_fl_paper_working.tex` |
 | Bibliography (edit this) | `revision/references.bib` |
 | Figures | `revision/figures/` (e.g. `data_efficiency.pdf`) |
-| Version snapshots (frozen, read-only) | `revision/glucose_fl_paper_v1..v15.tex` — v15 is newest ≈ working |
+| Version snapshots (frozen, read-only) | `revision/glucose_fl_paper_v1..v16.tex` — v16 is newest ≈ working |
 | **Original draft — DO NOT EDIT** | `glucose_fl_paper.tex` (the author's Overleaf file; see "Two files" below) |
 | **Submission checklist** | `reviews/SUBMISSION_TODO.md` |
 | Open items the author owes | `reviews/REQUIRED_FROM_YOU.md` ← check this every session |
