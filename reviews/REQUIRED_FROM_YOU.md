@@ -9,11 +9,9 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | What I need | Why it matters / what it blocks |
 |---|---|---|
-| 1 | **Sync the 5-seed runs** (you said done, not synced) | I'll re-verify every table against the synced data. Until then the tables rest on the current export. |
-| 2 | **Exact MLDG update spec** — inner learning rate; whether the 2nd-order term is really computed (`create_graph`); what happens to Adam's moment buffers in the inner step | Methods currently says "the exact inner update… will be released with the code." Reviewer 2 called the current description non-reproducible. This is the one method we name in the title. |
+| 1 | **Copy 7 missing seed_46 output dirs** from the machine that ran them: `apfl`, `decoupled`, `ditto_mu0.01`, `ditto_mu0.1`, `ditto_mu1.0`, `single_ABC4D`, `single_HUPA-UCM` (all empty under `output_arises_bolus/cgm/seed_46/`) | These are the "4-seed cells" in tab:main's caption. With them, every row becomes 5 seeds. Everything else is verified: I recomputed MLDG 19.99, FedAvg 20.09, FedProx 20.27 from the on-disk CSVs — exact match. |
 | 4 | **Sanity-check the GPFormer framing** (Intro para + Methods) | GPFormer (Zhu 2024) already did Transformer+MLDG+zero-shot glucose DG. I reposition us as "same objective, but without pooling, across institutions." If that framing is wrong, a reviewer reads the paper as re-doing GPFormer. |
-| 5 | **Patient-count filtering rule** — HUPA-UCM 22 (vs 25 published), T1D-UOM 14 (vs 17) | Need the explicit inclusion/exclusion criterion. A silent patient drop reads as bias risk. |
-| 6 | **Author names, affiliations, corresponding email** | Still `Name1 Surname` / `correspondingauthor@institute.edu`. |
+| 6 | **Author names, affiliations, corresponding email** | Still `Name1 Surname` / `correspondingauthor@institute.edu`. Corresponding author also needs an ORCID iD in the PLOS system. |
 | 7 | **Data availability**: code repo DOI/URL, per-dataset access route + licence + accession, IRB/consent statement for secondary use | PLOS will not accept "available from the authors." Desk-reject risk. |
 | 8 | **ARISES citation author list** (I added Zhu et al., npj Digit Med 2022, DOI 10.1038/s41746-022-00626-5); and **ABC4D**: registry (NCT02053051) or a journal paper? | I could confirm the DOI/trial but not the full author order. |
 
@@ -21,13 +19,44 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | Decision | My recommendation |
 |---|---|---|
-| 9 | Cite **MetaboNet-Bench**? | Optional. It benchmarks all 3 OOD cohorts but only as a *pooled* 13-dataset aggregate, and its train pool includes HUPA-UCM + T1D-UOM (2 of our training cohorts), so it is **not** an independent comparator. Bib entry is ready. |
 | 10 | Include **GPFormer's reciprocal data point** — it scores 22.9 zero-shot on ABC4D, one of *our* training cohorts (we get 19.68 held-in) | Nice symmetry (they transfer into our cohort, we transfer into theirs). Your call. |
-| 11 | Keep `tab:bolus`? | Paper now has 7 tables. If you want to cut one, this is the least load-bearing. |
+| 12 | **Add the centralised-pooling baseline to the paper?** Phase F was re-run convergence-matched (50k steps, 5 seeds; NEW_FINDINGS.md). Story it supports: FL ≈ centralised pooling held-in *and* OOD, so federation costs almost nothing vs pooling — and FL→finetune beats both centralised and from-scratch on every OOD target. | **Include.** Reviewers routinely ask "why not just pool?"; we now have the clean answer and it strengthens, not weakens, the FL story. One table or two sentences + a table would do it. |
 
 ---
 
+## 📌 DECIDED (author decisions on record — don't re-litigate)
+
+- **Persistence / clinical-metrics comparison (NEW_FINDINGS Phase D/E) will NOT be
+  reported** (decided 2026-08-11). Rationale: the paper's claim is about RMSE under
+  federation and transfer; the models were optimised for RMSE, not event detection,
+  and reporting a metric family we did not optimise for would import a problem that
+  is not the paper's focus. The Methods now justify RMSE@30 as the single primary
+  metric (training objective + comparability + readability), and the Limitations
+  already state that error-grid/MARD/event detection are not included.
+- **Bolus is out** (decided 2026-08-11). The bolus input variant, its Results
+  paragraph, and `tab:bolus` are removed from the working draft; the paper is now
+  7 tables, CGM-only throughout. The only remaining "bolus" is the Intro's clinical
+  phrase "inform bolus and snack decisions", which is about patient decisions.
+
 ## ✅ RESOLVED (answered by you)
+
+- **MLDG update spec** (was item 2) — resolved from you + verified in code and the
+  training logs (`flock_model_gpformer.py`; log line "MLDG enabled (second-order/
+  higher) — n_support=1, n_query=1, inner_iters=1, trade_off=1.0, inner_lr=same as
+  outer"). Batches split patient-disjoint ~50/50 by windows; inner step = one
+  differentiable SGD step at 1e-4; outer loss = support loss at original weights +
+  query loss at adapted weights (equal weight); second-order term retained; outer
+  Adam state untouched by the inner step; fallback to a plain step never fired
+  (0 of 191,100 steps). Methods rewritten accordingly — the "released with the
+  code" deferral is gone.
+- **Patient counts** (was item 5) — resolved: HUPA-UCM (22) and T1D-UOM (14) are the
+  counts carried in MetaboNet's harmonised release, not our filtering. The Methods
+  now say so and cite MetaboNet (which also settles old item 9 — it is cited as the
+  data source, not as a comparator benchmark).
+- **Loss function** — verified in logs: `Loss: MSE (single-head, c_out=1)`. The
+  `quantile_loss` attribute in the code is a naming shim (MSELossAdapter when
+  `proposer_loss_type='mse'`, which is what all paper runs used). Methods' "trained
+  with MSE" claim is correct.
 
 - **Normalisation constant is clean — NO OOD LEAK.** Confirmed by you and verified in the
   logs: `mean=154.04, std=61.00` is the *only* normalisation value used anywhere in the run

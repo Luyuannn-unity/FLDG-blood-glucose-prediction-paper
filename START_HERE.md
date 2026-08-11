@@ -45,6 +45,14 @@ comparison section, and every reviewer fix; the Overleaf file is the author's ow
 running copy. Before editing: `git pull --rebase --autostash origin main`. Expect
 Overleaf commits ("Updates from Overleaf") to land between sessions.
 
+**Merge status (verified 2026-08-11):** the Overleaf file's last content edit was
+2026-06-29 (the ReplaceBG-adaptation section), and that content is in the working
+file (extended to all 3 targets in `tab:finetune`). Nothing lives only in
+`glucose_fl_paper.tex`, so at submission the author can simply point Overleaf's main
+document at the working file (or rename it) — no line-by-line merge needed. If new
+"Updates from Overleaf" commits touch `glucose_fl_paper.tex` after this date,
+re-check before renaming.
+
 ## Workflow (do this every time)
 
 1. `cd paper && git pull --rebase --autostash origin main`.
@@ -86,10 +94,11 @@ Overleaf commits ("Updates from Overleaf") to land between sessions.
 
 ## Current state of the draft
 
-- **Tables (8):** datasets; held-in RMSE@30 (`tab:main`); OOD@30 across 3 cohorts
+- **Tables (7):** datasets; held-in RMSE@30 (`tab:main`); OOD@30 across 3 cohorts
   (`tab:ood`); zero-shot vs ReplaceBG-trained baselines (`tab:oodprior`); external
-  by-time comparison (`tab:prior`); 60-min (`tab:h60`); bolus delta (`tab:bolus`);
-  finetuning across 3 targets (`tab:finetune`).
+  by-time comparison (`tab:prior`); 60-min (`tab:h60`);
+  finetuning across 3 targets (`tab:finetune`). (`tab:bolus` and all bolus content
+  removed 2026-08-11 by author decision.)
 - **Figures (1):** data-efficiency (`fig:dataeff`). **FL architecture diagram still owed.**
 - **Key numbers:** held-in avg ~20 mg/dL (Local 20.15, FedAvg 20.09, MLDG 19.99);
   OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/Flair); single-ARISES collapses
@@ -98,17 +107,18 @@ Overleaf commits ("Updates from Overleaf") to land between sessions.
 
 ## The biggest open threads (see REQUIRED_FROM_YOU.md for the full list)
 
-- **Persistence & clinical metrics finding (`NEW_FINDINGS.md` Phase D/E) — NOT yet in
-  the paper.** ⚠️ Persistence beats our model on **hypo-detection F1 on all 7 datasets**
-  and Clarke A+B on 6/7. This changes the clinical story and must be reported honestly
-  (we still win RMSE, MARD, Parkes A+B, hyper F1). The author paused this ("not now").
-- **Centralised baseline (Phase F) is undertrained** (2000 steps vs FL's ~50k) — can't
-  yet answer "federation vs centralised pooling"; needs a convergence-matched re-run.
+- **Persistence & clinical metrics (`NEW_FINDINGS.md` Phase D/E): DECIDED 2026-08-11 —
+  not reported.** Author's call: the paper's claim is RMSE under federation/transfer;
+  models were not optimised for event detection. Don't re-open without the author.
+- **Centralised baseline (Phase F) has been re-run convergence-matched** (50k steps,
+  5 seeds — see NEW_FINDINGS.md). Result: FL ≈ centralised pooling held-in and OOD.
+  Open decision: add it to the paper (recommended — answers "why not just pool?").
 - **More seeds** would settle MLDG significance. **FedProx µ is untuned.**
-- **Admin blockers for PLOS:** author names/affiliations/email, code repo DOI,
-  per-dataset licence/accession + IRB statement, patient-count filtering rule
-  (22 vs 25; 14 vs 17), and the exact MLDG update spec (inner LR, 2nd-order term,
-  Adam-state handling) — currently deferred to "released code."
+- **Admin blockers for PLOS:** author names/affiliations/email + ORCID, code repo DOI,
+  per-dataset licence/accession + IRB statement, cover letter, ≥4 suggested
+  reviewers, abstract over the 300-word limit, author summary over 200 words.
+  (MLDG update spec and patient-count rule: resolved 2026-08-11, now in Methods.)
+  Full checklist: `reviews/SUBMISSION_TODO.md`.
 
 ## Next-run reminder for the author
 
