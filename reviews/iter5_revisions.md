@@ -85,6 +85,35 @@ global rows unchanged (already 5-seed). Every number in the paper is now
 `build_rmse60_fig.py`). The new outputs also include `best_global_model.pt`
 for every arm, so clinical metrics are recomputable by inference later.
 
+## Third addendum: centralised (pooled) reference added to the paper (v13)
+
+Author decided to include the convergence-matched Phase F baseline. Changes:
+
+- **Methods, "Federated strategies and baselines"**: new "Centralised (pooled)
+  reference" paragraph after Local — union of the 4 cohorts, 50,000 shuffled
+  steps (12,500/cohort, matching the federated budget), same architecture /
+  optimiser / batch / val-best selection / seeds (verified in
+  `main_centralized.py`). Framed as a *reference*, deliberately not "upper
+  bound" — empirically it is not strict (MLDG beats it on ReplaceBG; it beats
+  MLDG on ARISES/Flair).
+- **tab:main**: new group + row, Centralised 18.64±0.32 / 19.97±0.11 /
+  21.74±0.10 / 19.24±0.12, avg 19.90. Caption: bold = lowest among
+  privacy-preserving strategies; centralised excluded from bolding.
+- **tab:ood**: new group + row, Centralised 21.52±0.19 / 26.33±0.21 /
+  24.95±0.21; caption updated ("within 0.2 mg/dL in both directions").
+- **Results**: new paragraph "Federation costs almost nothing relative to
+  centralised pooling" — held-in gap ≈0.1 mg/dL (concentrated on ARISES), OOD
+  indistinguishable, and even the pooled model transfers worse than
+  target-trained from scratch on all 3 OOD cohorts (ties into finetuning).
+- **Discussion**: principal-findings sentence added; limitation (viii)
+  "No pooled-central control" rewritten as "(viii) Mechanism" (the control now
+  exists); future-work pooled-control clause removed.
+- **Evaluation protocol**: OOD-score sentence now includes the centralised
+  reference.
+- Numbers computed from NEW_FINDINGS.md per-seed values with *sample* sd (the
+  paper's convention; NEW_FINDINGS' ± are population sd). ⚠️ Outputs not yet on
+  this disk — author to sync `output_centralized_shuffled/` (REQUIRED #12 note).
+
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
 - Persistence / clinical-metrics comparison: **not reported** (author).

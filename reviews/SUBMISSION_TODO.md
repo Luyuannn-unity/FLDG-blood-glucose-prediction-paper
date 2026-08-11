@@ -80,10 +80,10 @@ guidelines (https://journals.plos.org/digitalhealth/s/submission-guidelines).
 
 1. [x] **Persistence / clinical-metrics finding: NOT reported** (author decision
    2026-08-11). Rationale recorded in REQUIRED_FROM_YOU.md. Don't re-open.
-2. [ ] **Centralised pooled baseline (Phase F)** — re-run convergence-matched
-   (50k steps, 5 seeds; NEW_FINDINGS.md). Open: add to the paper? Recommended —
-   FL ≈ pooling held-in and OOD answers "why not just pool?" and FL→finetune
-   beats both centralised and from-scratch on every OOD target.
+2. [x] **Centralised pooled baseline: added to the paper 2026-08-11** (Methods
+   reference paragraph, rows in tab:main/tab:ood, Results paragraph, Discussion
+   sentence; limitation (viii) rewritten). Follow-up: author to sync
+   `output_centralized_shuffled/` CSVs so the numbers trace to this disk.
 3. [ ] **MLDG significance wording** — numerically best everywhere, not
    significant at 5 seeds. More seeds, or keep the current careful phrasing.
 4. [ ] **FL architecture figure** — author, later. Note: this is the *deployment*

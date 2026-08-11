@@ -20,7 +20,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 | # | Decision | My recommendation |
 |---|---|---|
 | 10 | Include **GPFormer's reciprocal data point** — it scores 22.9 zero-shot on ABC4D, one of *our* training cohorts (we get 19.68 held-in) | Nice symmetry (they transfer into our cohort, we transfer into theirs). Your call. |
-| 12 | **Add the centralised-pooling baseline to the paper?** Phase F was re-run convergence-matched (50k steps, 5 seeds; NEW_FINDINGS.md). Story it supports: FL ≈ centralised pooling held-in *and* OOD, so federation costs almost nothing vs pooling — and FL→finetune beats both centralised and from-scratch on every OOD target. | **Include.** Reviewers routinely ask "why not just pool?"; we now have the clean answer and it strengthens, not weakens, the FL story. One table or two sentences + a table would do it. |
+| ~~12~~ | ~~Centralised baseline in paper~~ | **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. |
 
 ---
 
