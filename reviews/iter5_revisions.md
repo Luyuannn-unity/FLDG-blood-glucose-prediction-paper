@@ -53,6 +53,33 @@ Session driver: the author's pre-submission triage. Snapshot: `glucose_fl_paper_
 - Found 7 empty seed_46 output dirs (apfl, decoupled, ditto×3, single_ABC4D,
   single_HUPA-UCM) — the source of tab:main's 4-seed cells; author to copy.
 
+## Addendum (same day): seed_46 outputs synced — all 30-min tables now 5-seed
+
+The author downloaded the complete `seed_46` folder from the remote machine.
+Verified before replacing: all 12 arms present; the 5 overlapping arms'
+`best_model_local_test_irt.csv` are byte-identical to the local partial copy;
+the old partial folder was a strict subset (backed up to the session scratchpad).
+
+Numbers updated in the working draft (v11), all recomputed from CSVs at 5 seeds:
+
+- `tab:main` — Local: 18.86±0.15 / 19.94±0.17 / 22.04±0.22 / 19.80±0.19, avg
+  20.16 (was 20.15). APFL: avg 20.35 (was 20.28). APFL-decoupled: avg 20.32
+  (was 20.37). Ditto µ=0.01: avg 20.06; µ=0.1: 20.17; µ=1.0: 20.05 (was 20.09,
+  now numerically below FedAvg — prose softened to "on par with FedAvg").
+  Caption's 4-seed disclosure removed: every cell is 5 seeds.
+- `tab:ood` — trained-on-HUPA-UCM: 21.93±0.17 / 27.10±0.24 / 25.81±0.23;
+  trained-on-ABC4D: 21.78±0.22 / 26.70±0.28 / 25.35±0.20; Local mean Flair
+  26.75→26.76. ARISES/T1D-UOM rows unchanged (already 5-seed).
+- Prose: Local held-in average 20.15→20.16 (Results + Discussion); Ditto
+  ARISES best 21.98→21.95; evaluation-protocol 4-seed caveat removed.
+- Bold markers unchanged (same winners in every column).
+
+Not yet updatable: `tab:h60` Local cells — the 60-min values are parsed from
+training logs, and the local logs for the 7 recovered arms are stubs (0
+`rmse_60` lines). Author to download the remote logs (REQUIRED #1); the new
+outputs do include `best_global_model.pt` checkpoints for every arm, so 60-min
+(and clinical) metrics are also recomputable by inference if the logs are gone.
+
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
 - Persistence / clinical-metrics comparison: **not reported** (author).

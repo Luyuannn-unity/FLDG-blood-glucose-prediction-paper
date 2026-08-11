@@ -19,11 +19,12 @@ guidelines (https://journals.plos.org/digitalhealth/s/submission-guidelines).
   cohorts. (REQUIRED_FROM_YOU #7)
 - [ ] **Ethics statement.** Explicit IRB/consent statement for secondary use of
   de-identified public datasets — even "exempt, and why" must be stated.
-- [ ] **Seed 46 was skipped for 7 arms** (apfl, decoupled, ditto×3, single_ABC4D,
-  single_HUPA-UCM) — author decision: run those 7 arms at seed 46, or keep the
-  caption's honest 4-seed disclosure. Whole of tab:main otherwise verified
-  cell-by-cell against on-disk CSVs 2026-08-11 (exact match, incl. the 4-seed
-  cells). (REQUIRED_FROM_YOU #1)
+- [x] ~~Seed 46 outputs for 7 arms~~ **Synced + applied 2026-08-11.** All 30-min
+  tables now full 5-seed; tab:main, tab:ood, and prose updated and re-verified
+  cell-by-cell from CSVs.
+- [ ] **Remaining: download the remote training logs for those 7 arms** so
+  tab:h60's Local cells (single_HUPA-UCM/ABC4D at 60 min) can go from 4 to 5
+  seeds — the 60-min values only exist in logs. (REQUIRED_FROM_YOU #1)
 - [x] ~~MLDG exact update spec in Methods~~ **Done 2026-08-11** — spec verified in
   code + training logs and written into Methods (second-order, patient-disjoint
   split, inner SGD at 1e-4, equal-weight outer loss, Adam untouched).

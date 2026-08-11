@@ -100,7 +100,7 @@ re-check before renaming.
   finetuning across 3 targets (`tab:finetune`). (`tab:bolus` and all bolus content
   removed 2026-08-11 by author decision.)
 - **Figures (1):** data-efficiency (`fig:dataeff`). **FL architecture diagram still owed.**
-- **Key numbers:** held-in avg ~20 mg/dL (Local 20.15, FedAvg 20.09, MLDG 19.99);
+- **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99);
   OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/Flair); single-ARISES collapses
   (28.51±6.85 on ReplaceBG, and on all 3). MLDG numerically best everywhere but
   **not significant at 5 seeds** (paired t ≈ −1.3 @30, −2.1 @60).
