@@ -26,10 +26,11 @@ Oxford), not simulated on one host.
 | **LIVE draft (edit this)** | `revision/glucose_fl_paper_working.tex` |
 | Bibliography (edit this) | `revision/references.bib` |
 | Figures | `revision/figures/` (e.g. `data_efficiency.pdf`) |
-| Version snapshots (frozen, read-only) | `revision/glucose_fl_paper_v1..v9.tex` — v9 is newest ≈ working |
+| Version snapshots (frozen, read-only) | `revision/glucose_fl_paper_v1..v13.tex` — v13 is newest ≈ working |
 | **Original draft — DO NOT EDIT** | `glucose_fl_paper.tex` (the author's Overleaf file; see "Two files" below) |
+| **Submission checklist** | `reviews/SUBMISSION_TODO.md` |
 | Open items the author owes | `reviews/REQUIRED_FROM_YOU.md` ← check this every session |
-| Per-iteration change log | `reviews/iter{1,2,3,4}_revisions.md` |
+| Per-iteration change log | `reviews/iter{1,2,3,4,5}_revisions.md` |
 | Reviewer critiques (5) | `reviews/iter1_reviewer*.md`, `reviews/iter2_*.md` |
 | Reference verification | `reviews/refcheck_*.md` |
 | Older open-questions doc | `reviews/UNSURE.md` (superseded by REQUIRED_FROM_YOU.md for live items) |
@@ -100,20 +101,30 @@ re-check before renaming.
   finetuning across 3 targets (`tab:finetune`). (`tab:bolus` and all bolus content
   removed 2026-08-11 by author decision.)
 - **Figures (1):** data-efficiency (`fig:dataeff`). **FL architecture diagram still owed.**
-- **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99);
-  OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/Flair); single-ARISES collapses
-  (28.51±6.85 on ReplaceBG, and on all 3). MLDG numerically best everywhere but
-  **not significant at 5 seeds** (paired t ≈ −1.3 @30, −2.1 @60).
+- **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99,
+  Centralised reference 19.90); OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/
+  Flair), Centralised 21.52/26.33/24.95; single-ARISES collapses (28.51±6.85 on
+  ReplaceBG, and on all 3). MLDG numerically best among the *federated* strategies
+  everywhere but **not significant at 5 seeds** (paired t ≈ −1.3 @30, −2.1 @60).
+  Every number in the paper is full 5-seed and traced to disk (as of 2026-08-11),
+  except the centralised row — see open threads.
 
 ## The biggest open threads (see REQUIRED_FROM_YOU.md for the full list)
 
 - **Persistence & clinical metrics (`NEW_FINDINGS.md` Phase D/E): DECIDED 2026-08-11 —
   not reported.** Author's call: the paper's claim is RMSE under federation/transfer;
   models were not optimised for event detection. Don't re-open without the author.
-- **Centralised baseline (Phase F) has been re-run convergence-matched** (50k steps,
-  5 seeds — see NEW_FINDINGS.md). Result: FL ≈ centralised pooling held-in and OOD.
-  Open decision: add it to the paper (recommended — answers "why not just pool?").
+- **Centralised (pooled) reference: IN THE PAPER since v13** (Methods baselines,
+  rows in tab:main/tab:ood, Results paragraph, limitation (viii) rewritten). Framed
+  as "reference", NOT "upper bound" (empirically not strict). ⚠️ Its numbers trace
+  to `NEW_FINDINGS.md` per-seed values (recomputed with *sample* sd) — author still
+  owes `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` on disk.
 - **More seeds** would settle MLDG significance. **FedProx µ is untuned.**
+- **PLANNED NEXT (agreed 2026-08-11): full rewording/flow pass with the author, in
+  order Results → Discussion → Methods → Intro → Abstract + Author summary last**
+  (abstract cut 420→≤300 words and author summary 276→150–200 happen at the end,
+  after content settles). Facts and numbers are final unless the author says
+  otherwise — the pass is about prose, not content.
 - **Admin blockers for PLOS:** author names/affiliations/email + ORCID, code repo DOI,
   per-dataset licence/accession + IRB statement, cover letter, ≥4 suggested
   reviewers, abstract over the 300-word limit, author summary over 200 words.
