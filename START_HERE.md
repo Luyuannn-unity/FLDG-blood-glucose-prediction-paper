@@ -96,17 +96,23 @@ re-check before renaming.
 
 ## Current state of the draft
 
-- **Tables (7):** datasets; held-in RMSE@30 (`tab:main`); OOD@30 across 3 cohorts
-  (`tab:ood`); zero-shot vs ReplaceBG-trained baselines (`tab:oodprior`); external
-  by-time comparison (`tab:prior`); 60-min (`tab:h60`);
-  finetuning across 3 targets (`tab:finetune`). (`tab:bolus` and all bolus content
-  removed 2026-08-11 by author decision.)
+- **Tables (7):** datasets; held-in RMSE@30 (`tab:main`, avg column now carries
+  per-seed-avg sd); OOD@30 across 3 cohorts (`tab:ood`); 60-min (`tab:h60`, since
+  2026-08-12 includes the 5 PFL held-in rows from the training logs, sits right
+  after `tab:ood`, and still has NO centralised row — no 60-min centralised data
+  exists); zero-shot vs ReplaceBG-trained baselines (`tab:oodprior`); external
+  by-time comparison (`tab:prior`); finetuning across 3 targets (`tab:finetune`).
+  (`tab:bolus` and all bolus content removed 2026-08-11 by author decision.)
 - **Figures (1):** data-efficiency (`fig:dataeff`). **FL architecture diagram still owed.**
 - **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99,
   Centralised reference 19.90); OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/
   Flair), Centralised 21.52/26.33/24.95; single-ARISES collapses (28.51±6.85 on
   ReplaceBG, and on all 3). MLDG numerically best among the *federated* strategies
-  everywhere but **not significant at 5 seeds** (paired t ≈ −1.3 @30, −2.1 @60).
+  in every comparison the paper reports, but **not significant at 5 seeds**
+  (paired t ≈ −1.3 @30, −2.1 @60). The paper says "every *reported* comparison"
+  because at 60 min FedAvg edges MLDG on the undisplayed T1D-UOM held-in cell
+  (32.18 vs 32.25). FedProx held-in avg is 20.27 since 2026-08-12 (full-precision
+  per-seed mean; the old 20.28 was a mean of rounded cells).
   Every number in the paper is full 5-seed and traced to disk (as of 2026-08-11),
   except the centralised row — see open threads.
 

@@ -19,7 +19,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | Decision | My recommendation |
 |---|---|---|
-| ~~12~~ | ~~Centralised baseline in paper~~ | **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. |
+| ~~12~~ | ~~Centralised baseline in paper~~ | **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. ⚠️ Second follow-up (added 2026-08-12): **no 60-minute centralised numbers exist anywhere** (NEW_FINDINGS Phase F records rmse@30 only). Table `tab:h60` now carries the PFL held-in rows (recovered from `rmse_60=` in the training logs) but has no centralised row. If the centralised run's training logs on the remote machine logged `rmse_60=`, sync them and we can complete the table; otherwise it stays FL+PFL+Local only. |
 
 ---
 
