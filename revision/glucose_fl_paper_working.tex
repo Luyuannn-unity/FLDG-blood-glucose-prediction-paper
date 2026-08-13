@@ -307,14 +307,11 @@ the same protocol carries FedAvg, FedProx, and MLDG training. The results we
 report were produced by running this system live across four UK universities ---
 University College London, the University of Manchester, Newcastle University, and
 the University of Oxford --- with one client per institution, each training only
-on the dataset that institution was responsible for and exchanging nothing but
-model weights over the public internet. We do not claim that each site
-originated its cohort: two of the four are custodians of the clinical study that
-produced theirs, while the others host a dataset released publicly. What the run
-exercises is the conditions a federation faces across separate administrative
-domains --- separate hardware, network round-trips between rounds, no shared
-filesystem --- rather than the single-host shortcut that almost all federated
-glucose work takes. What we do
+on one dataset and exchanging nothing but model weights over the public
+internet. This exercises the conditions a federation faces across separate
+administrative domains --- separate hardware, network round-trips between
+rounds, no shared filesystem --- rather than the single-host shortcut that
+almost all federated glucose work takes. What we do
 \emph{not} claim is a production-grade or cross-border deployment: the system
 carries no encryption, secure aggregation, or differential privacy, and all four
 sites are in one country, so the additional legal machinery of cross-jurisdiction
@@ -1010,10 +1007,6 @@ with a single shared statistic, and the federation ran across four real
 institutions in separate administrative domains rather than as shards of one
 dataset on one host. To our knowledge these are the first federated
 glucose-forecasting results from a multi-institution run on real patient data.
-The closest prior work, Sun et al.\ \cite{sun2024multicontinental}, is also
-genuinely distributed --- four PCs and a server across five cities on three
-continents --- but its clients hold in-silico subjects from the UVA/Padova
-simulator, so no real patient record enters that federation.
 
 \paragraph{Positioning against prior results on these cohorts.} Our
 per-cohort accuracy is competitive with published results on the same
