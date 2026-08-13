@@ -627,21 +627,24 @@ heterogeneous cohorts through federation does not cost in-domain accuracy despit
 each client seeing only the shared global weights. The difference emerges
 out-of-distribution, and it is about reliability more than average accuracy. We
 test transfer on three independent held-out cohorts --- ReplaceBG, BrisT1D, and
-Flair (Table~\ref{tab:ood}) --- and the pattern is the same on all three: every
-global strategy beats the mean single-cohort model, and the mean single-cohort
-model is dragged up by one failure. Three of the four single-cohort models
-transferred to within roughly half a mg/dL of the federated models, while the
-ARISES-only model collapsed on all three cohorts, with a seed-to-seed standard
-deviation an order of magnitude larger than any federated model's. The
-reading is therefore not that federation is a couple of mg/dL more accurate ---
-a gap that is in any case small relative to the measurement error of current CGM
-sensors, whose mean absolute relative difference from reference glucose is
-$\approx 8$--$9\%$, or roughly $12$--$14$ mg/dL at this population's mean
-glucose \cite{garg2022dexcomg7,alva2023libre3} --- but that a single-cohort
-model can transfer
-catastrophically and one cannot know in advance which cohort's model will fail,
-whereas across three unseen cohorts no federated model did so. Federation's value
-here is reduced tail risk, not a large mean gain.
+Flair (Table~\ref{tab:ood}).
+
+The spread among the single-cohort models is the finding, not their average.
+The best of them, trained on T1D-UOM, matched the federated models on all
+three held-out cohorts and edged them on BrisT1D and Flair; two others
+transferred to within roughly half a mg/dL. The ARISES-only model collapsed on
+all three, with a seed-to-seed standard deviation an order of magnitude larger
+than any federated model's. Federation therefore does not buy a better average
+--- a mean gain of a couple of mg/dL would in any case be small next to the
+measurement error of current CGM sensors, whose mean absolute relative
+difference from reference glucose is $\approx 8$--$9\%$, or roughly $12$--$14$
+mg/dL at this population's mean glucose
+\cite{garg2022dexcomg7,alva2023libre3}. What it buys is the removal of the
+worst case. Choosing a single cohort to train on meant choosing between a model
+that matched federation and one that collapsed, and in-domain accuracy did not
+separate them: the ARISES-only model was on par with federation on its own
+patients ($22.04$ vs MLDG $22.30$ mg/dL) and still failed on every held-out
+cohort. Federation's value here is reduced tail risk, not a large mean gain.
 
 \begin{table}[!ht]
 \centering
@@ -671,16 +674,16 @@ Local (mean of the four) & $23.45$ & $28.10$ & $26.76$ \\
 \begin{center}
 {\small Mean $\pm$ standard deviation across 5 seeds. None of these three cohorts
 contributed any training data, so every number is zero-shot transfer to an unseen
-cohort \emph{and} unseen patients. On all three cohorts each federated strategy
-beats the mean single-cohort model, and MLDG is numerically lowest among the
+cohort \emph{and} unseen patients. Bold marks the lowest value among the
 federated strategies; the centralised reference lands within $0.2$ mg/dL of the
 federated models in both directions (better on Flair, worse on ReplaceBG) and is
-excluded from bolding. Three of the
-four single-cohort models transfer competitively; the model trained on ARISES
-(the smallest cohort) collapses on all three, with a seed-to-seed sd $30$--$40
-\times$ that of any federated model --- and which cohort will fail this way is not
-knowable in advance. \emph{Local} is the unweighted mean of the four
-single-cohort models above it.}
+excluded from bolding. Three of the four single-cohort models transfer
+competitively --- the T1D-UOM model is the lowest of all rows on BrisT1D and
+Flair --- while the model trained on ARISES (the smallest cohort) collapses on
+all three, with a seed-to-seed sd $30$--$40 \times$ that of any federated model.
+\emph{Local} is the unweighted mean of the four single-cohort models above it,
+so it is dragged up by that one failure and is reported for completeness rather
+than as a deployable comparator.}
 \end{center}
 \end{table}
 
@@ -774,14 +777,16 @@ out-of-distribution transfer that is federation's main benefit.
 The comparison that motivates federated learning is not only against local
 training but against the centralised model one would train if pooling raw data
 were allowed. Held-in, the pooled reference is ahead of the best federated
-strategy by roughly $0.1$ mg/dL on average (Table~\ref{tab:main}), with the gap
-concentrated on ARISES --- the smallest cohort, where pooling plausibly helps
-most. Out-of-distribution the two are on par: MLDG is slightly better on
-ReplaceBG, the two are tied on BrisT1D, and the pooled model is slightly better
-on Flair (Table~\ref{tab:ood}). The practical reading is that the privacy
-constraint is nearly free: relative to pooling raw data it could not lawfully
-pool, a federated consortium gives up about $0.1$ mg/dL held-in and nothing
-measurable out-of-distribution.
+strategy by $0.09$ mg/dL on average ($19.90$ vs $19.99$,
+Table~\ref{tab:main}), with the gap concentrated on ARISES --- the smallest
+cohort, where pooling plausibly helps most. Out-of-distribution the two are on
+par: MLDG is slightly better on ReplaceBG, the two are tied on BrisT1D, and the
+pooled model is slightly better on Flair (Table~\ref{tab:ood}). The privacy
+constraint is therefore nearly free, and the sensor yardstick above puts a size
+on ``nearly'': $0.09$ mg/dL is under $1\%$ of the $12$--$14$ mg/dL error of the
+CGM sensors these models read from. Relative to pooling raw data it could not
+lawfully pool, a federation gives up less accuracy than the noise floor of its
+own input, and nothing measurable out-of-distribution.
 
 \paragraph{A federated model is a better starting point than local training, on
 every target.} Zero-shot transfer has a ceiling: even the pooled centralised
