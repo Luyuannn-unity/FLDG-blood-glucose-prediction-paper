@@ -85,7 +85,15 @@ re-check before renaming.
 - **Normalisation** = single global constant **154.04 ± 61.00 mg/dL**, computed on the
   4 training cohorts only. **No OOD leakage** (verified in logs). Shipped with the model.
 - **Metric** = RMSE, **point** error at 30 min (also 60 min in `tab:h60`), mg/dL,
-  mean±sd over **5 seeds (42,43,44,46,47)**; seed 45 not run.
+  mean±sd over **5 seeds (42,43,44,46,47)**; seed 45 not run. The paper text
+  says just "5 random seeds" — author decision 2026-08-13: don't list the IDs
+  in the paper (internal docs keep them).
+- **MLDG inner step** = one differentiable step by a `higher`-library copy of
+  the client's Adam (inherits moments, lr, weight decay; writes nothing back);
+  outer = meta-train + meta-test loss, equal weight, second-order kept.
+  In Methods as equations (`eq:mldginner`/`eq:mldgouter`) since 2026-08-13;
+  re-verified in `fl_paper_release/transformer/flock_model_transformer.py`
+  (`_train_step_mldg_ref`). Not plain SGD — don't regress the wording.
 - **OOD scoring** = each cohort's held-out **test split** (ReplaceBG = 21 patients), so
   zero-shot / from-scratch / finetuned all share one test set per cohort.
 - **APFL α is learned, not frozen**: it decays 0.23→0.02–0.08, i.e. APFL chooses to
@@ -103,7 +111,9 @@ re-check before renaming.
   exists); zero-shot vs ReplaceBG-trained baselines (`tab:oodprior`); external
   by-time comparison (`tab:prior`); finetuning across 3 targets (`tab:finetune`).
   (`tab:bolus` and all bolus content removed 2026-08-11 by author decision.)
-- **Figures (1):** data-efficiency (`fig:dataeff`). **FL architecture diagram still owed.**
+- **Figures (2):** data-efficiency (`fig:dataeff`); FL-system architecture
+  (`fig:system`, `revision/figures/fl_system.pdf`, matplotlib source
+  `fl_system_fig.py` beside it, added 2026-08-13 — the long-owed diagram).
 - **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99,
   Centralised reference 19.90); OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/
   Flair), Centralised 21.52/26.33/24.95; single-ARISES collapses (28.51±6.85 on

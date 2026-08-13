@@ -91,3 +91,18 @@ Diagnosis: the value case existed but sat below the fold.
   ReplaceBG (17) and Flair (9) clear their noise cleanly, so the abstract says
   9-17 and the 2-patient figure stays in the Discussion with its caveat.
 - Snapshot: `revision/glucose_fl_paper_v22.tex`.
+
+## Addendum (2026-08-13, later session) — OOD cohort ordering made consistent
+
+Author noticed `tab:finetune` ordered its columns ReplaceBG, Flair, BrisT1D while
+`tab:ood` and `tab:h60` use ReplaceBG, BrisT1D, Flair. Reordered `tab:finetune`
+columns to the canonical ReplaceBG, BrisT1D, Flair (cells swapped, bolding
+unchanged) and matched the table-tied text: the "FedProx on ReplaceBG, MLDG on
+BrisT1D and Flair" lists (Results + Discussion) and the caption's zero-shot
+comparison now follow the same order.
+
+Deliberately NOT reordered: `fig:dataeff` panels still run ReplaceBG, Flair,
+BrisT1D (no local source script exists for that figure — it was produced on the
+remote machine), so its caption and the data-efficiency paragraph keep the
+figure's own panel order. If the figure is ever regenerated, use the canonical
+order and flip those two spots to match. Snapshot v23.
