@@ -966,17 +966,19 @@ in transit, secure aggregation or differential privacy against inversion of
 the exchanged updates, access control, and governance and impact assessment.
 Our system provides none of these yet. Those are additions to a working
 architecture, not obstacles to it. With those safeguards, the tooling is
-light enough to run without dedicated federated-learning infrastructure, and
-the benefit should grow as more cohorts join and the shared model becomes
-more representative. Taken further, that points to a foundation model for
-CGM. General time-series foundation models are already being benchmarked on
-glucose forecasting \cite{lu2026glucofmbench}; building one specific to CGM
-would need data from many sites, which today means pooling it. Federation is
-a way to train on that data without moving any of it. Our four-cohort adult
-T1D model is far short of that scale, and we ran no experiment on how many
-sites such a model would need. What we report is a prerequisite --- a shared
-model a new site can adapt cheaply --- not evidence that the larger model
-would work.
+light enough to run without dedicated federated-learning infrastructure. We
+would expect the benefit to grow as more cohorts join and the shared model
+becomes more representative, though we did not vary the number of clients and
+cannot show it. Adding cohorts is also the path to something larger: a
+foundation model for CGM. General time-series foundation models are already
+benchmarked on glucose forecasting, where they do not yet beat a small
+supervised LSTM \cite{lu2026glucofmbench} --- an argument for training on
+more glucose data, not against it. Much of that data is public; much is not,
+and cannot be released. Federation is one route to the part that cannot, and
+it has not been tried at this scale. Our four-cohort adult T1D model is not
+such a model. What we report is one ingredient --- a shared model a new site
+can adapt with about a tenth of its patients --- not evidence that the larger
+one would work.
 
 \paragraph{Strengths.} Three features set this study apart from prior
 federated glucose work. First, it compares local training, FedAvg, FedProx,
