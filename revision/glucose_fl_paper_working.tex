@@ -687,6 +687,18 @@ than as a deployable comparator.}
 \end{center}
 \end{table}
 
+\paragraph{Zero-shot, the federated model lands among models built on the
+target cohort.} Those OOD numbers are absolute errors on cohorts nobody in this
+study trained on, so the question is how they compare with models developed on
+those cohorts directly. ReplaceBG allows that comparison, because published
+results exist for it under our protocol. Our MLDG model reaches $21.34$ mg/dL
+there having never seen one of its patients, which places it inside the field of
+models trained on ReplaceBG itself --- ahead of an in-distribution Bi-LSTM, GRU,
+ARIMA and SVR, level with N-BEATS, TCN and Crossformer, and behind only GluLLM
+and GPFormer, both of which trained on the cohort and two of which also consume
+insulin and electronic-health-record inputs we do not use. We set out that
+comparison, and its caveats, in the Discussion (Table~\ref{tab:oodprior}).
+
 \paragraph{At the 60-minute horizon the same ordering holds, and the
 single-cohort failure grows.} Because the model forecasts 12 steps, we can read
 off the 60-minute horizon as well (Table~\ref{tab:h60}). Errors grow to roughly
@@ -789,11 +801,13 @@ lawfully pool, a federation gives up less accuracy than the noise floor of its
 own input, and nothing measurable out-of-distribution.
 
 \paragraph{A federated model is a better starting point than local training, on
-every target.} Zero-shot transfer has a ceiling: even the pooled centralised
-model transfers worse to every held-out cohort than a model trained from scratch
-on that cohort's own data (Table~\ref{tab:finetune}) --- no amount of other
-cohorts' data substitutes for the target's own. A transferred model can,
-however, serve as a starting point. We therefore asked whether the federated
+every target.} Zero-shot transfer mostly has a ceiling. Comparing
+Table~\ref{tab:ood} against the from-scratch row of Table~\ref{tab:finetune},
+the pooled centralised model transfers worse to all three held-out cohorts than
+a model trained from scratch on that cohort's own data, and zero-shot MLDG does
+so on two of the three --- though on ReplaceBG it edges from-scratch training
+($21.34$ vs $21.38$ mg/dL), so the target's own data is not always decisive. A
+transferred model can also serve as a starting point. We therefore asked whether the federated
 model helps a \emph{new} site that has local data of its own, by finetuning the
 global model on the target cohort's training patients and comparing against a
 model trained on that cohort from scratch, on all three held-out cohorts
