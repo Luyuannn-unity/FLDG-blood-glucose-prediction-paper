@@ -78,6 +78,37 @@ where noted (one rounding fix, one new-data table extension — both traced to d
   conclusion is, and whether to keep it. Assessment delivered in-session; awaiting
   decision.
 
+## Second batch (same session) — centralised paragraph + full number sweep
+
+- **Centralised-provenance question resolved in-session**: the author asked how
+  the paper can claim centralised-vs-FL parity OOD when "I never ran an OOD test
+  on CL". Answer: the Phase F centralised run's standard eval pass scored all 7
+  datasets (per-seed OOD values are in NEW_FINDINGS Phase F); the author
+  confirmed they had forgotten the run. Claim stands; CSV sync still owed
+  (item 12).
+- **¶"Federation costs almost nothing"** rewritten to carry one message only:
+  privacy is nearly free — ~0.1 mg/dL held-in, on par OOD ("indistinguishable" →
+  "on par"). All table-restated numbers replaced with table refs. **Moved** from
+  after tab:h60 to directly before the "better starting point" paragraph.
+- **The transfer-limit point** ("even the pooled model transfers worse than
+  from-scratch on the target") moved out of the centralised paragraph and now
+  opens the "better starting point" paragraph as its motivation: zero-shot has a
+  ceiling → use the transferred model as an initialisation. Also fixed the odd
+  "a new site that does contribute data" → "that has local data of its own".
+- **Number sweep across all Results paragraphs** (rule: no numbers in text that a
+  table already carries; derived gaps/ranges stay):
+  - ¶MLDG: personalised-cluster range "(20.1–20.4)" → table ref.
+  - ¶personalised: Ditto µ=1.0 "(20.05, on par with FedAvg's 20.09)" and ARISES
+    "(21.95)" dropped; wording "best Ditto held-in average, on par with
+    FedAvg's".
+  - ¶data-efficiency: the three "(21.14 vs 21.38 ...)" RMSE parentheticals
+    dropped (from-scratch column is in tab:finetune, 10% values are in the
+    figure); patient counts kept.
+- New Results order: tab:main → ¶federation-matches + tab:ood → ¶60-min +
+  tab:h60 → ¶MLDG → ¶personalised → ¶centralised-cost → ¶starting-point +
+  tab:finetune → ¶data-efficiency + fig → ¶beyond-RMSE.
+- Snapshot v18.
+
 ## Verification
 
 - Env balance (table/tabular/figure/center/document) OK; all \cite keys resolve;
