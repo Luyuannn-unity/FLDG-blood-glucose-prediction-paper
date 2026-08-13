@@ -40,14 +40,16 @@ specific claims in the paper. Ordered by what would sink the paper first.
 ## ✅ RESOLVED (answered by you)
 
 - **MLDG update spec** (was item 2) — resolved from you + verified in code and the
-  training logs (`flock_model_gpformer.py`; log line "MLDG enabled (second-order/
-  higher) — n_support=1, n_query=1, inner_iters=1, trade_off=1.0, inner_lr=same as
-  outer"). Batches split patient-disjoint ~50/50 by windows; inner step = one
-  differentiable SGD step at 1e-4; outer loss = support loss at original weights +
-  query loss at adapted weights (equal weight); second-order term retained; outer
-  Adam state untouched by the inner step; fallback to a plain step never fired
-  (0 of 191,100 steps). Methods rewritten accordingly — the "released with the
-  code" deferral is gone.
+  run configs (`gpformer_arises_bolus_alt.sh` generator sets
+  `mldg_first_order=False`, `mldg_inner_reuse_outer_opt=True` → the
+  `_train_step_mldg_ref` path). Batches split patient-disjoint ~50/50 by windows;
+  **inner step = one differentiable step by a `higher` copy of the outer Adam**
+  (reads its moment history and LR 1e-4, writes nothing back) — *not* plain SGD;
+  the author's memory caught an earlier wrong "SGD inner step" wording, fixed
+  2026-08-11. Outer loss = support loss at original weights + query loss at
+  adapted weights (equal weight); second-order term retained; fallback to a plain
+  step never fired (0 of 191,100 steps). Release code + configs ship the same
+  variant.
 - **Patient counts** (was item 5) — resolved: HUPA-UCM (22) and T1D-UOM (14) are the
   counts carried in MetaboNet's harmonised release, not our filtering. The Methods
   now say so and cite MetaboNet (which also settles old item 9 — it is cited as the

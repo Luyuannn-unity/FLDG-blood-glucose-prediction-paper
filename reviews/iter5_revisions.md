@@ -20,8 +20,10 @@ Session driver: the author's pre-submission triage. Snapshot: `glucose_fl_paper_
      meta-test, ~50/50 by window count, patient-disjoint;
    - fallback to a plain step if <2 eligible patients — never fired
      (0 of 191,100 MLDG steps across 5 seeds, from `mldg_split_usage.csv`);
-   - inner update: one differentiable SGD step on the meta-train loss at the
-     outer LR (1e-4);
+   - inner update: one differentiable step on the meta-train loss (CORRECTED
+     same day, caught by the author: taken by a `higher` copy of the outer Adam
+     — reads its moment history and LR 1e-4, writes nothing back — NOT plain
+     SGD; the runs set `mldg_inner_reuse_outer_opt=True`, the `_ref` path);
    - outer loss: meta-train loss at original weights + meta-test loss at adapted
      weights, equal weight; second-order term retained (no first-order approx.);
    - outer step by the client's Adam; inner step does not touch Adam state.

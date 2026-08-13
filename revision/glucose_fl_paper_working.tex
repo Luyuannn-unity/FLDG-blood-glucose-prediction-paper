@@ -497,12 +497,15 @@ meta-test sets so that each side holds roughly half of the batch's windows and n
 patient appears on both sides; a batch with fewer than two eligible patients
 falls back to a plain gradient step (this never occurred: all $191{,}100$ MLDG
 training steps across the five seeds used the patient-disjoint split). The inner
-update is a single differentiable SGD step on the meta-train loss, at the same
-learning rate as the outer optimiser ($10^{-4}$). The outer loss is the
+update is a single differentiable step on the meta-train loss that reuses the
+outer optimiser's own update rule: it is taken by a differentiable copy of the
+client's Adam optimiser (via the \texttt{higher} library), so the inner step
+sees Adam's current moment estimates and learning rate ($10^{-4}$) but --- being
+a copy --- writes nothing back to the optimiser's state. The outer loss is the
 meta-train loss at the original weights plus the meta-test loss at the adapted
 weights, with equal weight on the two terms; its gradient retains the
 second-order term (we do not use a first-order approximation) and is applied by
-the client's Adam optimiser, whose moment state the inner step does not touch.
+the client's (real) Adam optimiser.
 
 \textbf{Personalised FL (PFL).} APFL learns a per-client mixture
 $\alpha v_i + (1-\alpha)w$ of a personal model $v_i$ and the global model $w$
