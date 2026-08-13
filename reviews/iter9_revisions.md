@@ -71,10 +71,18 @@ Diagnosis: the value case existed but sat below the fold.
   multi-site federated glucose study exists the claim stands but needs
   citations for the "almost all simulated" half; if one does exist, claim (c)
   must be narrowed.
-- **Deployment reports no deployment-only datum.** FedAvg over HTTP yields the
-  same weights as FedAvg in a for-loop, so nothing in Results distinguishes the
-  live run from a simulation. Server logs would give wall-clock, bytes/round,
-  straggler gap, retried rounds — cheap and would make contribution 3 checkable.
+- **Deployment reports no deployment-only datum. CLOSED 2026-08-13 — not
+  available.** FedAvg over HTTP yields the same weights as FedAvg in a for-loop,
+  so nothing in Results distinguishes the live run from a simulation. Wall-clock,
+  bytes/round, straggler gap and retried rounds would have made contribution 3
+  independently checkable, but the server logs were not kept. The deployment
+  therefore stands as an architectural contribution, honestly stated; nothing in
+  the paper claims a measured result from it. Do not re-raise.
+- **Clinical metrics (Clarke/Parkes, MARD, event detection): CLOSED 2026-08-13 —
+  not reported.** Author's decision, re-affirmed (it was already a locked call of
+  2026-08-11). The paper's position is coherent at both ends: the evaluation
+  section justifies RMSE@30 as the single primary metric with three positive
+  reasons, and Limitations (i) concedes the gap by name. Do not re-raise.
 - **No persistence baseline** (author decision, START_HERE). Survivable for the
   *relative* pooling-parity claim; not survivable for any absolute-accuracy
   claim. The abstract as rewritten makes only the relative claim.
