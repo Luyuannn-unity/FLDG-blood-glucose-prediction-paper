@@ -88,44 +88,34 @@ Name1 Surname\textsuperscript{1*}
 
 % Please keep the abstract below 300 words
 \section*{Abstract}
-Algorithms that predict blood glucose 30 minutes ahead are increasingly used in
-type~1 diabetes (T1D) to warn of excursions and support insulin decisions, but a
-model trained on one cohort often transfers poorly to new patients, devices, and
-sites --- and the diverse, multi-site data that would make it robust are kept
-siloed by privacy regulation. Federated learning (FL) lets institutions train a
-shared model without moving raw records. Yet for glucose forecasting the leading
-federated strategies have rarely been compared head-to-head, evaluations seldom
-separate accuracy on the training cohorts (held-in) from accuracy on entirely
-unseen cohorts (out-of-distribution, OOD), and almost all such work is simulated
-rather than run across real machines. We address these gaps. Using a common
-encoder--decoder transformer and four real T1D cohorts as federated clients ---
-with three never-seen cohorts (ReplaceBG, BrisT1D, Flair) as OOD test sets --- we
-benchmark
-single-cohort local training against federated averaging (FedAvg), FedProx,
-meta-learning for domain generalisation (MLDG), and two personalised-FL methods,
-under a strict by-patient split and a five-seed protocol, reporting held-in and
-OOD error separately at the 30- and 60-minute horizons. Federation matched local
-training
-in-domain (held-in average $\approx$20 mg/dL RMSE) and transferred more reliably
-out of it: on all three unseen cohorts the global models beat the mean
-single-cohort model, and a model trained on the smallest
-cohort alone collapsed on every one of them (e.g.\ $28.5$ vs $\approx$21.3 mg/dL
-on ReplaceBG). The gains over local training are small relative to CGM sensor
-error, so the practical value is reduced deployment risk rather than a large
-accuracy jump; MLDG was numerically best in every comparison but by margins
-within seed-to-seed variation (not significant at five seeds). Adapting the model
-to a new site by finetuning beat training there from scratch on all three held-out
-cohorts, and needed as little as $10\%$ of the new site's patients to do so. Crucially, these results
-were not simulated: we built a lightweight FL system --- a stateless server plus
-per-cohort clients communicating over HTTP with only the Python standard library
---- and ran the federation live across four universities (University College
-London, Manchester, Newcastle, and Oxford), one client per institution, over the
-public internet, rather than sharding one dataset on a single host as almost all
-prior federated glucose work does. The contribution is thus a clean, by-patient,
-held-in-versus-OOD benchmark of federated strategies across four real T1D cohorts,
-delivered by a genuinely multi-institution federation: a privacy-preserving way to
-reduce the risk of catastrophic transfer failure, using tooling light enough for a
-small clinical consortium to adopt.
+Algorithms that forecast blood glucose 30 minutes ahead are used in type~1
+diabetes (T1D) to warn of excursions, but a model trained at one centre can
+transfer poorly to new patients and sites --- and the varied data that would
+make it robust cannot lawfully be pooled. Federated learning (FL)
+trains a shared model without moving raw records. For glucose forecasting, FL
+strategies have rarely been compared head-to-head, evaluations
+seldom separate accuracy on the training cohorts (held-in) from accuracy on
+unseen cohorts (out-of-distribution, OOD), and almost all such work is
+simulated. Using one encoder--decoder transformer, four real T1D cohorts as
+federated clients and three never-seen cohorts (ReplaceBG, BrisT1D, Flair) as
+OOD tests, we benchmarked single-cohort local training against federated
+averaging (FedAvg), FedProx, meta-learning for domain generalisation (MLDG),
+and two personalised-FL methods under a by-patient split over five seeds,
+reporting held-in and OOD error at 30 and 60 minutes.
+
+The privacy constraint proved nearly free. Federation reached $19.99$ mg/dL
+RMSE at 30 minutes against $19.90$ for a convergence-matched model trained on
+the four cohorts pooled --- a gap of $0.09$ mg/dL, under $1\%$ of the
+$12$--$14$ mg/dL error of the CGM sensors these models read.
+Out-of-distribution, the best single-cohort model matched the federated
+models, but the model trained on the smallest cohort collapsed on all three
+($28.5$ vs $\approx$$21.3$ mg/dL on ReplaceBG) with in-domain accuracy that
+gave no warning. On ReplaceBG the federated model reached $21.34$ mg/dL
+without seeing any of its patients, within the range of models trained on it.
+A new site beat from-scratch training on all its patients after finetuning on
+$9$--$17$ of them. Differences between FL strategies fell within seed noise.
+We ran the federation live across four universities, not in simulation, using
+tooling light enough for a small group of clinics to adopt.
 
 % Author Summary: 150-200 words, first person.
 \section*{Author summary}
