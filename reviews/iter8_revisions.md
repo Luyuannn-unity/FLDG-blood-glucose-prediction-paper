@@ -63,3 +63,69 @@ merged to 12. Structure checks pass after editing: envs balanced
   li2018mldg, deng2020apfl, li2021ditto — currently Intro-only), then the
   wording/flow pass.
 - Snapshot: `revision/glucose_fl_paper_v21.tex`.
+
+---
+
+# Part 2 — author-directed Methods changes (2026-08-13, same day)
+
+Per the author's instructions. Note: some of these edits rode into the
+concurrent session's commit 5a0ccec (whose message covers only the
+tab:finetune column reorder); this log is the record for all of them.
+
+1. **Datasets**: the three held-out cohorts are no longer "never seen during
+   training / used only as OOD test cohorts" — they are later finetuned on.
+   New text names both roles (zero-shot OOD test; finetuning target adapted on
+   training patients, evaluated on held-out test patients). Table note now
+   says "excluded from *federated* training"; Evaluation regimes now says
+   "the three held-out cohorts"; the OOD-test-sets claim ("unseen cohort and
+   unseen individual") is now scoped to the zero-shot evaluation.
+2. **FL system figure added** (`fig:system`; `figures/fl_system.pdf`/`.png`,
+   matplotlib source `figures/fl_system_fig.py`): server + 4 clients with
+   patient counts, numbered round steps (broadcast / local train / return /
+   FedAvg), public-internet HTTP band, no-raw-data-movement footer.
+   Referenced from the FL-system subsection; closes the long-owed
+   FL-architecture-figure item (tex author-NOTE updated).
+3. **Strategy citations at point of definition**: FedAvg (mcmahan2017fedavg),
+   FedProx (li2020fedprox), MLDG (li2018mldg), APFL (deng2020apfl), Ditto
+   (li2021ditto). Previously Intro-only.
+4. **FedProx**: dropped "did not sweep µ / indicative rather than tuned"
+   (author instruction). Methods now just states µ=0.05; the untuned-µ caveat
+   stays in Limitations (iv).
+5. **MLDG rewritten with equations** (`eq:mldginner`, `eq:mldgouter`)
+   replacing the verbose mechanics. The Adam-with-history inner step was
+   re-verified in code (fl_paper_release/transformer/flock_model_transformer.py,
+   `_train_step_mldg_ref`): one differentiable step by a `higher` copy of the
+   client's Adam (inherits moments, lr 1e-4, weight decay; no write-back);
+   outer = meta-train + meta-test loss at equal weight (mldg_trade_off=1.0);
+   second-order retained; real-Adam outer step; patient-disjoint split with
+   never-fired fallback. All six claims VERIFIED with file:line evidence.
+6. **Seeds**: paper no longer lists seed IDs — "5 random seeds" only (author
+   instruction; internal docs keep the IDs). "Across the common seeds" →
+   "across seeds".
+7. **Removed** the "We emphasise that these standard deviations…" passage to
+   the end of the paragraph (author instruction). The seed-sd caveat and
+   clinical-metrics pointer survive in Limitations (i)/(iii).
+8. **New Methods paragraph "Finetuning on held-out cohorts"** (the protocol
+   was previously only implied by Results): three arms (zero-shot /
+   from-scratch / finetuned) on the same held-out test patients; finetuning =
+   all parameters, 10 epochs, lr 1e-4, val-best selection (traced to
+   NEW_FINDINGS Phases B/C/G/H and `finetune_ood()` in the release code);
+   data-efficiency = random 10–70% of training patients per seed, val/test
+   unchanged.
+9. **Implementation details corrected**: "one local epoch per communication
+   round" → "one pass over the local training set, capped at 500 gradient
+   steps" (traced to `proposer_max_steps_per_epoch: 500` in
+   config_mldg_seed42.yaml and NEW_FINDINGS Phase B; the 191,100 MLDG-step
+   total is consistent with the cap, not with full epochs). Also added
+   gradient-norm clipping at 1.0 (verified universal: main step, MLDG paths,
+   PFL trainers).
+10. **Results honesty fix that follows from 8/9**: "identical training
+    budget" claim removed (the finetuned arm trains for *fewer* steps than
+    from-scratch — ≤5,000 vs ≤12,500 — so the old wording was wrong, though
+    conservative). Now: both arms see identical target data, gain attributed
+    to initialisation. tab:finetune note likewise now says the finetuned rows
+    differ in starting weights, not in data seen.
+
+Structure checks: envs balanced (figure=2, equation=2), fig:system 1 ref,
+fig:dataeff 3 refs, eq labels ref'd via \eqref, all 5 new cite keys in
+references.bib (82 \cite total). Snapshot: v24.
