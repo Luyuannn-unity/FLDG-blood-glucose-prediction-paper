@@ -193,8 +193,8 @@ central difficulty is statistical heterogeneity: plain federated averaging
 degrades when client distributions diverge, motivating proximal
 regularisation~\cite{li2020fedprox} and control-variate variance
 reduction~\cite{karimireddy2020scaffold}. Most of this work, however, is evaluated
-in simulation, where ``clients'' are partitions of one dataset on a single
-machine.
+in simulation, with the whole federation executed as processes or dataset shards
+on a single machine.
 
 Even with federation, real CGM cohorts differ in device generation, demographics,
 treatment protocols, and glycaemic regime, and these differences widen across
@@ -245,8 +245,18 @@ glucose task under a shared protocol, with held-in and OOD performance reported
 separately---is the main focus of this paper.
 
 A second, more practical observation is that almost all federated glucose work is
-simulated rather than deployed, with ``clients'' as partitions of one dataset on a
-single machine. Running a federation for real additionally requires networked,
+simulated rather than deployed: the usual setup treats individual patients as
+clients and executes the whole federation as processes or dataset shards on a
+single machine
+\cite{piao2023graph,piao2025gluadfl,dave2025fedglu,defalco2023federated}. The
+pattern is not specific to glucose --- of 612 federated healthcare studies only
+$5.2\%$ report a real-life application \cite{teo2024federated}, and of 107
+implementation studies only ten involve real-world distributed clinical settings
+\cite{li2025challenges}. The exception is Sun et al.\
+\cite{sun2024multicontinental}, who deploy a blockchain-enabled federated glucose
+model across five cities on three continents, though on in-silico subjects from
+the UVA/Padova simulator rather than real patient records.
+Running a federation for real additionally requires networked,
 physically separate sites to exchange updates and to start from a common model;
 production FL frameworks can do this but carry substantial dependencies and
 assumptions that can be ill-suited to a small clinical consortium that simply wants
@@ -290,17 +300,21 @@ turns the benchmark into usable deployment advice.
 \textbf{Third, we run this federation for real across four institutions, rather
 than simulating it.} We build, from scratch, a lightweight
 cross-site FL system for CGM forecasting: a stateless aggregation server that
-holds the global model but no data, and clients that each wrap one institution's
-cohort, communicating over HTTP using only the Python standard library. The server
+holds the global model but no data, and clients that each wrap one dataset,
+communicating over HTTP using only the Python standard library. The server
 broadcasts the initial weights so every client starts from an identical model, and
 the same protocol carries FedAvg, FedProx, and MLDG training. The results we
 report were produced by running this system live across four UK universities ---
 University College London, the University of Manchester, Newcastle University, and
-the University of Oxford --- with one client per institution, each training only on
-its own cohort and exchanging nothing but model weights over the public internet.
-This exercises the conditions a real consortium faces (separate administrative
-domains, separate hardware, network round-trips between rounds) rather than the
-single-host shortcut that almost all federated glucose work takes. What we do
+the University of Oxford --- with one client per institution, each training only
+on the dataset that institution was responsible for and exchanging nothing but
+model weights over the public internet. We do not claim that each site
+originated its cohort: two of the four are custodians of the clinical study that
+produced theirs, while the others host a dataset released publicly. What the run
+exercises is the conditions a federation faces across separate administrative
+domains --- separate hardware, network round-trips between rounds, no shared
+filesystem --- rather than the single-host shortcut that almost all federated
+glucose work takes. What we do
 \emph{not} claim is a production-grade or cross-border deployment: the system
 carries no encryption, secure aggregation, or differential privacy, and all four
 sites are in one country, so the additional legal machinery of cross-jurisdiction
@@ -995,7 +1009,11 @@ strategies. Third, the cohorts are split strictly by patient and normalised
 with a single shared statistic, and the federation ran across four real
 institutions in separate administrative domains rather than as shards of one
 dataset on one host. To our knowledge these are the first federated
-glucose-forecasting results from a real multi-institution run.
+glucose-forecasting results from a multi-institution run on real patient data.
+The closest prior work, Sun et al.\ \cite{sun2024multicontinental}, is also
+genuinely distributed --- four PCs and a server across five cities on three
+continents --- but its clients hold in-silico subjects from the UVA/Padova
+simulator, so no real patient record enters that federation.
 
 \paragraph{Positioning against prior results on these cohorts.} Our
 per-cohort accuracy is competitive with published results on the same
