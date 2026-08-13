@@ -119,30 +119,24 @@ tooling light enough for a small group of clinics to adopt.
 
 % Author Summary: 150-200 words, first person.
 \section*{Author summary}
-People with type~1 diabetes rely increasingly on algorithms that predict where
-their glucose will be in the next half hour. These predictors work well for the
-patients they were trained on but can fail when applied to a different clinic,
-device, or population --- and the varied data that would make them robust are
-scattered across institutions that, for privacy reasons, cannot pool raw
-records. Federated learning lets those institutions train a shared model while
-each keeps its own data in-house. We asked which federated method to use, and
-whether the approach works outside a simulation. Treating four separate
-diabetes studies as collaborating sites, we compared the main federated
-strategies and tested each on three further studies that contributed no training
-data.
-We found that federation was about as accurate as training on a single cohort
-for patients from the participating sites, and more reliable on the unseen
-cohorts: a model trained on one cohort alone sometimes failed badly on new
-patients, whereas the federated models did not, on any of the three held-out
-cohorts we tested. The accuracy differences are
-small, so the main benefit is lower risk of a bad surprise on a new population
-rather than a large accuracy gain. We also built a minimal system and ran the
-training for real --- not as a simulation --- across four universities, with each
-university's computer holding only its own cohort. Our results
-give a small group of clinics a practical, privacy-preserving starting point for
-building glucose predictors that are less likely to fail on patients they have
-never seen --- though clinical metrics beyond error size, and tests on more
-diverse populations, are still needed before deployment.
+People with type~1 diabetes increasingly rely on algorithms that predict their
+glucose half an hour ahead. These work well for the patients they were trained
+on but can fail on a different clinic or population, and the data that would
+fix that sits in institutions which cannot legally pool raw records. Federated
+learning lets them train a shared model while each keeps its data in-house.
+
+We treated four diabetes studies as collaborating sites, compared the main
+federated methods, and tested each on three further studies that gave no
+training data. Federation cost almost nothing: it came within $0.09$ mg/dL of a
+model trained on all four datasets pooled, far less than the error of the
+sensors themselves. Training on one cohort alone was a gamble --- the best such
+model matched federation, another failed on every unseen population, and their
+accuracy at home gave no warning. A new site could beat training alone after
+finetuning the shared model on as few as nine of its own patients.
+
+We ran this across four universities for real, each holding only its own data.
+That gives a small group of clinics a practical route to predictors that fail
+less often on unseen patients.
 
 \clearpage
 \newgeometry{top=0.85in,left=1in,right=1in,footskip=0.75in}
