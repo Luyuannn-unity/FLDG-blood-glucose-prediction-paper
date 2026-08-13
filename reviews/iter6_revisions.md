@@ -73,10 +73,32 @@ where noted (one rounding fix, one new-data table extension — both traced to d
 ## Untouched, pending author
 
 - ¶"Federation costs almost nothing relative to centralised pooling" — author
-  asked for a summary of its message before rewording.
+  asked for a summary of its message before rewording. (Resolved in batch 2.)
 - ¶"Beyond RMSE" (TIR/lag) — author asked where the numbers live, what the
-  conclusion is, and whether to keep it. Assessment delivered in-session; awaiting
-  decision.
+  conclusion is, and whether to keep it. Assessment delivered in-session.
+  (Resolved in batch 3: removed.)
+
+## Third batch (same session) — Beyond-RMSE paragraph removed
+
+Author decision: the paper's framing is train-on-RMSE, evaluate-on-RMSE for
+simplicity, so the TIR/lag paragraph is not a valuable result. Removed the
+paragraph and its three tendrils:
+
+- Methods (evaluation protocol): "Alongside RMSE we report TIR agreement and
+  forecast lag ..." → "Clinically oriented metrics --- an error-grid analysis,
+  MARD, and hypo-/hyperglycaemia event detection --- are not included here and
+  are discussed as limitations."
+- Limitation (i): "only partly tested (we report time-in-range agreement and
+  prediction lag, below)" → "is untested".
+- Future work: "extend the clinically oriented metrics we begin here (TIR
+  agreement, forecast lag) to a full ..." → "add clinically oriented metrics ---
+  a full ...".
+
+Note: the ~20-min forecast-lag observation (persistence-like behaviour caveat)
+now appears nowhere in the paper. If a reviewer raises persistence-like
+behaviour, the numbers still trace to the per-run CSVs
+(`time_lag_30min_min` column). Results now ends at the data-efficiency figure.
+Snapshot v19.
 
 ## Second batch (same session) — centralised paragraph + full number sweep
 

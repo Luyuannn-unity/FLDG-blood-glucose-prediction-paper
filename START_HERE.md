@@ -121,6 +121,11 @@ re-check before renaming.
 - **Persistence & clinical metrics (`NEW_FINDINGS.md` Phase D/E): DECIDED 2026-08-11 —
   not reported.** Author's call: the paper's claim is RMSE under federation/transfer;
   models were not optimised for event detection. Don't re-open without the author.
+  **Extended 2026-08-12:** the Results "Beyond RMSE" TIR/lag paragraph is also
+  removed (author decision — the paper's framing is RMSE-only). The paper now
+  reports no TIR agreement or forecast-lag numbers anywhere; Methods, Limitation
+  (i), and Future work were cleaned to match. The ~20-min forecast-lag caveat is
+  gone with it.
 - **Centralised (pooled) reference: IN THE PAPER since v13** (Methods baselines,
   rows in tab:main/tab:ood, Results paragraph, limitation (viii) rewritten). Framed
   as "reference", NOT "upper bound" (empirically not strict). ⚠️ Its numbers trace
