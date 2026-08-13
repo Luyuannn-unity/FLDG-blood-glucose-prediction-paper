@@ -903,7 +903,7 @@ difference.
 results also show a tension. The personalised strategies (Ditto, APFL) and
 dedicated single-cohort models were the \emph{only} approaches that beat the
 federated models on the hardest and smallest in-domain cohort: on ARISES,
-Ditto ($\mu{=}0.01$, $21.98$ mg/dL) and the dedicated ARISES model ($22.04$
+Ditto ($\mu{=}0.01$, $21.95$ mg/dL) and the dedicated ARISES model ($22.04$
 mg/dL) edged MLDG ($22.30$). But these methods produce no single global model,
 so they cannot serve the OOD cohorts at all --- the regime in which the global
 models are most valuable. Specialising to a site helps that site but gives up
@@ -1031,7 +1031,7 @@ GlucoFM-Bench \cite{lu2026glucofmbench} (LSTM) & T1D-UOM  & 20.81 (4.26) & by-ti
 Zhu et al.\ \cite{zhu2023fcnn} (FCNN)          & ARISES   & 20.23 (3.38) & by-time & patients \\
 Zhu et al.\ \cite{zhu2023fcnn} (FCNN)          & ABC4D    & 20.25 (2.60) & by-time & patients \\
 \hline
-Ours (MLDG, global)            & HUPA-UCM & 18.46 (0.15) & \emph{by-patient} & seeds \\
+Ours (MLDG, global)            & HUPA-UCM & 18.46 (0.28) & \emph{by-patient} & seeds \\
 Ours (MLDG, global)            & ABC4D    & 19.68 & \emph{by-patient} & seeds \\
 Ours (MLDG, global)            & ARISES   & 22.30 & \emph{by-patient} & seeds \\
 Ours (MLDG, global)            & T1D-UOM  & 19.53 & \emph{by-patient} & seeds \\
