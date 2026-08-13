@@ -744,8 +744,8 @@ time.}
 \end{center}
 \end{table}
 
-\paragraph{MLDG is a small, consistent, but not statistically significant
-improvement.} Among the federated strategies that produce a deployable global
+\paragraph{MLDG has the lowest error in every reported comparison, within seed
+noise.} Among the federated strategies that produce a deployable global
 model (FedAvg, FedProx, MLDG), MLDG
 has the numerically lowest error in \emph{every} reported held-in and OOD
 comparison, and
@@ -880,14 +880,14 @@ distinct domains and tested on three never-seen cohorts (out-of-distribution,
 OOD). Federation matched single-cohort local training in-domain and
 transferred more reliably out of it. Held-in, the global FedAvg and MLDG
 models matched local training (average RMSE $20.09$ and $19.99$ vs.\ $20.16$
-mg/dL at 30 minutes) and were within $0.1$ mg/dL of a convergence-matched
-centralised model trained on the four cohorts pooled ($19.90$). OOD, on all
-three held-out cohorts the federated models beat the mean single-cohort model
-and avoided the collapse that the smallest-cohort model showed on each of
-them. Still, most single-cohort models transferred comparably, and the mean
-gain is small next to sensor error. Among the federated strategies MLDG was
-numerically best in every reported comparison, but by margins within
-seed-to-seed variation. These results were produced by a federation that ran
+mg/dL at 30 minutes) and came within $0.09$ mg/dL of a convergence-matched
+centralised model trained on the four cohorts pooled ($19.90$) --- so the
+accuracy cost of never pooling raw data was smaller than the error of the
+sensors the model reads from. OOD, the choice of a single training cohort
+decided everything: the best single-cohort model matched the federated models,
+the smallest-cohort model collapsed on all three held-out cohorts, and
+in-domain accuracy did not tell the two apart. Every federated model avoided
+that collapse. These results were produced by a federation that ran
 across four universities --- UCL, Manchester, Newcastle, and Oxford ---
 training FedAvg, FedProx, and MLDG under the same protocol over the public
 internet, with no raw data leaving any site. It is a working
@@ -946,15 +946,12 @@ still helps where it is small (BrisT1D). In short: federate to get a robust
 shared model, then adapt it to a new centre with a modest amount of that
 centre's own data.
 
-\paragraph{On meta-learning.} MLDG was numerically best in every reported
-held-in and OOD comparison and beat FedAvg on four of five seeds. But the
-margins ($\le 0.1$ mg/dL) are within seed noise, and a paired test at five
-seeds does not reach significance. We therefore report a small, consistent
-edge, not a demonstrated meta-learning advantage. One caveat: our MLDG splits
-patients into meta-train and meta-test \emph{within} each client, so it
+\paragraph{On meta-learning.} MLDG's edge is small, consistent, and
+underpowered (Limitations (iii)), but its mechanism is worth a note: our MLDG
+splits patients into meta-train and meta-test \emph{within} each client, so it
 simulates cross-\emph{patient} shift inside a cohort, not the
 cross-\emph{cohort} shift the OOD test measures. That it still comes out
-consistently ahead OOD is suggestive but unexplained; a federated-DG
+consistently ahead OOD is suggestive but unexplained. A federated-DG
 formulation that meta-splits \emph{across} clients would target the evaluated
 shift more directly and, with more seeds to power a test, is the natural next
 step. The dominant effect in our results is federation itself; the choice of
