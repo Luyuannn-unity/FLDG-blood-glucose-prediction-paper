@@ -100,7 +100,11 @@ re-check before renaming.
   deploy a ~95% global model. This is a *finding* (personalisation isn't worth much
   here), not a bug.
 - **Deployment** = ran live across the 4 universities. Title says "four-institution
-  deployment". Honest caveats: plain HTTP (no encryption/secure-agg/DP), single country.
+  deployment". Caveats: single country; no secure aggregation / DP yet. **Author
+  decision 2026-08-11: do NOT emphasise the lack of security** — "plain HTTP /
+  no encryption / could be attacked" language was removed everywhere; the only
+  remaining mention is one neutral sentence in Limitations (v) framed as the
+  next step (add secure aggregation + DP).
 
 ## Current state of the draft
 
@@ -147,9 +151,11 @@ re-check before renaming.
   (abstract cut 420→≤300 words and author summary 276→150–200 happen at the end,
   after content settles). Facts and numbers are final unless the author says
   otherwise — the pass is about prose, not content.
-- **Admin blockers for PLOS:** author names/affiliations/email + ORCID, code repo DOI,
-  per-dataset licence/accession + IRB statement, cover letter, ≥4 suggested
-  reviewers, abstract over the 300-word limit, author summary over 200 words.
+- **Admin blockers for PLOS:** author names/affiliations/email + ORCID, cover
+  letter, ≥4 suggested reviewers, abstract over the 300-word limit, author summary
+  over 200 words. (Done 2026-08-11: ethics statement — UCL IHI LREC Project ID
+  1665; ABC4D/ARISES access route — on request via ken.li@ucl.ac.uk; code repo
+  live + MIT; Limitations and Future work merged into one paragraph.)
   (MLDG update spec and patient-count rule: resolved 2026-08-11, now in Methods.)
   Full checklist: `reviews/SUBMISSION_TODO.md`.
 

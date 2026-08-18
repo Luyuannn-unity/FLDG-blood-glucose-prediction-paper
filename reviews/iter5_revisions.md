@@ -153,6 +153,32 @@ as the paper's antecedent/starting point.
 - Still owed (REQUIRED #7): real repo URL/DOI, accessions, ABC4D/ARISES access
   route + justification, IRB/consent statement.
 
+## Sixth addendum: ethics, data access, merged Limitations, security de-emphasis
+
+- **Ethics statement** added to "Data and code availability, and ethics":
+  secondary analysis of de-identified data; approved by UCL Institute of Health
+  Informatics LREC, Project ID 1665 (title quoted); no participants contacted.
+- **ABC4D / ARISES**: now "available upon request and approval" via Dr Kezhi Li
+  (ken.li@ucl.ac.uk); code line now says "under the MIT licence".
+- **Limitations + Future work merged** into one paragraph "Limitations and
+  future work" (7 numbered items + closing joint-training/continual-federation
+  sentence, kept verbatim per author). New content per author: (i) reframed —
+  goal was FL performance; next step is training/evaluating with clinical
+  relevance built in, e.g. a loss penalising the dangerous error-grid zones;
+  (v) secure aggregation + DP as the next step, and the cross-border sentence
+  kept verbatim. Persistence baselines are NOT mentioned (author instruction).
+  Deduplicated the paediatric/type-2 point (was in both (ii) and (vii)).
+  Old (iv) "no persistence or simple learned baseline" dropped; FedProx-untuned
+  and APFL-not-under-tuned kept under (iii).
+- **Security de-emphasis** (author instruction): removed "plain HTTP without
+  encryption… could in principle be attacked" from Methods FL-system paragraph
+  (whole caveat sentence deleted), "plain" from the HTTP mention and the
+  fig:system caption, and "encryption in transit… Our system provides none of
+  these yet" from the Discussion implications paragraph. Remaining: one neutral
+  Limitations sentence framing secure aggregation/DP as the next step, and the
+  Discussion's "necessary but not sufficient… would add safeguards such as
+  secure aggregation" clause.
+
 ## Decisions recorded (see REQUIRED_FROM_YOU.md)
 
 - Persistence / clinical-metrics comparison: **not reported** (author).
