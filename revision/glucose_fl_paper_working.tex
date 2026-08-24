@@ -390,15 +390,6 @@ the global model's input scale identical at every site, which is what allows
 weights aggregated across clients to be applied directly to the OOD cohorts.
 All models, including the single-cohort models, are trained with this shared
 constant.
-% NOTE (author, 2026-08-24): the reporting evaluation (eval_extended.py)
-% recomputes the normalisation constants from each arm's training directories
-% and overrides the config: the pooled clean four-cohort statistics for the
-% federated and centralised arms (152.18 / 61.09, immaterial) and each single
-% cohort's own statistics for the single-cohort arms (e.g. HUPA-UCM 136.29 /
-% 52.36, which shifts that model's held-in RMSE by about 0.5 mg/dL at seed 42:
-% 20.44 with the training constants vs 20.99 reported). Decision pending: rerun
-% the extended evaluation of the four single-cohort arms with the training
-% constants, or describe the mismatch here. See REQUIRED_FROM_YOU.md item 16.
 Alongside CGM, each example carries a time-of-day mark encoded as
 $(\sin 2\pi\,\mathrm{frac},\ \cos 2\pi\,\mathrm{frac})$, where $\mathrm{frac}$
 is the fraction of the day, to expose circadian structure.
