@@ -98,3 +98,34 @@ filled on all four Ours rows.
 - Single-cohort OOD rows decision (above).
 - Confirm the BrisT1D source-study participant count if it is to be mentioned
   (the draft now says "15 patients in the release we use").
+
+## Addendum (2026-08-24, evening): single-cohort re-evaluation
+
+The verification sweep found that the four single-cohort arms had been trained
+with the shared constant (154.04 / 61.00) but evaluated with their own cohort's
+statistics (the old Phase-D quirk carried over). The author re-evaluated them
+with the training constants (`output_clean_retrain/clean_eval_pinned/`) and
+updated CHANGES.md. Batch 11 swapped the Local rows of `tab:main` and `tab:h60`,
+the single-cohort and Local-mean rows of `tab:ood`, and every sentence that
+depended on them. Snapshot v30.
+
+Two conclusions moved:
+
+1. **Held-in: only MLDG beats local training.** Local avg 20.49 (was 20.62).
+   MLDG − Local −0.23 (p = 0.014, 5/5). FedAvg − Local −0.05 (p = 0.14, not
+   significant). FedProx level. Local wins ARISES numerically (21.87 vs 22.06,
+   p = 0.24, bold on Local). Headline changed from "federation beats local" to
+   "the meta-learned federated model beats local training, plain averaging
+   matches it". The meta-learning paragraph now says strategy choice mattered
+   more than federating at all at 30 min.
+2. **OOD: only MLDG beats the average single cohort on every target.** Local
+   mean 21.73 / 26.56 / 25.22. MLDG −0.43 / −0.31 / −0.20 (all p ≤ 0.004).
+   FedAvg beats it on ReplaceBG only. FedProx matches it. Single-ARISES ties MLDG
+   on BrisT1D and edges it by 0.17 on Flair. Single-HUPA is 0.7–0.9 behind MLDG
+   (was 1.2–1.6). Best-to-worst spread 0.5–1.0 (was 1.1–1.7). MLDG beats a single
+   model in 18 of 24 cells (was 19).
+
+Unchanged: everything about FedAvg/FedProx/MLDG/centralised/PFL held-in and
+OOD, the finetuning and data-efficiency results, the 0.09 gap and the 60-min
+tie, the ReplaceBG zero-shot parity.
+

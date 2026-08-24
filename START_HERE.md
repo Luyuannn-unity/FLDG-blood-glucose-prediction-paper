@@ -139,18 +139,26 @@ re-check before renaming.
 - **Figures (2):** data-efficiency (`fig:dataeff`, regenerated 2026-08-24 by
   `revision/figures/data_efficiency_fig.py` from the clean per-seed CSVs);
   FL-system architecture (`fig:system`).
-- **Key numbers (30 min, 5 seeds 42–46):** held-in avg Local 20.62, FedAvg 20.43,
-  FedProx 20.58, MLDG 20.25, Centralised 20.16. MLDG − Local −0.36 (p = 0.005,
-  5/5), FedAvg − Local −0.18 (p = 0.015), MLDG − FedAvg −0.18 (p = 0.010; −0.21,
-  p = 0.002 at 60 min), MLDG − Centralised +0.09 (p = 0.32; exact tie at 60 min).
-  MLDG lowest of {FedAvg, FedProx, MLDG} in all 24 held-in/OOD cells. OOD@30 MLDG
+- **Key numbers (30 min, 5 seeds 42–46; single-cohort arms re-evaluated
+  2026-08-24 with the training-time normalisation constant):** held-in avg Local
+  20.49, FedAvg 20.43, FedProx 20.58, MLDG 20.25, Centralised 20.16. MLDG − Local
+  −0.23 (p = 0.014, 5/5), FedAvg − Local −0.05 (p = 0.14, NOT significant),
+  FedProx − Local +0.10 (n.s.), MLDG − FedAvg −0.18 (p = 0.010; −0.21, p = 0.002
+  at 60 min), MLDG − Centralised +0.09 (p = 0.32; exact tie at 60 min). Local
+  wins ARISES numerically (21.87 vs MLDG 22.06, p = 0.24). MLDG lowest of
+  {FedAvg, FedProx, MLDG} in all 16 held-in/OOD cells. OOD@30 MLDG
   21.30/26.25/25.02 (ReplaceBG/BrisT1D/Flair), Centralised 21.41/26.31/25.00,
-  Local mean-of-four 21.90/26.75/25.34. Single-ARISES is the best single-cohort
-  OOD model (21.71/26.16/24.84) and edges MLDG on BrisT1D and Flair; single-HUPA
-  is the worst. Finetune beats scratch on all three by 0.49/0.29/0.29 (best
+  Local mean-of-four 21.73/26.56/25.22 (MLDG beats it on all three, p ≤ 0.004;
+  FedAvg on ReplaceBG only; FedProx nowhere). Single-ARISES is the best single
+  OOD model on BrisT1D/Flair (ties MLDG on BrisT1D, edges it by 0.17 on Flair);
+  single-HUPA is the worst, 0.7–0.9 behind MLDG. MLDG beats a single model in 18
+  of 24 OOD cells. Finetune beats scratch on all three by 0.49/0.29/0.29 (best
   arm, all 5/5); 10% of patients enough on ReplaceBG (17) and Flair (10); BrisT1D
   pulls ahead from ~30%. HUPA-UCM absolute errors are ~1.4 mg/dL higher on the
   clean test set than the same models score on the public grid.
+- **Headline wording (since v30): "the meta-learned federated model beats local
+  training; plain averaging matches it."** Do not write "federation beats local"
+  without the MLDG qualifier.
 - **Two things every number in the paper currently is NOT:** from the live
   four-site run (see open threads), and final for the single-cohort rows.
 
