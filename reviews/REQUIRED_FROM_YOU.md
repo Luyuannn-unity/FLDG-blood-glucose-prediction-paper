@@ -5,6 +5,16 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 ---
 
+## 🔴 OPEN — added 2026-08-24 (clean-retrain revision)
+
+| # | What I need | Why it matters / what it blocks |
+|---|---|---|
+| 13 | **Rerun the federated arms live on the four institutions**, then hand over the per-seed CSVs | The clean rerun (2026-08-21/22) ran on cloud pods through the sweep driver. Six sentences say the reported numbers came from the live four-site run (abstract, summary, intro contribution 3, principal findings, implications, strengths). You chose to keep them and rerun live. Until the live numbers exist those sentences are a promise, not a report. After the run: one more number swap (tables + the prose spots listed in `iter12_revisions.md`). |
+| 14 | **Decide the single-cohort OOD rows**: keep in `tab:ood` (current), move to an S1 Table, or drop | Gates the last five sentences of the Results OOD paragraph, the single-cohort sentences of the `tab:ood` caption, the second half of the Discussion paragraph "Federation gains in-domain and removes the need to pick a source cohort", and two Methods clauses. My recommendation is S1 Table + one sentence. |
+| 16 | **Single-cohort models: train/eval normalisation mismatch (found 2026-08-24 by the verification sweep, confirmed against the CSVs).** Every arm, including the four single-cohort models, was TRAINED with the shared constant 154.04 / 61.00 (`_configs/cgm_s42_single_*.yaml`, training logs). The reporting evaluation (`eval_extended.py`, driven by `run_contaminated_evals.py`, which deliberately matches "the same training-vs-eval stats quirk the old Phase D runs used") recomputes the constants from each arm's training dirs: pooled clean four-cohort stats for federated/centralised arms (152.18 / 61.09, immaterial: training-time and extended evals agree within 0.03) and each single cohort's OWN stats for the single-cohort arms (HUPA-UCM 136.29 / 52.36, ARISES 161.69 / 65.13). For seed 42 the same single-HUPA-UCM model scores 20.44 with the training constants (`cgm/seed_42/single_HUPA-UCM/best_model_local_test_irt.csv`) vs 20.99 reported; single-ARISES 21.71 vs 21.80; ABC4D and T1D-UOM within 0.1. | This inflates the local baseline on HUPA-UCM (and so the FL-vs-local gain, 1.00 on HUPA-UCM, 0.36 on average) and touches every single-cohort row held-in and OOD (tab:main Local row, tab:h60 Local row, tab:ood single-cohort rows and the Local mean, all "ARISES best / HUPA worst" sentences). **Recommended fix:** re-run the extended evaluation of the four single-cohort arms x 5 seeds with the training constants (eval only, no training; checkpoints for seed 42 are local, seeds 43-46 are on the pods), then swap the single-cohort numbers and the paired tests. Until then the Methods carry a `% NOTE (author)` at the normalisation sentence and say only that all models are trained with the shared constant. |
+| 15 | **BrisT1D source-study participant count** | Limitation (ii) used to say "24-participant"; the release we use has 15 patients, so it now says "15 patients in the release we use". If you want the source count too, confirm it. |
+
+
 ## 🔴 OPEN — blocks a claim currently in the paper
 
 | # | What I need | Why it matters / what it blocks |
@@ -19,11 +29,21 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 | # | Decision | My recommendation |
 |---|---|---|
-| ~~12~~ | ~~Centralised baseline in paper~~ | **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. ⚠️ Second follow-up (added 2026-08-12): **no 60-minute centralised numbers exist anywhere** (NEW_FINDINGS Phase F records rmse@30 only). Table `tab:h60` now carries the PFL held-in rows (recovered from `rmse_60=` in the training logs) but has no centralised row. If the centralised run's training logs on the remote machine logged `rmse_60=`, sync them and we can complete the table; otherwise it stays FL+PFL+Local only. |
+| ~~12~~ | ~~Centralised baseline in paper~~ | **CLOSED 2026-08-24:** the clean retrain put the centralised per-seed CSVs on disk (`release_bundle/output_clean_retrain/pod_results/clean_eval/seed_*/centralized/extended_metrics.csv`) at 30 and 60 min, and `tab:h60` now carries a Centralised row. Earlier history: **DONE 2026-08-11** (author decided include). Methods reference paragraph, rows in tab:main + tab:ood, Results paragraph, Discussion sentence; old limitation (viii) rewritten, future-work clause dropped. Framed as "centralised (pooled) reference", not "upper bound" (empirically it isn't strict). ⚠️ One follow-up: **sync `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` (5 files) from the remote machine** — the paper's centralised numbers currently trace to the per-seed values in NEW_FINDINGS.md, not to CSVs on this disk. ⚠️ Second follow-up (added 2026-08-12): **no 60-minute centralised numbers exist anywhere** (NEW_FINDINGS Phase F records rmse@30 only). Table `tab:h60` now carries the PFL held-in rows (recovered from `rmse_60=` in the training logs) but has no centralised row. If the centralised run's training logs on the remote machine logged `rmse_60=`, sync them and we can complete the table; otherwise it stays FL+PFL+Local only. |
 
 ---
 
 ## 📌 DECIDED (author decisions on record — don't re-litigate)
+
+- **2026-08-24, clean-retrain revision.** (a) Paper is unpublished, so the three
+  data fixes are a Methods subsection ("Data quality"), not a corrigendum. (b) The
+  "single-ARISES collapses OOD" result is retired (timestamp-bug artefact). (c)
+  `tab:h60` is a full table with OOD columns and a Centralised row. (d) Local
+  models normalise with their own cohort statistics; federated and centralised use
+  154.04 ± 61.00. (e) MLDG step count dropped, zero-fallback claim kept. (f) Subset
+  sizes use the ceiling: 10% of Flair = 10 patients. (g) BrisT1D data-efficiency
+  wording: "pulls ahead from about 30%", no seed-noise caveat. (h) Style: simple
+  sentences, no semicolons, no em-dash asides, paper-wide.
 
 - **Persistence / clinical-metrics comparison (NEW_FINDINGS Phase D/E) will NOT be
   reported** (decided 2026-08-11). Rationale: the paper's claim is about RMSE under

@@ -8,11 +8,17 @@ Read this first if you're picking up the paper with no prior context.
 *PLOS Digital Health*. One-line thesis:
 
 > Train a 30-min CGM forecaster across four real T1D cohorts held at four separate
-> institutions, without pooling raw data. Federation matches single-cohort training
-> in-domain and transfers more reliably out-of-distribution (it avoids the
-> catastrophic collapse a single-cohort model can suffer). The headline practical
-> result: a new site reaches — and beats — local-only training by finetuning the
-> federated model on as little as ~10% of its own patients.
+> institutions, without pooling raw data. Federation beats single-cohort training
+> in-domain (MLDG 0.36 mg/dL lower, p = 0.005, 5/5 seeds) and transfers about as
+> well as the best single cohort and better than the average one. The privacy
+> cost vs pooling is 0.09 mg/dL (not significant; exact tie at 60 min). The
+> headline practical result: a new site beats local-only training by finetuning
+> the federated model on ~10% of its own patients on the two larger OOD cohorts
+> (about 30% on the 15-patient BrisT1D).
+>
+> **2026-08-24: all numbers come from the clean retrain (see `../CHANGES.md`).
+> The old "single-ARISES collapses OOD" story was a timestamp-bug artefact and is
+> retired.**
 
 Two contributions: (1) a **by-patient, held-in-vs-OOD benchmark** of federated
 strategies (Local, FedAvg, FedProx, MLDG, APFL, Ditto) on one glucose task; (2) the
@@ -34,8 +40,9 @@ Oxford), not simulated on one host.
 | Reviewer critiques (5) | `reviews/iter1_reviewer*.md`, `reviews/iter2_*.md` |
 | Reference verification | `reviews/refcheck_*.md` |
 | Older open-questions doc | `reviews/UNSURE.md` (superseded by REQUIRED_FROM_YOU.md for live items) |
-| New experiment results not yet fully in the paper | `../NEW_FINDINGS.md` (repo root) |
-| Raw experiment outputs (numbers come from here) | `../FLockit_GPFormer/output_arises_bolus/cgm/seed_*/<method>/` |
+| Corrected results summary (the numbers come from here) | `../CHANGES.md` (repo root) |
+| Raw per-seed outputs of the clean retrain | `C:\Users\luyua\Desktop\release_bundle\output_clean_retrain\` (`final_results_summary.csv`; per-seed under `pod_results/clean_eval` and `pod_results/followup`) |
+| STALE, do not use | `../NEW_FINDINGS.md`, `../FLockit_GPFormer/output_arises_bolus/` (pre-fix runs) |
 
 ## Two files, one repo — the Overleaf gotcha
 
@@ -65,7 +72,7 @@ re-check before renaming.
 5. Log substantive changes in a new `reviews/iterN_revisions.md`; move resolved
    author-items out of `reviews/REQUIRED_FROM_YOU.md`.
 6. **Never fabricate numbers.** Every value in the paper traces to a CSV under
-   `FLockit_GPFormer/output_*/` or to a verified citation. If a number can't be
+   `release_bundle/output_clean_retrain/` or to a verified citation. If a number can't be
    traced, flag it — don't invent it. (This principle already caught and fixed the
    "untraceable Table 1" scare — the numbers were real, the source just wasn't shared.)
 
@@ -83,11 +90,24 @@ re-check before renaming.
 - **Decoder** = Informer-style warm-up: last `label_len=6` context steps + 12 zeros.
   Not a learned start token.
 - **Normalisation** = single global constant **154.04 ± 61.00 mg/dL**, computed on the
-  4 training cohorts only. **No OOD leakage** (verified in logs). Shipped with the model.
+  4 training cohorts only, used by the federated and centralised models. **No OOD
+  leakage** (verified in logs). Single-cohort (local) models use their own cohort's
+  mean/sd (author confirmed 2026-08-24). Unchanged after the clean retrain.
 - **Metric** = RMSE, **point** error at 30 min (also 60 min in `tab:h60`), mg/dL,
-  mean±sd over **5 seeds (42,43,44,46,47)**; seed 45 not run. The paper text
-  says just "5 random seeds" — author decision 2026-08-13: don't list the IDs
-  in the paper (internal docs keep them).
+  mean±sd over **5 seeds (42–46)** since the 2026-08-21/22 clean rerun (the old
+  set was 42/43/44/46/47). The paper text says just "5 random seeds" — author
+  decision 2026-08-13: don't list the IDs in the paper (internal docs keep them).
+  Every pairwise comparison uses a two-sided paired t-test across the 5 seeds.
+- **Data quality (2026-08-24).** HUPA-UCM and T1D-UOM are cleaned rebuilds
+  (constant-slope or clamped runs > 60 min cut, stretches < 280 samples dropped;
+  kept 88% train / 70% test samples, same patient splits). Training and validation
+  loss masked to real samples; test metrics unmasked. ABC4D/ARISES timestamps
+  repaired. Described in the Methods subsection "Data quality". The paper is
+  unpublished, so this is Methods, not a corrigendum.
+- **Style rule (author, 2026-08-24):** simple, concise sentences. No semicolons
+  and no em-dash asides (`---`) in prose. Numeric ranges written `$12$--$14$` stay.
+- **Subset sizes use the ceiling:** 10% of Flair = 10 patients (not 9), 10% of
+  BrisT1D = 2, 70% of BrisT1D = 11 (do not state that count in the paper).
 - **MLDG inner step** = one differentiable step by a `higher`-library copy of
   the client's Adam (inherits moments, lr, weight decay; writes nothing back);
   outer = meta-train + meta-test loss, equal weight, second-order kept.
@@ -108,56 +128,55 @@ re-check before renaming.
 
 ## Current state of the draft
 
-- **Tables (7):** datasets; held-in RMSE@30 (`tab:main`, avg column now carries
-  per-seed-avg sd); OOD@30 across 3 cohorts (`tab:ood`); 60-min (`tab:h60`, since
-  2026-08-12 includes the 5 PFL held-in rows from the training logs, sits right
-  after `tab:ood`, and still has NO centralised row — no 60-min centralised data
-  exists); zero-shot vs ReplaceBG-trained baselines (`tab:oodprior`); external
-  by-time comparison (`tab:prior`); finetuning across 3 targets (`tab:finetune`).
-  (`tab:bolus` and all bolus content removed 2026-08-11 by author decision.)
-- **Figures (2):** data-efficiency (`fig:dataeff`); FL-system architecture
-  (`fig:system`, `revision/figures/fl_system.pdf`, matplotlib source
-  `fl_system_fig.py` beside it, added 2026-08-13 — the long-owed diagram).
-- **Key numbers:** held-in avg ~20 mg/dL (Local 20.16, FedAvg 20.09, MLDG 19.99,
-  Centralised reference 19.90); OOD@30 MLDG 21.34/26.31/25.05 (ReplaceBG/BrisT1D/
-  Flair), Centralised 21.52/26.33/24.95; single-ARISES collapses (28.51±6.85 on
-  ReplaceBG, and on all 3). MLDG numerically best among the *federated* strategies
-  in every comparison the paper reports, but **not significant at 5 seeds**
-  (paired t ≈ −1.3 @30, −2.1 @60). The paper says "every *reported* comparison"
-  because at 60 min FedAvg edges MLDG on the undisplayed T1D-UOM held-in cell
-  (32.18 vs 32.25). FedProx held-in avg is 20.27 since 2026-08-12 (full-precision
-  per-seed mean; the old 20.28 was a mean of rounded cells).
-  Every number in the paper is full 5-seed and traced to disk (as of 2026-08-11),
-  except the centralised row — see open threads.
+- **Tables (7):** datasets (HUPA-UCM/T1D-UOM rows are the cleaned data); held-in
+  RMSE@30 (`tab:main`, ties both bold); OOD@30 (`tab:ood`, federated + centralised
+  + four single-cohort rows + Local mean-of-four, all with sd); 60-min (`tab:h60`,
+  since 2026-08-24 a FULL table: all four held-in cohorts for every strategy, OOD
+  columns, Centralised row, wrapped in `\resizebox`); zero-shot vs
+  ReplaceBG-trained baselines (`tab:oodprior`); external by-time comparison
+  (`tab:prior`, sd on all four Ours rows, harder-HUPA footnote); finetuning
+  (`tab:finetune`).
+- **Figures (2):** data-efficiency (`fig:dataeff`, regenerated 2026-08-24 by
+  `revision/figures/data_efficiency_fig.py` from the clean per-seed CSVs);
+  FL-system architecture (`fig:system`).
+- **Key numbers (30 min, 5 seeds 42–46):** held-in avg Local 20.62, FedAvg 20.43,
+  FedProx 20.58, MLDG 20.25, Centralised 20.16. MLDG − Local −0.36 (p = 0.005,
+  5/5), FedAvg − Local −0.18 (p = 0.015), MLDG − FedAvg −0.18 (p = 0.010; −0.21,
+  p = 0.002 at 60 min), MLDG − Centralised +0.09 (p = 0.32; exact tie at 60 min).
+  MLDG lowest of {FedAvg, FedProx, MLDG} in all 24 held-in/OOD cells. OOD@30 MLDG
+  21.30/26.25/25.02 (ReplaceBG/BrisT1D/Flair), Centralised 21.41/26.31/25.00,
+  Local mean-of-four 21.90/26.75/25.34. Single-ARISES is the best single-cohort
+  OOD model (21.71/26.16/24.84) and edges MLDG on BrisT1D and Flair; single-HUPA
+  is the worst. Finetune beats scratch on all three by 0.49/0.29/0.29 (best
+  arm, all 5/5); 10% of patients enough on ReplaceBG (17) and Flair (10); BrisT1D
+  pulls ahead from ~30%. HUPA-UCM absolute errors are ~1.4 mg/dL higher on the
+  clean test set than the same models score on the public grid.
+- **Two things every number in the paper currently is NOT:** from the live
+  four-site run (see open threads), and final for the single-cohort rows.
 
 ## The biggest open threads (see REQUIRED_FROM_YOU.md for the full list)
 
-- **Persistence & clinical metrics (`NEW_FINDINGS.md` Phase D/E): DECIDED 2026-08-11 —
-  not reported.** Author's call: the paper's claim is RMSE under federation/transfer;
-  models were not optimised for event detection. Don't re-open without the author.
-  **Extended 2026-08-12:** the Results "Beyond RMSE" TIR/lag paragraph is also
-  removed (author decision — the paper's framing is RMSE-only). The paper now
-  reports no TIR agreement or forecast-lag numbers anywhere; Methods, Limitation
-  (i), and Future work were cleaned to match. The ~20-min forecast-lag caveat is
-  gone with it.
-- **Centralised (pooled) reference: IN THE PAPER since v13** (Methods baselines,
-  rows in tab:main/tab:ood, Results paragraph, limitation (viii) rewritten). Framed
-  as "reference", NOT "upper bound" (empirically not strict). ⚠️ Its numbers trace
-  to `NEW_FINDINGS.md` per-seed values (recomputed with *sample* sd) — author still
-  owes `output_centralized_shuffled/seed_*/best_model_local_test_irt.csv` on disk.
-- **More seeds** would settle MLDG significance. **FedProx µ is untuned.**
-- **PLANNED NEXT (agreed 2026-08-11): full rewording/flow pass with the author, in
-  order Results → Discussion → Methods → Intro → Abstract + Author summary last**
-  (abstract cut 420→≤300 words and author summary 276→150–200 happen at the end,
-  after content settles). Facts and numbers are final unless the author says
-  otherwise — the pass is about prose, not content.
-- **Admin blockers for PLOS:** author names/affiliations/email + ORCID, cover
-  letter, ≥4 suggested reviewers, abstract over the 300-word limit, author summary
-  over 200 words. (Done 2026-08-11: ethics statement — UCL IHI LREC Project ID
-  1665; ABC4D/ARISES access route — on request via ken.li@ucl.ac.uk; code repo
-  live + MIT; Limitations and Future work merged into one paragraph.)
-  (MLDG update spec and patient-count rule: resolved 2026-08-11, now in Methods.)
-  Full checklist: `reviews/SUBMISSION_TODO.md`.
+- **Live four-institution rerun (author decision 2026-08-24).** The clean rerun
+  was executed on rented cloud pods + the local machine through the sweep driver,
+  not through the HTTP server/clients across the four universities. The author
+  will rerun live on the four sites. Until then the "run live across four
+  universities" sentences stay as they are, and a final number swap follows the
+  live run (the `batch*.py` scripts in the session scratchpad show the pattern;
+  every number lives in the tables plus a known list of prose spots).
+- **Single-cohort OOD rows (deferred).** Keep in `tab:ood` / move to an S1 Table /
+  drop. The draft is written for "keep". Sentences that hang on it are listed in
+  `reviews/iter12_revisions.md`.
+- **Persistence & clinical metrics: DECIDED 2026-08-11, not reported.** Don't
+  re-open without the author. RMSE-only framing throughout.
+- **Centralised reference:** fully on disk now (`clean_eval/seed_*/centralized/`),
+  30 and 60 min, in every table. Framed as "reference", not "upper bound".
+- **Statistical framing:** MLDG vs FedAvg and FL vs Local are significant at 5
+  seeds; still unsettled are MLDG vs Centralised, MLDG vs FedAvg on Flair @30
+  (p = 0.09), FedAvg vs FedProx (p = 0.06), FedProx vs Local @30 (p = 0.77).
+  Limitation (iii) says so. FedProx µ is untuned.
+- **Admin blockers for PLOS:** author affiliations 2 and 3, ORCID, CRediT, cover
+  letter, suggested reviewers. Abstract ≤ 300 words and summary ≤ 200 are now met
+  (re-count after any edit). Full checklist: `reviews/SUBMISSION_TODO.md`.
 
 ## Next-run reminder for the author
 
