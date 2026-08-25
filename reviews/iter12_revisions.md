@@ -88,8 +88,9 @@ filled on all four Ours rows.
   Methods "Local-mean" in the OOD-scored list, `tab:h60` Local OOD cells.
 - Subset sizes use the ceiling (10% of Flair = 10 patients, 70% of BrisT1D = 11).
 - BrisT1D data-efficiency wording: "pulls ahead from about 30%", no caveat.
-- Normalisation: federated and centralised use 154.04 +/- 61.00, singles use own
-  cohort statistics.
+- Normalisation: every model, single-cohort ones included, is trained and
+  evaluated with the shared constant 154.04 +/- 61.00 (see the addendum below;
+  an earlier note here saying singles use own-cohort statistics is superseded).
 
 ## Still open
 

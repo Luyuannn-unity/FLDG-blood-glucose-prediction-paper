@@ -1,5 +1,10 @@
 # Open questions / things I'm unsure about
 
+> **SUPERSEDED (2026-08-24).** Live open items are in `REQUIRED_FROM_YOU.md`.
+> The "ARISES collapse 28.51 +/- 6.85 (verified)" below was later found to be an
+> artefact of a timestamp bug (see `../../CHANGES.md` section 1). The corrected
+> results and the revised story are in `iter12_revisions.md`.
+
 > **UPDATE (after you pointed me to `output_arises_bolus/cgm`):** items #1, #2, #3 below
 > are now **RESOLVED**. I aggregated the CGM-only 5-seed outputs and they reproduce
 > Table 1 essentially exactly, including the ARISES collapse **28.51 ± 6.85** (verified).

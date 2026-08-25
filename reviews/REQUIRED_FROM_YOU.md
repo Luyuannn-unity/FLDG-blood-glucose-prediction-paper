@@ -12,6 +12,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 | 13 | **Rerun the federated arms live on the four institutions**, then hand over the per-seed CSVs | The clean rerun (2026-08-21/22) ran on cloud pods through the sweep driver. Six sentences say the reported numbers came from the live four-site run (abstract, summary, intro contribution 3, principal findings, implications, strengths). You chose to keep them and rerun live. Until the live numbers exist those sentences are a promise, not a report. After the run: one more number swap (tables + the prose spots listed in `iter12_revisions.md`). |
 | 14 | **Decide the single-cohort OOD rows**: keep in `tab:ood` (current), move to an S1 Table, or drop | Gates the last five sentences of the Results OOD paragraph, the single-cohort sentences of the `tab:ood` caption, the second half of the Discussion paragraph "Federation gains in-domain and removes the need to pick a source cohort", and two Methods clauses. My recommendation is S1 Table + one sentence. |
 | ~~16~~ | **CLOSED 2026-08-24 (evening): the author re-evaluated the four single-cohort arms x 5 seeds with the training constants (`output_clean_retrain/clean_eval_pinned/`), CHANGES.md and `final_results_summary.csv` updated, paper updated (v30).** Original note: **Single-cohort models: train/eval normalisation mismatch (found 2026-08-24 by the verification sweep, confirmed against the CSVs).** Every arm, including the four single-cohort models, was TRAINED with the shared constant 154.04 / 61.00 (`_configs/cgm_s42_single_*.yaml`, training logs). The reporting evaluation (`eval_extended.py`, driven by `run_contaminated_evals.py`, which deliberately matches "the same training-vs-eval stats quirk the old Phase D runs used") recomputes the constants from each arm's training dirs: pooled clean four-cohort stats for federated/centralised arms (152.18 / 61.09, immaterial: training-time and extended evals agree within 0.03) and each single cohort's OWN stats for the single-cohort arms (HUPA-UCM 136.29 / 52.36, ARISES 161.69 / 65.13). For seed 42 the same single-HUPA-UCM model scores 20.44 with the training constants (`cgm/seed_42/single_HUPA-UCM/best_model_local_test_irt.csv`) vs 20.99 reported; single-ARISES 21.71 vs 21.80; ABC4D and T1D-UOM within 0.1. | This inflates the local baseline on HUPA-UCM (and so the FL-vs-local gain, 1.00 on HUPA-UCM, 0.36 on average) and touches every single-cohort row held-in and OOD (tab:main Local row, tab:h60 Local row, tab:ood single-cohort rows and the Local mean, all "ARISES best / HUPA worst" sentences). **Recommended fix:** re-run the extended evaluation of the four single-cohort arms x 5 seeds with the training constants (eval only, no training; checkpoints for seed 42 are local, seeds 43-46 are on the pods), then swap the single-cohort numbers and the paired tests. Until then the Methods carry a `% NOTE (author)` at the normalisation sentence and say only that all models are trained with the shared constant. |
+| 17 | **Bring the public code repo (`fldg-glucose`) up to what the paper now says it carries.** The Methods (Data quality) and the availability statement promise: the cleaning scripts (`build_clean_cohorts.py` splice rule, `fix_broken_ts.py` timestamp repair), the resulting split manifests for the cleaned HUPA-UCM and T1D-UOM, the masked training/validation loss, and the configs for seeds 42–46. The repo today ships the pre-fix `build_metabonet.py` pipeline, no cleaning step, no masked loss, and 18 configs for seeds 42/43/44 only. Its `README.md` and `data_pipeline/DATASET.md` describe that old state. | Until the repo is updated the availability statement is a promise. Port the code first, then I can rewrite `README.md` and `DATASET.md` to match (they are stale relative to the paper but I did not edit them, because describing files that are not there yet would be worse). |
 | 15 | **BrisT1D source-study participant count** | Limitation (ii) used to say "24-participant"; the release we use has 15 patients, so it now says "15 patients in the release we use". If you want the source count too, confirm it. |
 
 
@@ -105,13 +106,12 @@ specific claims in the paper. Ordered by what would sink the paper first.
 
 ## ⚠️ Trap to avoid on the next run
 
-**If you finetune on BrisT1D / Flair, you must recompute their zero-shot OOD numbers on the
-reduced test split.** They are currently 100% test. The moment you carve out a finetuning
-train split, the zero-shot / from-scratch / finetuned arms are no longer on the same test
-set — which is precisely why ReplaceBG uses a 21-patient test split. Their OOD numbers will
-shift slightly.
+**Done in the clean rerun (2026-08-21/22):** BrisT1D and Flair now have patient-level
+train/val/test splits, and the zero-shot, from-scratch and finetuned arms all score on the
+same test split per cohort, as ReplaceBG always did.
 
-**Also: save checkpoints AND per-window predictions on the next run.** Clinical metrics
-(Clarke/Parkes grid, MARD, hypo/hyper detection) cannot be computed from what is currently
-on disk — only aggregate CSVs were kept. The 60-min numbers survived only by luck, because
-someone logged them.
+**For the live four-institution rerun: save checkpoints AND per-window predictions.**
+The clean rerun kept checkpoints (`release_bundle/output_clean_retrain/ckpt_all.tar`) and
+the extended-metric CSVs (`clean_eval*/`), which is what made the single-cohort
+re-evaluation possible. Keep doing that, and add per-window predictions if clinical
+metrics are ever wanted.
