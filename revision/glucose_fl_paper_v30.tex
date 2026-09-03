@@ -78,26 +78,35 @@
 Luyuan Qi\textsuperscript{1},
 Paul Taylor\textsuperscript{1},
 Rui Sun\textsuperscript{2},
-Taiyu Zhu\textsuperscript{3},
-Simon Harper\textsuperscript{4},
+Taiyu Zhu\textsuperscript{3,4,5},
+Jiahao Sun\textsuperscript{6},
+Pantelis Georgiou\textsuperscript{7},
+Simon Harper\textsuperscript{8},
 Kezhi Li\textsuperscript{1*}
 \\
 \bigskip
 \textbf{1} Institute of Health Informatics, University College London, London, United Kingdom
 \\
-\textbf{2} [affiliation to be confirmed]
+\textbf{2} School of Computing, Newcastle University, Newcastle upon Tyne, United Kingdom
 \\
-\textbf{3} [affiliation to be confirmed]
+\textbf{3} Department of Biostatistics \& Health Informatics, Institute of Psychiatry, Psychology \& Neuroscience, King's College London, London, United Kingdom
 \\
-\textbf{4} University of Manchester, Manchester, United Kingdom
+\textbf{4} Department of Psychiatry, University of Oxford, Oxford, United Kingdom
+\\
+\textbf{5} NIHR Maudsley Biomedical Research Centre, London, United Kingdom
+\\
+\textbf{6} [Flock.io Ltd]
+\\
+\textbf{7} Centre for Bio-Inspired Technology, Imperial College London, United Kingdom
+\\
+\textbf{8} University of Manchester, Manchester, United Kingdom
 \\
 \bigskip
 
 * ken.li@ucl.ac.uk
-% NOTE (author): (a) confirm name order for "Rui Sun" (given name first, per
-% PLOS "First name Last name" convention; the input read "Sun Rui");
-% (b) fill affiliations 2 and 3; (c) add department for Manchester if wanted;
-% (d) PLOS wants each author's ORCID (corresponding author's is mandatory) and a
+% NOTE (author): (a) Taiyu Zhu's affiliation listing to be confirmed with him
+% (per Ken's comment); (b) add department for Manchester if wanted;
+% (c) PLOS wants each author's ORCID (corresponding author's is mandatory) and a
 % CRediT contribution per author, both entered in the submission system.
 
 \end{flushleft}
@@ -110,11 +119,14 @@ transfer poorly to new patients and sites, and the varied data that would
 make it robust cannot lawfully be pooled. Federated learning (FL)
 trains a shared model without moving raw records. For glucose forecasting, FL
 strategies have rarely been compared head-to-head, evaluations seldom
-separate accuracy on the training cohorts (held-in) from accuracy on unseen
-cohorts (out-of-distribution, OOD), and almost all such work is simulated.
-Using one encoder--decoder transformer, four real T1D cohorts as federated
-clients and three never-seen cohorts (ReplaceBG, BrisT1D, Flair) as OOD
-tests, we benchmarked single-cohort local training against federated
+separate accuracy on training cohorts (held-in) from unseen cohorts
+(out-of-distribution, OOD), and almost all such work is simulated.
+We ran our federation live across four universities instead, with tooling
+light enough for small clinics. Using one encoder--decoder transformer, four
+T1D cohorts as federated clients ($\approx 5{,}400$ patient-days of CGM) and
+three never-seen cohorts as OOD tests (ReplaceBG, BrisT1D, Flair;
+$\approx 63{,}000$ patient-days), we benchmarked single-cohort local
+training against federated
 averaging (FedAvg), FedProx, meta-learning for domain generalisation (MLDG),
 and two personalised-FL methods under a by-patient split over five seeds, at
 30 and 60 minutes.
@@ -123,16 +135,17 @@ The meta-learned federated model (MLDG) beat local training on the
 contributing cohorts, $20.25$ vs $20.49$ mg/dL RMSE at 30 minutes, lower on
 every seed, while plain federated averaging only matched it. The privacy
 constraint proved nearly free: MLDG came within $0.09$ mg/dL of a
-model trained on the four cohorts pooled, under $1\%$ of the $12$--$14$
-mg/dL error of CGM sensors, and tied it at 60 minutes.
+model trained on the four cohorts pooled, under $1\%$ of CGM sensor error,
+and tied it at 60 minutes.
 Out of distribution, MLDG was the best federated model on all three unseen
 cohorts. On ReplaceBG it reached
-$21.30$ mg/dL without seeing any of its patients, within the range of models
-trained on it. Finetuning the federated model on a new site's
-patients beat training there from scratch on all three cohorts, and $10$ to
-$17$ patients sufficed on the two larger ones. We ran the federation live
-across four universities, not in simulation, with tooling light enough for
-small clinics.
+$21.30$ mg/dL without seeing any of its patients, ahead of FedAvg ($21.48$)
+and the mean single-cohort model ($21.73$). Finetuning the federated model
+on a new site's
+patients beat training there from scratch on all three cohorts; on the two
+larger ones, finetuning on just $10\%$ of the training patients ($17$ for
+ReplaceBG, $10$ for Flair) still beat from-scratch training on the full
+cohort.
 
 % Author Summary: 150-200 words, first person.
 \section*{Author summary}
@@ -344,7 +357,11 @@ patient as described above.
 
 Table~\ref{tab:datasets} summarises each cohort. Mean and standard deviation of
 CGM are reported in mg/dL, and time-in-range (TIR) is the fraction of CGM
-readings in the clinical 70--180 mg/dL band. For HUPA-UCM and T1D-UOM the
+readings in the clinical 70--180 mg/dL band. Patient-days count real
+(non-interpolated) CGM readings on the 5-minute grid, i.e.\ real samples
+$\times$ 5 minutes: the four clients together contribute
+$\approx 5{,}400$ patient-days of CGM, and the three held-out cohorts a
+further $\approx 63{,}000$. For HUPA-UCM and T1D-UOM the
 window counts and statistics are those of the cleaned data described under
 Data quality.
 
@@ -353,27 +370,36 @@ Data quality.
 \captionsetup{justification=centering,singlelinecheck=on}
 \caption{\bf Client and held-out cohorts.}
 \label{tab:datasets}
-\begin{tabular}{lrrrrr}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lrrrllrrr}
 \thickhline
-dataset & patients & total windows & mean CGM & sd CGM & TIR (\%) \\
-        &          &               & (mg/dL)  & (mg/dL) & 70--180  \\
+dataset & patients & patient- & total & CGM device & age & mean CGM & sd CGM & TIR (\%) \\
+        & (train/val/test) & days & windows &  & (years) & (mg/dL)  & (mg/dL) & 70--180  \\
 \hline
-\multicolumn{6}{l}{\emph{federated clients}} \\
-HUPA-UCM & 22 & 205,849 & 139.3 & 55.1 & 74.0 \\
-ABC4D    & 25 & 562,043 & 155.1 & 63.4 & 65.5 \\
-ARISES   & 12 & 126,248 & 160.5 & 63.7 & 63.7 \\
-T1D-UOM  & 14 & 290,753 & 151.2 & 58.7 & 70.7 \\
+\multicolumn{9}{l}{\emph{federated clients}} \\
+HUPA-UCM & 22 (18/2/2) & 876 & 205,849 & Libre 2 & 42 (27--48) & 139.3 & 55.1 & 74.0 \\
+ABC4D    & 25 (19/3/3) & 3,093 & 562,043 & Dexcom G5 & 36 (29--46) & 155.1 & 63.4 & 65.5 \\
+ARISES   & 12 (8/2/2) & 533 & 126,248 & Dexcom G6 & 40 (30--50) & 160.5 & 63.7 & 63.7 \\
+T1D-UOM  & 14 (10/2/2) & 876 & 290,753 & mixed & 50 (32--59) & 151.2 & 58.7 & 70.7 \\
 \hline
-\multicolumn{6}{l}{\emph{held-out OOD cohorts}} \\
-ReplaceBG & 208 & 9,924,380 & 160.7 & 64.5 & 63.1 \\
-BrisT1D   & 19 & 792,546 & 157.5 & 60.0 & 68.6 \\
-Flair     & 113 & 2,799,490 & 161.6 & 60.4 & 65.7 \\
+\multicolumn{9}{l}{\emph{held-out OOD cohorts}} \\
+ReplaceBG & 208 (166/21/21) & 44,891 & 9,924,380 & Dexcom G4 & 43 (31--55) & 160.7 & 64.5 & 63.1 \\
+BrisT1D   & 19 (15/2/2) & 2,706 & 792,546 & mixed & 22 (21--24) & 157.5 & 60.0 & 68.6 \\
+Flair     & 113 (91/11/11) & 15,289 & 2,799,490 & Guardian 3 & 19 (16--22) & 161.6 & 60.4 & 65.7 \\
 \thickhline
-\end{tabular}
+\end{tabular}}
 \begin{center}
 {\small The three held-out cohorts take no part in federated training. They
 are used as zero-shot OOD test sets (Table~\ref{tab:ood}) and as finetuning
-targets (Table~\ref{tab:finetune}). ARISES is both the highest-glucose and the
+targets (Table~\ref{tab:finetune}). Patients are split by patient ID into
+train/validation/test as shown. Patient-days count real (non-interpolated)
+CGM readings, i.e.\ real samples $\times$ 5 minutes (see text). Age is the
+median (interquartile range), for ABC4D and ARISES as reported in prior
+publications on these cohorts~\cite{zhu2023glugan,zhu2022arises} and
+otherwise computed from the data release. Mixed-device cohorts: T1D-UOM
+spans Libre, Dexcom, and Medtronic platforms (7 of its 14 patients wore a
+15-minute sensor); BrisT1D spans Dexcom G6, Libre 2, Guardian 4, and Dexcom
+ONE. ARISES is both the highest-glucose and the
 smallest client cohort. Patient counts are those of the data release we use
 and can be smaller than the totals in the original study publications (see
 text). For HUPA-UCM and T1D-UOM the window counts and statistics are after the
@@ -490,7 +516,9 @@ weights (step 3). The server
 averages the four sets by FedAvg into the next global model (step 4). Rounds
 repeat up to a maximum of 25 with early stopping on average validation MSE.
 At round one the server broadcasts a single seeded initialisation, so every
-client starts from identical parameters. All traffic crosses the public
+client starts from identical parameters. Client boxes give each cohort's size
+in patients and in patient-days of real CGM readings (Datasets). All traffic
+crosses the public
 internet, and raw CGM data never leaves its institution.
 FedProx and MLDG change only the clients' local training step, so the same
 protocol carries all three strategies.}

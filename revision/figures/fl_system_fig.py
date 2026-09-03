@@ -51,23 +51,25 @@ ax.text(4.02, sy1 - 0.26, "early stopping on\navg validation MSE", ha="left", va
         fontsize=6.4, color=MUTED, linespacing=1.25)
 
 # ---------------- client boxes
-cohorts = [("HUPA-UCM", 22), ("ABC4D", 25), ("ARISES", 12), ("T1D-UOM", 14)]
+cohorts = [("HUPA-UCM", 22, 876), ("ABC4D", 25, 3093), ("ARISES", 12, 533), ("T1D-UOM", 14, 876)]
 bw, gap, x0 = 1.16, 0.13, 0.09
-cy0, cy1 = 0.72, 1.58
+cy0, cy1 = 0.66, 1.58
 centers = []
-for i, (name, n) in enumerate(cohorts):
+for i, (name, n, pdays) in enumerate(cohorts):
     bx = x0 + i * (bw + gap)
     cx = bx + bw / 2
     centers.append(cx)
     rbox(bx, cy0, bw, cy1 - cy0, BLUE_100, BLUE, lw=1.1)
-    ax.text(cx, cy1 - 0.14, f"Client {i+1}", ha="center", va="center",
+    ax.text(cx, cy1 - 0.13, f"Client {i+1}", ha="center", va="center",
             fontsize=6.6, color=INK2)
-    ax.text(cx, cy1 - 0.32, name, ha="center", va="center",
+    ax.text(cx, cy1 - 0.30, name, ha="center", va="center",
             fontsize=8, fontweight="bold", color=INK)
-    ax.text(cx, cy1 - 0.50, f"{n} patients", ha="center", va="center",
-            fontsize=6.6, color=INK2)
-    ax.text(cx, cy0 + 0.135, "\u2461 local training\n(1 epoch per round)", ha="center", va="center",
-            fontsize=6.6, color=INK, linespacing=1.2)
+    ax.text(cx, cy1 - 0.46, f"{n} patients", ha="center", va="center",
+            fontsize=6.4, color=INK2)
+    ax.text(cx, cy1 - 0.61, f"{pdays:,} patient-days", ha="center", va="center",
+            fontsize=6.4, color=INK2)
+    ax.text(cx, cy0 + 0.14, "\u2461 local training\n(1 epoch per round)", ha="center", va="center",
+            fontsize=6.4, color=INK, linespacing=1.2)
 
 # ---------------- arrows: server <-> clients (slanted pairs)
 anchors = [1.55, 2.25, 2.95, 3.65]  # points along the server's bottom edge
