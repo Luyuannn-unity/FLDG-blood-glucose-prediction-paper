@@ -351,26 +351,33 @@ Data quality.
 \begin{table}[!ht]
 \centering
 \captionsetup{justification=centering,singlelinecheck=on}
-\caption{\bf Federated client cohorts.}
+\caption{\bf Client and held-out cohorts.}
 \label{tab:datasets}
 \begin{tabular}{lrrrrr}
 \thickhline
 dataset & patients & total windows & mean CGM & sd CGM & TIR (\%) \\
         &          &               & (mg/dL)  & (mg/dL) & 70--180  \\
 \hline
+\multicolumn{6}{l}{\emph{federated clients}} \\
 HUPA-UCM & 22 & 205,849 & 139.3 & 55.1 & 74.0 \\
 ABC4D    & 25 & 562,043 & 155.1 & 63.4 & 65.5 \\
 ARISES   & 12 & 126,248 & 160.5 & 63.7 & 63.7 \\
 T1D-UOM  & 14 & 290,753 & 151.2 & 58.7 & 70.7 \\
+\hline
+\multicolumn{6}{l}{\emph{held-out OOD cohorts}} \\
+ReplaceBG & 208 & 9,924,380 & 160.7 & 64.5 & 63.1 \\
+BrisT1D   & 19 & 792,546 & 157.5 & 60.0 & 68.6 \\
+Flair     & 113 & 2,799,490 & 161.6 & 60.4 & 65.7 \\
 \thickhline
 \end{tabular}
 \begin{center}
-{\small The three OOD test cohorts (ReplaceBG, BrisT1D, Flair) are excluded from
-federated training and reported separately (Table~\ref{tab:ood}). ARISES is both the
-highest-glucose and the smallest client cohort. Patient counts are those of the
-data release we use (see text). For HUPA-UCM and T1D-UOM they are smaller than
-the totals in the original dataset publications, and the window counts and
-statistics are after the cleaning step described in the text.}
+{\small The three held-out cohorts take no part in federated training. They
+are used as zero-shot OOD test sets (Table~\ref{tab:ood}) and as finetuning
+targets (Table~\ref{tab:finetune}). ARISES is both the highest-glucose and the
+smallest client cohort. Patient counts are those of the data release we use
+and can be smaller than the totals in the original study publications (see
+text). For HUPA-UCM and T1D-UOM the window counts and statistics are after the
+cleaning step described in the text.}
 \end{center}
 \end{table}
 
