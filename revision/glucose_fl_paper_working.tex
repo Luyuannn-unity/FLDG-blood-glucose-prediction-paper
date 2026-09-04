@@ -116,7 +116,7 @@ Kezhi Li\textsuperscript{1*}
 Algorithms that forecast blood glucose 30 minutes ahead are used in type~1
 diabetes (T1D) to warn of excursions, but a model trained at one centre can
 transfer poorly to new patients and sites, and the varied data that would
-make it robust cannot lawfully be pooled. Federated learning (FL)
+fix this cannot lawfully be pooled. Federated learning (FL)
 trains a shared model without moving raw records. For glucose forecasting, FL
 strategies have rarely been compared head-to-head, evaluations seldom
 separate accuracy on training cohorts (held-in) from unseen cohorts
@@ -125,27 +125,26 @@ We ran our federation live across four universities instead, with tooling
 light enough for small clinics. Using one encoder--decoder transformer, four
 T1D cohorts as federated clients ($\approx 5{,}400$ patient-days of CGM) and
 three never-seen cohorts as OOD tests (ReplaceBG, BrisT1D, Flair;
-$\approx 63{,}000$ patient-days), we benchmarked single-cohort local
+$\approx 63{,}000$ patient-days), we benchmarked local
 training against federated
 averaging (FedAvg), FedProx, meta-learning for domain generalisation (MLDG),
 and two personalised-FL methods under a by-patient split over five seeds, at
 30 and 60 minutes.
 
-The meta-learned federated model (MLDG) beat local training on the
-contributing cohorts, $20.25$ vs $20.49$ mg/dL RMSE at 30 minutes, lower on
+The meta-learned federated model (MLDG) beat local training held-in,
+$20.25$ vs $20.49$ mg/dL RMSE at 30 minutes, lower on
 every seed, while plain federated averaging only matched it. The privacy
 constraint proved nearly free: MLDG came within $0.09$ mg/dL of a
-model trained on the four cohorts pooled, under $1\%$ of CGM sensor error,
+pooled centralised model, under $1\%$ of CGM sensor error,
 and tied it at 60 minutes.
 Out of distribution, MLDG was the best federated model on all three unseen
 cohorts. On ReplaceBG it reached
-$21.30$ mg/dL without seeing any of its patients, ahead of FedAvg ($21.48$)
+$21.30$ mg/dL zero-shot, ahead of FedAvg ($21.48$)
 and the mean single-cohort model ($21.73$). Finetuning the federated model
 on a new site's
 patients beat training there from scratch on all three cohorts; on the two
 larger ones, finetuning on just $10\%$ of the training patients ($17$ for
-ReplaceBG, $10$ for Flair) still beat from-scratch training on the full
-cohort.
+ReplaceBG, $10$ for Flair) still beat it.
 
 % Author Summary: 150-200 words, first person.
 \section*{Author summary}
