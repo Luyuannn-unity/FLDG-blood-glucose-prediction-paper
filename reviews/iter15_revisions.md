@@ -94,3 +94,4 @@ FCNN: 20.23 (3.38), 20.25 (2.60), by-time, CGM + carbs + bolus.
 ## Resolved (2026-09-09, same day)
 
 - **AEGIS on T1D-UOM: confirmed by the author from the full text.** The paper says: "Using the T1D-UOM dataset, which includes continuous glucose, insulin, nutrition, and activity measurements, we engineer physiologically meaningful features and evaluate the system under a leave-one-patient-out protocol to ensure generalizability to unseen individuals." All four claims about AEGIS (T1D-UOM, leave-one-patient-out, 15-min horizon, mmol/L) are now verified. No change to the paper. Item removed from REQUIRED_FROM_YOU.md.
+- **The other four items closed by the author, no change (2026-09-09):** FedDG bare cite stays as chosen for Paul 3; the eight uncited bib entries stay (they do not print); Darpit/Dave stays as published; no GPFormer three-days-per-subject clause. Section removed from REQUIRED_FROM_YOU.md.

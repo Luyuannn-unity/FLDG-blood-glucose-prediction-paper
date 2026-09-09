@@ -120,11 +120,3 @@ the extended-metric CSVs (`clean_eval*/`), which is what made the single-cohort
 re-evaluation possible. Keep doing that, and add per-window predictions if clinical
 metrics are ever wanted.
 
----
-
-## Added 2026-09-09 after the full reference check (`refcheck_2026-09-09_full.md`)
-
-- **FedDG wording (your call).** "adapted to the federated setting~\cite{liu2021feddg}" reads as if our patient-split MLDG comes from FedDG. FedDG is the closest precedent (episodic meta-learning inside FL) but its meta-test data come from cross-client frequency-space augmentation, not a patient split. You chose the bare cite for Paul comment 3, so it was left as is. Suggested minimal change: "adapted to the federated setting, where FedDG~\cite{liu2021feddg} is the closest precedent".
-- **Uncited bib entries (harmless, they do not print):** fang2026mthyponet, fedadv2022, fedcl2023, flda2023, james2025brist1dpaper, jeffries2026metabonetbench, li2021moon, and now idf2021 (dropped from the 8.4 million sentence, which the IDF Atlas does not support). Delete or cite as you prefer.
-- **Darpit vs Dave.** Scientific Reports and its erratum print the first author as given "Dave", family "Darpit"; the same person publishes elsewhere as Darpit Dave. The bib follows the published record. Say if you want it the other way.
-- **GPFormer protocol detail (optional).** GPFormer keeps only the first three days of each ReplaceBG subject (its Section II-A), so its 46-subject hold-out is 3 days per subject. The tab:oodprior note does not mention this. Add a clause if you think it matters for the comparison.
