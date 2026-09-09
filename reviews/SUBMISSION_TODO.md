@@ -3,7 +3,8 @@
 Consolidated checklist before submission. Sources: author's list (2026-08-11),
 REQUIRED_FROM_YOU.md, START_HERE.md, and the PLOS Digital Health submission
 guidelines (https://journals.plos.org/digitalhealth/s/submission-guidelines).
-Updated 2026-08-24 after the clean-retrain revision (v30).
+Updated 2026-08-24 after the clean-retrain revision (v30), and 2026-09-09 after
+the Paul/Ken comment round (see `iter13_revisions.md`).
 
 ## A. Hard blockers (desk-reject or fabrication risk)
 
@@ -16,14 +17,15 @@ Updated 2026-08-24 after the clean-retrain revision (v30).
   manifests, the masked loss, the repaired ABC4D/ARISES timestamps and the
   5-seed configs. The public repo (`fldg-glucose`) still ships the pre-fix
   pipeline and 3-seed configs. (REQUIRED_FROM_YOU #17)
-- [ ] **Author block** — names and corresponding email are in (2026-08-18).
-  Still open: affiliations for Rui Sun and Taiyu Zhu (`[affiliation to be
-  confirmed]`), ORCID for the corresponding author, CRediT roles for all six,
-  entered in the submission system. (REQUIRED_FROM_YOU #6)
+- [x] ~~Author block~~ **Done 2026-09-09.** Eight authors, every affiliation
+  filled (Taiyu KCL-only per his confirmation; FLock.io line matches
+  arXiv:2410.17933). Still for the submission system: corresponding-author
+  ORCID and CRediT roles for all eight. (REQUIRED_FROM_YOU #6)
 - [ ] **Decide the single-cohort OOD rows** — keep in `tab:ood`, move to an S1
   Table, or drop. The draft is written for keep. (REQUIRED_FROM_YOU #14)
-- [x] ~~Cut the abstract to ≤300 words~~ **Done 2026-08-24: 291 words.** Re-count
-  after any edit.
+- [x] ~~Cut the abstract to ≤300 words~~ **Done; re-trimmed twice after Ken's
+  additions (patient-days, comparison numbers): 276 words on 2026-09-09.**
+  Re-count after any edit.
 - [x] ~~Cut the author summary to 150–200 words~~ **Done 2026-08-24: 199 words.**
 - [x] ~~Data availability statement~~ **Written 2026-08-11:** MetaboNet route for
   the five public cohorts, ABC4D/ARISES on request via the corresponding author,
@@ -45,8 +47,8 @@ Updated 2026-08-24 after the clean-retrain revision (v30).
 - [ ] **Author contributions** — CRediT taxonomy, at least one role per author;
   entered in the submission system.
 - [ ] **Suggest ≥4 reviewers** — must avoid recent collaborators and
-  institutional colleagues (careful: 4 UK institutions are involved in the
-  deployment).
+  institutional colleagues (careful: the author list now spans UCL, Newcastle,
+  KCL, FLock.io, Imperial, and Manchester).
 - [ ] **Compile to PDF** — LaTeX submissions go in as PDF. No local toolchain, so
   final compile + visual check happens on Overleaf (table widths, overfull
   boxes, figure placement). `tab:h60` is 9 columns inside `\resizebox`; check
@@ -67,8 +69,9 @@ Updated 2026-08-24 after the clean-retrain revision (v30).
   Abstract, Author summary and Intro contribution 2 were rewritten 2026-08-24
   for the corrected results and the new style rule (simple sentences, no
   semicolons, no em-dash asides). Methods gained a Data quality subsection.
-- [ ] **Reference correctness pass** — finish open refcheck items: ARISES full
-  author list, ABC4D registry-vs-paper. (REQUIRED_FROM_YOU #8)
+- [x] ~~Reference correctness pass~~ **Done 2026-09-03** — ARISES author list
+  and ABC4D details verified against primary sources; `zhu2023glugan` and
+  `liu2021feddg` added to the bib. (REQUIRED_FROM_YOU #8)
 - [x] ~~GPFormer framing sanity check~~ **Resolved 2026-08-11:** precursor
   framing removed by author decision.
 - [x] ~~Number-consistency pass~~ **Done 2026-08-24** by a 14-agent adversarial

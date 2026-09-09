@@ -9,7 +9,7 @@ Read this first if you're picking up the paper with no prior context.
 
 > Train a 30-min CGM forecaster across four real T1D cohorts held at four separate
 > institutions, without pooling raw data. Federation beats single-cohort training
-> in-domain (MLDG 0.36 mg/dL lower, p = 0.005, 5/5 seeds) and transfers about as
+> in-domain (MLDG 0.23 mg/dL lower, p = 0.014, 5/5 seeds) and transfers about as
 > well as the best single cohort and better than the average one. The privacy
 > cost vs pooling is 0.09 mg/dL (not significant; exact tie at 60 min). The
 > headline practical result: a new site beats local-only training by finetuning
@@ -23,7 +23,8 @@ Read this first if you're picking up the paper with no prior context.
 Two contributions: (1) a **by-patient, held-in-vs-OOD benchmark** of federated
 strategies (Local, FedAvg, FedProx, MLDG, APFL, Ditto) on one glucose task; (2) the
 system was **run for real across four UK universities** (UCL, Manchester, Newcastle,
-Oxford), not simulated on one host.
+KCL — corrected 2026-09-09; Taiyu's client ran on KCL's CREATE server, earlier
+docs and drafts said Oxford), not simulated on one host.
 
 ## Where things are
 
@@ -32,11 +33,11 @@ Oxford), not simulated on one host.
 | **LIVE draft (edit this)** | `revision/glucose_fl_paper_working.tex` |
 | Bibliography (edit this) | `revision/references.bib` |
 | Figures | `revision/figures/` (e.g. `data_efficiency.pdf`) |
-| Version snapshots (frozen, read-only) | `revision/glucose_fl_paper_v1..v16.tex` — v16 is newest ≈ working |
+| Version snapshots | `revision/glucose_fl_paper_v1..v30.tex` — v30 is newest and is kept **byte-identical** to the working file; earlier vN are frozen |
 | **Original draft — DO NOT EDIT** | `glucose_fl_paper.tex` (the author's Overleaf file; see "Two files" below) |
 | **Submission checklist** | `reviews/SUBMISSION_TODO.md` |
 | Open items the author owes | `reviews/REQUIRED_FROM_YOU.md` ← check this every session |
-| Per-iteration change log | `reviews/iter{1,2,3,4,5}_revisions.md` |
+| Per-iteration change log | `reviews/iter{1..13}_revisions.md` (iter13 = the 2026-09 Paul/Ken comment round) |
 | Reviewer critiques (5) | `reviews/iter1_reviewer*.md`, `reviews/iter2_*.md` |
 | Reference verification | `reviews/refcheck_*.md` |
 | Older open-questions doc | `reviews/UNSURE.md` (superseded by REQUIRED_FROM_YOU.md for live items) |
@@ -44,22 +45,23 @@ Oxford), not simulated on one host.
 | Raw per-seed outputs of the clean retrain | `C:\Users\luyua\Desktop\release_bundle\output_clean_retrain\` (`final_results_summary.csv`; per-seed under `pod_results/clean_eval` and `pod_results/followup`) |
 | STALE, do not use | `../NEW_FINDINGS.md`, `../FLockit_GPFormer/output_arises_bolus/` (pre-fix runs) |
 
-## Two files, one repo — the Overleaf gotcha
+## Two files, one repo — the Overleaf gotcha (rewritten 2026-09-09)
 
-The author edits `glucose_fl_paper.tex` in **Overleaf** and pushes; our reviewed work
-lives in `revision/glucose_fl_paper_working.tex`. These are **two separate documents**
-that have not been merged — `revision/` has the abstract, all the analysis, the moved
-comparison section, and every reviewer fix; the Overleaf file is the author's own
-running copy. Before editing: `git pull --rebase --autostash origin main`. Expect
-Overleaf commits ("Updates from Overleaf") to land between sessions.
+Overleaf's main document is now `revision/glucose_fl_paper_working.tex`, and the
+author and co-authors edit it there. Overleaf sends nothing to GitHub on its own:
+someone must click Menu → GitHub → Push in Overleaf. Those commits arrive as
+"Updates from Overleaf" and touch **only the working file** (seen 2026-09-03/04:
+author-list additions, then an affiliation removal).
 
-**Merge status (verified 2026-08-11):** the Overleaf file's last content edit was
-2026-06-29 (the ReplaceBG-adaptation section), and that content is in the working
-file (extended to all 3 targets in `tab:finetune`). Nothing lives only in
-`glucose_fl_paper.tex`, so at submission the author can simply point Overleaf's main
-document at the working file (or rename it) — no line-by-line merge needed. If new
-"Updates from Overleaf" commits touch `glucose_fl_paper.tex` after this date,
-re-check before renaming.
+Our convention: the newest vN snapshot (currently v30) and the working file are
+kept **byte-identical**. So:
+- after every pull that brings an Overleaf commit, mirror the change into
+  `glucose_fl_paper_v30.tex` and push;
+- after every local edit, copy the file over the working copy before committing.
+
+`glucose_fl_paper.tex` (top of `paper/`) is the author's pre-revision original.
+It is superseded and no longer edited anywhere (last content edit 2026-06-29,
+already merged into the working file).
 
 ## Workflow (do this every time)
 
@@ -68,7 +70,9 @@ re-check before renaming.
 3. **No LaTeX toolchain locally** — validate structurally instead:
    - env balance: `begin{table}`==`end{table}`, same for `tabular`, `figure`, `document`
    - every `\label{tab:/fig:...}` has a `\ref`, and every `\cite{key}` key exists in `references.bib`
-4. Snapshot to the next `glucose_fl_paper_vN.tex`, commit, `git push origin main`.
+4. Keep `glucose_fl_paper_v30.tex` and the working file byte-identical (cp one
+   over the other), commit, `git push origin main`. Mint a new vN only at a
+   milestone, not per session.
 5. Log substantive changes in a new `reviews/iterN_revisions.md`; move resolved
    author-items out of `reviews/REQUIRED_FROM_YOU.md`.
 6. **Never fabricate numbers.** Every value in the paper traces to a CSV under
@@ -119,8 +123,9 @@ re-check before renaming.
 - **APFL α is learned, not frozen**: it decays 0.23→0.02–0.08, i.e. APFL chooses to
   deploy a ~95% global model. This is a *finding* (personalisation isn't worth much
   here), not a bug.
-- **Deployment** = ran live across the 4 universities. Title says "four-institution
-  deployment". Caveats: single country; no secure aggregation / DP yet. **Author
+- **Deployment** = ran live across the 4 universities: UCL, Manchester, Newcastle,
+  KCL (corrected 2026-09-09 — Taiyu's client ran on KCL's CREATE server, not
+  Oxford). Title says "four-institution deployment". Caveats: single country; no secure aggregation / DP yet. **Author
   decision 2026-08-11: do NOT emphasise the lack of security** — "plain HTTP /
   no encryption / could be attacked" language was removed everywhere; the only
   remaining mention is one neutral sentence in Limitations (v) framed as the
@@ -128,7 +133,9 @@ re-check before renaming.
 
 ## Current state of the draft
 
-- **Tables (7):** datasets (HUPA-UCM/T1D-UOM rows are the cleaned data); held-in
+- **Tables (7):** datasets (since 2026-09-03: all seven cohorts with
+  train/val/test patient counts, patient-days, CGM device, age median (IQR),
+  wrapped in `\resizebox`; HUPA-UCM/T1D-UOM rows are the cleaned data); held-in
   RMSE@30 (`tab:main`, ties both bold); OOD@30 (`tab:ood`, federated + centralised
   + four single-cohort rows + Local mean-of-four, all with sd); 60-min (`tab:h60`,
   since 2026-08-24 a FULL table: all four held-in cohorts for every strategy, OOD
@@ -176,15 +183,19 @@ re-check before renaming.
   `reviews/iter12_revisions.md`.
 - **Persistence & clinical metrics: DECIDED 2026-08-11, not reported.** Don't
   re-open without the author. RMSE-only framing throughout.
-- **Centralised reference:** fully on disk now (`clean_eval/seed_*/centralized/`),
-  30 and 60 min, in every table. Framed as "reference", not "upper bound".
+- **Centralised baseline** (renamed from "centralised (pooled) reference" for
+  Paul comment 2, 2026-09-03): fully on disk (`clean_eval/seed_*/centralized/`),
+  30 and 60 min, in every table. Still reported as the accuracy federation must
+  match, not as an upper bound.
 - **Statistical framing:** MLDG vs FedAvg and FL vs Local are significant at 5
   seeds; still unsettled are MLDG vs Centralised, MLDG vs FedAvg on Flair @30
   (p = 0.09), FedAvg vs FedProx (p = 0.06), FedProx vs Local @30 (p = 0.77).
   Limitation (iii) says so. FedProx µ is untuned.
-- **Admin blockers for PLOS:** author affiliations 2 and 3, ORCID, CRediT, cover
-  letter, suggested reviewers. Abstract ≤ 300 words and summary ≤ 200 are now met
-  (re-count after any edit). Full checklist: `reviews/SUBMISSION_TODO.md`.
+- **Admin blockers for PLOS:** ORCID and CRediT for the (now eight) authors,
+  cover letter, suggested reviewers (conflict list spans UCL, Newcastle, KCL,
+  FLock.io, Imperial, Manchester). The author block itself is complete since
+  2026-09-09. Abstract ≤ 300 (276 words) and summary ≤ 200 are met (re-count
+  after any edit). Full checklist: `reviews/SUBMISSION_TODO.md`.
 
 ## Next-run reminder for the author
 

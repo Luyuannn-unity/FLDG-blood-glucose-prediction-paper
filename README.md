@@ -8,9 +8,12 @@ Start with `START_HERE.md`. It says which file is live, what is locked in, and
 what is still open.
 
 ## Files
-- `revision/glucose_fl_paper_working.tex` — the live manuscript. Edit this one.
-- `revision/glucose_fl_paper_v1..vN.tex` — frozen snapshots, one per revision
-  iteration. The highest N is the newest.
+- `revision/glucose_fl_paper_working.tex` — the live manuscript and Overleaf's
+  main document. Overleaf commits ("Updates from Overleaf") touch only this
+  file.
+- `revision/glucose_fl_paper_v1..vN.tex` — snapshots, one per revision
+  iteration. The highest N (v30) is kept byte-identical to the working file;
+  mirror every change between the two. Earlier ones are frozen.
 - `revision/references.bib` — bibliography.
 - `revision/figures/` — `fl_system.pdf` (source `fl_system_fig.py`) and
   `data_efficiency.pdf` (source `data_efficiency_fig.py`, which regenerates it
