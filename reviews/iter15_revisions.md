@@ -90,3 +90,7 @@ real-world. Sun 2025: five cities, three continents, in-silico. Dexcom G7 MARD
 MLDG, decoder convention. GluLLM: 20.6/21.1/21.3/22.1, 46 individuals.
 GlucoFM-Bench: 16.71 (4.82), 20.81 (4.26), LSTM, by-time, univariate.
 FCNN: 20.23 (3.38), 20.25 (2.60), by-time, CGM + carbs + bolus.
+
+## Resolved (2026-09-09, same day)
+
+- **AEGIS on T1D-UOM: confirmed by the author from the full text.** The paper says: "Using the T1D-UOM dataset, which includes continuous glucose, insulin, nutrition, and activity measurements, we engineer physiologically meaningful features and evaluate the system under a leave-one-patient-out protocol to ensure generalizability to unseen individuals." All four claims about AEGIS (T1D-UOM, leave-one-patient-out, 15-min horizon, mmol/L) are now verified. No change to the paper. Item removed from REQUIRED_FROM_YOU.md.
