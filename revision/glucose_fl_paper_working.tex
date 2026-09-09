@@ -130,7 +130,8 @@ and two personalised-FL methods under a by-patient split over five seeds, at
 
 The meta-learned federated model (MLDG) beat local training held-in,
 $20.25$ vs $20.49$ mg/dL RMSE at 30 minutes, lower on
-every seed, while plain federated averaging only matched it. The privacy
+every seed, while plain federated averaging only matched it. The ordering
+held on the Clarke error grid. The privacy
 constraint proved nearly free: MLDG came within $0.09$ mg/dL of a
 pooled centralised model, under $1\%$ of CGM sensor error,
 and tied it at 60 minutes.
@@ -617,7 +618,7 @@ FedAvg, FedProx, MLDG, the centralised baseline, and each single-cohort
 model. We also report the mean of the four single-cohort models as a
 reference row.
 We report root-mean-squared error (RMSE) in mg/dL as a \emph{point} error at the
-30-minute horizon, and use it as the single primary metric for three reasons.
+30-minute horizon, and use it as the primary metric for three reasons.
 First, it is the unmasked counterpart of the MSE objective every strategy
 optimises, so it measures what the training procedures being compared were
 asked to do.
@@ -628,6 +629,14 @@ one scalar per strategy and cohort is what keeps those comparisons readable. Bec
 forecasts 12 steps, we also report the 60-minute horizon in full
 (Table~\ref{tab:h60}). Neither figure is a window average
 over the forecast horizon. Both are the error at that specific step.
+As a clinical check on the same forecasts we also report the Clarke error
+grid \cite{clarke1987} at 30 minutes (Table~\ref{tab:clarke}), computed on
+the same test windows as the RMSE with the standard zone rules. Zone A holds
+forecasts within $20\%$ of the reference value, and forecasts below 70 mg/dL
+when the reference is also below 70 mg/dL. Zones D and E hold forecasts that
+would miss a hypoglycaemic or hyperglycaemic event or prompt the wrong
+treatment. We report the share of windows in zone A and in zones D and E
+together.
 
 \emph{OOD test sets.} In the zero-shot evaluation, every OOD test patient is
 unseen in the strong sense: unseen cohort \emph{and} unseen individual. Each
@@ -644,8 +653,9 @@ cohorts. All federated and local runs use early stopping on average
 validation MSE over real samples (patience~5 over a maximum of 25
 communication rounds). Every configuration is repeated over 5 random seeds. We report the mean and standard
 deviation across seeds. To test whether a difference between two strategies is
-meaningful, we compare their per-seed RMSE with a two-sided paired $t$-test
-across the five seeds. We apply the same test to every comparison we report:
+meaningful, we compare their per-seed RMSE, or per-seed zone share, with a
+two-sided paired $t$-test across the five seeds. We apply the same test to
+every comparison we report:
 held-in, OOD, finetuning against training from scratch, and the data-efficiency
 curves.
 
@@ -887,6 +897,71 @@ values come from the same runs as Table~\ref{tab:main}.}
 \end{center}
 \end{table}
 
+\paragraph{The ordering holds on the Clarke error grid.} RMSE is the
+objective the strategies were trained for. The Clarke error grid
+\cite{clarke1987} scores the same forecasts by their clinical consequence,
+and it gives the same ordering (Table~\ref{tab:clarke}). At 30 minutes MLDG
+has the largest share of clinically accurate forecasts (zone A) of the three
+global strategies in every column, and it is above local training in every
+column. Its held-in average is $84.71\%$ against $83.80\%$ for local
+training ($+0.9$ points, $p = 0.058$, four of five seeds), and the gain is
+significant on every OOD cohort ($+0.3$ to $+0.9$ points, $p \le 0.043$,
+five of five seeds). FedAvg and FedProx do not beat local training on zone A
+held-in ($+0.40$ and $+0.06$ points, $p = 0.35$ and $0.81$). The dangerous
+zones D and E move the same way. MLDG has the lowest D+E share of the
+federated strategies in every column, and it cuts the held-in average from
+$3.57\%$ under local training to $3.08\%$ ($p = 0.028$). The cut is
+significant on ABC4D, ARISES, and T1D-UOM (five of five seeds,
+$p \le 0.009$) and on all three OOD cohorts ($p \le 0.024$). HUPA-UCM is the
+one exception. Its own local model has the fewest dangerous forecasts there
+($2.06\%$ vs $2.60\%$ for MLDG, $p = 0.07$). Nearly all dangerous forecasts
+are zone D, a missed excursion. Zone E, the wrong treatment, is below
+$0.05\%$ in every cell. The centralised baseline has the highest zone A share
+in every column ($0.7$ points above MLDG held-in, $p = 0.014$), but its D+E
+share is not significantly lower than MLDG's in any column ($p \ge 0.25$).
+Ditto ($\mu{=}0.1$), the best personalised strategy, reaches $84.48\%$ zone A
+held-in, above local training ($p = 0.037$) but below MLDG. At 60 minutes
+MLDG's zone A gain over local training grows to $+0.8$ points held-in
+($p = 0.015$, five of five seeds), and its D+E share is the lowest of every
+strategy, including the centralised baseline, on five of the seven cohorts.
+
+\begin{table}[!ht]
+\centering
+\captionsetup{justification=centering,singlelinecheck=on}
+\caption{\bf Clarke error grid at the 30-minute horizon (\% of test windows).}
+\label{tab:clarke}
+\resizebox{\linewidth}{!}{%
+\begin{tabular}{lcccccccc}
+\thickhline
+ & \multicolumn{5}{c}{held-in} & \multicolumn{3}{c}{out-of-distribution} \\
+strategy & HUPA-UCM & ABC4D & ARISES & T1D-UOM & avg & ReplaceBG & BrisT1D & Flair \\
+\hline
+\multicolumn{9}{l}{\emph{zone A, clinically accurate (higher is better)}} \\
+Local (per cohort) & $87.60 \pm 0.56$ & $83.86 \pm 0.37$ & $79.43 \pm 1.30$ & $84.29 \pm 0.89$ & $83.80 \pm 0.51$ & $85.40 \pm 0.36$ & $82.44 \pm 0.15$ & $82.74 \pm 0.15$ \\
+FedAvg & $87.21 \pm 0.45$ & $83.83 \pm 0.73$ & $80.33 \pm 0.32$ & $85.43 \pm 0.23$ & $84.20 \pm 0.41$ & $86.01 \pm 0.21$ & $82.65 \pm 0.16$ & $82.89 \pm 0.14$ \\
+FedProx & $86.62 \pm 0.55$ & $83.54 \pm 0.70$ & $80.01 \pm 0.60$ & $85.24 \pm 0.46$ & $83.85 \pm 0.54$ & $85.79 \pm 0.32$ & $82.48 \pm 0.33$ & $82.79 \pm 0.26$ \\
+MLDG & $\mathbf{87.87 \pm 0.39}$ & $\mathbf{84.52 \pm 0.60}$ & $\mathbf{80.65 \pm 0.32}$ & $\mathbf{85.81 \pm 0.25}$ & $\mathbf{84.71 \pm 0.37}$ & $\mathbf{86.28 \pm 0.21}$ & $\mathbf{82.85 \pm 0.14}$ & $\mathbf{83.04 \pm 0.14}$ \\
+Centralised & $88.48 \pm 0.44$ & $85.05 \pm 0.60$ & $81.65 \pm 0.16$ & $86.63 \pm 0.10$ & $85.46 \pm 0.25$ & $86.63 \pm 0.05$ & $82.89 \pm 0.21$ & $83.38 \pm 0.22$ \\
+\hline
+\multicolumn{9}{l}{\emph{zones D and E, clinically dangerous (lower is better)}} \\
+Local (per cohort) & $\mathbf{2.06 \pm 0.40}$ & $5.41 \pm 0.17$ & $3.87 \pm 0.28$ & $2.93 \pm 0.26$ & $3.57 \pm 0.17$ & $2.50 \pm 0.16$ & $1.12 \pm 0.04$ & $1.42 \pm 0.05$ \\
+FedAvg & $3.00 \pm 0.36$ & $5.23 \pm 0.51$ & $3.23 \pm 0.18$ & $2.30 \pm 0.17$ & $3.44 \pm 0.30$ & $2.17 \pm 0.17$ & $1.05 \pm 0.05$ & $1.31 \pm 0.06$ \\
+FedProx & $3.28 \pm 0.17$ & $5.51 \pm 0.32$ & $3.41 \pm 0.12$ & $2.37 \pm 0.10$ & $3.64 \pm 0.17$ & $2.30 \pm 0.10$ & $1.12 \pm 0.02$ & $1.39 \pm 0.03$ \\
+MLDG & $2.60 \pm 0.25$ & $\mathbf{4.60 \pm 0.41}$ & $\mathbf{3.05 \pm 0.16}$ & $\mathbf{2.07 \pm 0.15}$ & $\mathbf{3.08 \pm 0.24}$ & $\mathbf{2.01 \pm 0.13}$ & $\mathbf{1.02 \pm 0.05}$ & $\mathbf{1.26 \pm 0.06}$ \\
+Centralised & $2.37 \pm 0.52$ & $4.42 \pm 0.63$ & $2.93 \pm 0.27$ & $1.90 \pm 0.25$ & $2.91 \pm 0.41$ & $1.94 \pm 0.23$ & $1.00 \pm 0.09$ & $1.27 \pm 0.10$ \\
+\thickhline
+\end{tabular}}
+\begin{center}
+{\small Mean $\pm$ standard deviation across 5 random seeds, on the same
+test windows and forecasts as Table~\ref{tab:main}. \emph{avg} and
+\emph{Local} OOD are defined as in Table~\ref{tab:h60}. Zone A is
+clinically accurate. Zones D and E are clinically dangerous (a missed
+excursion or the wrong treatment). Zones B and C make up the remainder, and
+zone C is below $0.15\%$ in every cell. Bold marks the best value per column
+within each block, excluding the centralised baseline.}
+\end{center}
+\end{table}
+
 \paragraph{MLDG has the lowest error in every comparison, and its edge is
 significant.} Among the federated strategies that produce a deployable global
 model (FedAvg, FedProx, MLDG), MLDG has the lowest error in \emph{every}
@@ -1042,7 +1117,9 @@ So the accuracy cost of never pooling raw data was smaller than the error of
 the sensors the model reads from. Among the three global federated
 strategies (FedAvg, FedProx, MLDG), MLDG was the most accurate in every
 held-in and OOD comparison, and its edge over FedAvg was larger than FedAvg's
-edge over local training. OOD, MLDG beat the average single-cohort model on
+edge over local training. The same ordering held on the Clarke error grid,
+where MLDG also had the fewest clinically dangerous forecasts of the
+federated strategies. OOD, MLDG beat the average single-cohort model on
 every held-out cohort, FedAvg and FedProx matched it, and a cohort's in-domain
 accuracy did not predict how well its model transferred. These results were produced by a federation that ran across
 four universities, UCL, Manchester, Newcastle, and KCL, training FedAvg,
@@ -1331,16 +1408,17 @@ and that the same strategy, MLDG, stays ahead on each.
 \paragraph{Limitations and future work.} Several constraints bound these
 conclusions, and each points to a next step.
 \emph{(i) Clinical relevance.} Our goal was to establish how federated
-strategies compare on the forecasting objective they were trained for, so we
-report a single aggregate error (RMSE at 30 and 60 min) and a point forecast with no
-calibrated uncertainty. Aggregate RMSE is dominated by the euglycaemic range and
-can be near-blind to the safety-critical hypoglycaemic tail, and the studies we
-compare against also report clinical error grids (Clarke/Parkes), MARD, or
-hypo-/hyperglycaemia detection. Whether federation's small advantage survives
-on such metrics is untested. The next step is to train and evaluate with clinical
-relevance built in, for example a loss that penalises forecasts falling in
-the dangerous zones of the error grid, and to report the full error-grid,
-MARD, and event-detection profile with predictive uncertainty.
+strategies compare on the forecasting objective they were trained for, so
+RMSE is the primary metric and the forecast is a point estimate with no
+calibrated uncertainty. The Clarke error grid shows that the ordering holds
+on a clinical view of the same forecasts, but the models were not trained
+for it, and between $1\%$ and $5\%$ of 30-minute forecasts, depending on the
+cohort, still fall in the dangerous zones. The studies we compare against
+also report MARD or hypo-/hyperglycaemia detection, which we do not. The
+next step is to train with clinical relevance built in, for example a loss
+that penalises forecasts falling in the dangerous zones of the error grid,
+and to report MARD, event detection, and predictive uncertainty alongside
+the grid.
 \emph{(ii) OOD breadth and composition.} Our transfer claim rests on three
 held-out cohorts (ReplaceBG, BrisT1D, Flair), and the three are not equivalent
 tests. Flair is a hybrid closed-loop (automated insulin delivery) cohort of

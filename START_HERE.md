@@ -133,7 +133,7 @@ already merged into the working file).
 
 ## Current state of the draft
 
-- **Tables (7):** datasets (since 2026-09-03: all seven cohorts with
+- **Tables (8):** datasets (since 2026-09-03: all seven cohorts with
   train/val/test patient counts, patient-days, CGM device, age median (IQR),
   wrapped in `\resizebox`; HUPA-UCM/T1D-UOM rows are the cleaned data); held-in
   RMSE@30 (`tab:main`, ties both bold); OOD@30 (`tab:ood`, federated + centralised
@@ -142,7 +142,9 @@ already merged into the working file).
   columns, Centralised row, wrapped in `\resizebox`); zero-shot vs
   ReplaceBG-trained baselines (`tab:oodprior`); external by-time comparison
   (`tab:prior`, sd on all four Ours rows, harder-HUPA footnote); finetuning
-  (`tab:finetune`).
+  (`tab:finetune`); Clarke error grid at 30 min (`tab:clarke`, since 2026-09-09:
+  zone A and zones D+E for Local/FedAvg/FedProx/MLDG/Centralised, held-in +
+  OOD, from `release_bundle/clarke_analysis.py`).
 - **Figures (2):** data-efficiency (`fig:dataeff`, regenerated 2026-08-24 by
   `revision/figures/data_efficiency_fig.py` from the clean per-seed CSVs);
   FL-system architecture (`fig:system`).
@@ -181,8 +183,12 @@ already merged into the working file).
 - **Single-cohort OOD rows (deferred).** Keep in `tab:ood` / move to an S1 Table /
   drop. The draft is written for "keep". Sentences that hang on it are listed in
   `reviews/iter12_revisions.md`.
-- **Persistence & clinical metrics: DECIDED 2026-08-11, not reported.** Don't
-  re-open without the author. RMSE-only framing throughout.
+- **Clinical metrics (updated 2026-09-09).** The author reopened the 2026-08-11
+  decision for the Clarke error grid only: it is now in Methods, Results
+  (`tab:clarke` + one paragraph), Abstract (one sentence), Discussion (one
+  sentence) and Limitation (i). Persistence, MARD, Parkes and event detection
+  stay unreported. RMSE stays the primary metric (wording: "the primary
+  metric", no longer "the single primary metric").
 - **Centralised baseline** (renamed from "centralised (pooled) reference" for
   Paul comment 2, 2026-09-03): fully on disk (`clean_eval/seed_*/centralized/`),
   30 and 60 min, in every table. Still reported as the accuracy federation must
@@ -200,6 +206,9 @@ already merged into the working file).
 ## Next-run reminder for the author
 
 Save **model checkpoints AND per-window predictions** on any future training run.
-Clinical metrics (Clarke/Parkes/MARD/event-detection) can't be recomputed from the
-aggregate CSVs currently on disk. The 60-min numbers only survived because they were
-logged (`rmse_60=` in the training logs).
+Since 2026-09-04 per-window predictions of the clean-retrain checkpoints exist in
+`release_bundle/output_clean_retrain/predictions/` (see its README), and the Clarke
+grid in `tab:clarke` was computed from them on 2026-09-09
+(`release_bundle/clarke_analysis.py`, outputs in `predictions/analysis/clarke/`).
+The 60-min numbers only survived because they were logged (`rmse_60=` in the
+training logs).

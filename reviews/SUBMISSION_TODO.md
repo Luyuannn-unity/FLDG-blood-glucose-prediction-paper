@@ -83,7 +83,8 @@ the Paul/Ken comment round (see `iter13_revisions.md`).
 ## D. Science decisions
 
 1. [x] **Persistence / clinical-metrics finding: NOT reported** (author decision
-   2026-08-11). Rationale recorded in REQUIRED_FROM_YOU.md. Don't re-open.
+   2026-08-11), except the Clarke error grid, which the author added on
+   2026-09-09 (`tab:clarke`). Rationale recorded in REQUIRED_FROM_YOU.md.
 2. [x] **Centralised pooled baseline: in the paper** (2026-08-11). Per-seed
    CSVs on disk and a 60-min row in `tab:h60` since 2026-08-24.
 3. [x] **MLDG significance** — resolved by the clean retrain: MLDG beats FedAvg

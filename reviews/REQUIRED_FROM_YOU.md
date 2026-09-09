@@ -46,8 +46,12 @@ specific claims in the paper. Ordered by what would sink the paper first.
   wording: "pulls ahead from about 30%", no seed-noise caveat. (h) Style: simple
   sentences, no semicolons, no em-dash asides, paper-wide.
 
+- **Clarke error grid IS reported since 2026-09-09** (author reopened the item
+  below for the Clarke grid only; `tab:clarke`, computed from the per-window
+  prediction dumps by `release_bundle/clarke_analysis.py`). Persistence, MARD,
+  Parkes and event detection stay out.
 - **Persistence / clinical-metrics comparison (NEW_FINDINGS Phase D/E) will NOT be
-  reported** (decided 2026-08-11). Rationale: the paper's claim is about RMSE under
+  reported** (decided 2026-08-11, partly superseded above). Rationale: the paper's claim is about RMSE under
   federation and transfer; the models were optimised for RMSE, not event detection,
   and reporting a metric family we did not optimise for would import a problem that
   is not the paper's focus. The Methods now justify RMSE@30 as the single primary
