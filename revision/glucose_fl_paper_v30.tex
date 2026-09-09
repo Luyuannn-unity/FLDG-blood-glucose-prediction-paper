@@ -176,7 +176,7 @@ clinically valuable in type~1 diabetes (T1D): it can trigger preemptive
 alerts, inform bolus and snack decisions, and close the loop in automated
 insulin-delivery systems~\cite{vettoretti2020advanced,bekiari2018ap}. T1D
 affects an estimated 8.4~million people
-worldwide~\cite{idf2021,gregory2022t1dindex}, who must continually balance
+worldwide~\cite{gregory2022t1dindex}, who must continually balance
 insulin, food, and activity to keep blood glucose within a narrow target
 range. Excursions outside that range drive both the acute dangers of
 hypoglycaemia and the long-term complications of hyperglycaemia. Continuous
@@ -195,9 +195,10 @@ transformer~\cite{vaswani2017attention} and its time-series
 variants~\cite{zhou2021informer,wu2021autoformer}, with transformer
 forecasters reporting state-of-the-art accuracy on
 glucose~\cite{sergazinov2023gluformer} and curated benchmarks standardising
-their evaluation~\cite{sergazinov2024glucobench}. But glucose dynamics,
-demographics, and devices differ from site to site, and a model can degrade
-on populations it did not see in training~\cite{farahmand2025glumind}.
+their evaluation~\cite{sergazinov2024glucobench}. But glucose dynamics differ
+between populations~\cite{farahmand2025glumind}, demographics and devices
+differ from site to site, and a model can degrade on populations it did not
+see in training.
 Robust generalisation therefore requires methods that can exploit diversity
 across available cohorts while remaining effective on populations not
 observed during training.
@@ -230,7 +231,7 @@ memorise~\cite{li2018mldg}.
 These ideas have reached glucose forecasting only in the \emph{centralised}
 setting: a Transformer trained with MLDG on a single large cohort transfers
 zero-shot to external cohorts~\cite{zhu2024gpformer}, and a language-model
-backbone improves in-cohort accuracy further~\cite{zhu2026glullm}, but both
+backbone beats a bank of deep-learning baselines in-cohort~\cite{zhu2026glullm}, but both
 are trained on data pooled at a single site, precisely what
 data-protection regimes prevent a multi-institution consortium from doing.
 Our question is what happens when the same objective must be optimised
@@ -1316,7 +1317,7 @@ Second, the test sets are not identical: the published studies evaluate on a
 evaluate on a 21-patient test split from a model that never saw \emph{any}
 ReplaceBG patient. Both test on unseen individuals. Only ours also faces an
 unseen cohort, a different and arguably harder setting. Third, reported
-ReplaceBG results vary widely with protocol: one study reports $9.3$ mg/dL
+ReplaceBG results vary widely with protocol: one study reports $9.7$ mg/dL
 \cite{jaloli2023cnnlstm}, but on a 15-minute grid and with a rolling split
 that re-admits test patients to training. That is not comparable to any of
 the numbers here. With those caveats, the point stands: a model that never
@@ -1349,14 +1350,14 @@ model & inputs & trained on ReplaceBG & RMSE@30 \\
 \hline
 GPFormer \cite{zhu2024gpformer}    & CGM                & yes & $19.2$ \\
 GluLLM \cite{zhu2026glullm}        & CGM + insulin + EHR & yes & $20.6$ \\
-Crossformer \cite{zhu2026glullm}   & CGM + insulin + EHR & yes & $21.1$ \\
+Crossformer \cite{zhu2026glullm}   & not stated         & yes & $21.1$ \\
 N-BEATS \cite{zhu2024gpformer}     & CGM                & yes & $21.2$ \\
-TCN \cite{zhu2026glullm}           & CGM + insulin + EHR & yes & $21.3$ \\
+TCN \cite{zhu2026glullm}           & not stated         & yes & $21.3$ \\
 \textbf{Ours, MLDG (federated)}   & \textbf{CGM}       & \textbf{no} & $\mathbf{21.30}$ \\
 \textbf{Ours, FedAvg}             & \textbf{CGM}       & \textbf{no} & $\mathbf{21.48}$ \\
 \textbf{Ours, FedProx}            & \textbf{CGM}       & \textbf{no} & $\mathbf{21.65}$ \\
 Bi-LSTM \cite{zhu2024gpformer}     & CGM                & yes & $21.7$ \\
-GRU \cite{zhu2026glullm}           & CGM + insulin + EHR & yes & $22.1$ \\
+GRU \cite{zhu2026glullm}           & not stated         & yes & $22.1$ \\
 ARIMA \cite{zhu2024gpformer}       & CGM                & yes & $28.1$ \\
 SVR \cite{zhu2024gpformer}         & CGM                & yes & $37.4$ \\
 \thickhline
@@ -1367,8 +1368,9 @@ by-patient hold-out on a 5-minute grid and report a \emph{point} error at 30
 minutes (not a window average). Every published row was \emph{trained on
 ReplaceBG}. Our three rows were trained on four entirely different cohorts and
 never saw ReplaceBG, so they are zero-shot. Published values are read from
-\cite{zhu2024gpformer,zhu2026glullm}. Those two sources evaluate on the same
-46-subject hold-out of ReplaceBG, whereas our models are evaluated on a 21-patient
+\cite{zhu2024gpformer,zhu2026glullm}. Each of those two sources evaluates on a
+46-subject hold-out of ReplaceBG, and the GluLLM paper does not state the inputs
+of its Crossformer, TCN, and GRU baselines. Our models are evaluated on a 21-patient
 test split of ReplaceBG that, like all ReplaceBG patients, was never seen in
 training. Note that GPFormer additionally uses sparse attention while our
 forecaster uses full attention, so the GPFormer--ours gap reflects architecture as

@@ -103,7 +103,7 @@ specific claims in the paper. Ordered by what would sink the paper first.
 - **We use full attention, not GPFormer's sparse attention** — verified in code. Methods/Intro/comparison corrected; the gap to GPFormer now explicitly attributed to architecture *and* training regime.
 - **APFL α is not frozen** — I checked `apfl_alpha_log.csv`: α decays 0.23 → 0.02–0.08 in every seed. Better than a "failure mode": APFL *learns* to deploy ~95% global model. Now a Results finding, and it supplies the missing explanation for the personalised-FL family.
 - **Decoder** = Informer-style warm-up (last 6 context steps + 12 zeros), not a start token.
-- **Deployment** = 4 real institutions (UCL/Manchester/Newcastle/Oxford). Claim upgraded throughout.
+- **Deployment** = 4 real institutions (UCL/Manchester/Newcastle/KCL; corrected from Oxford 2026-09-09). Claim upgraded throughout.
 - **60-min horizon** = recovered from training logs (`rmse_60=`); no retrain was needed.
 
 ---
@@ -119,3 +119,13 @@ The clean rerun kept checkpoints (`release_bundle/output_clean_retrain/ckpt_all.
 the extended-metric CSVs (`clean_eval*/`), which is what made the single-cohort
 re-evaluation possible. Keep doing that, and add per-window predictions if clinical
 metrics are ever wanted.
+
+---
+
+## Added 2026-09-09 after the full reference check (`refcheck_2026-09-09_full.md`)
+
+- **FedDG wording (your call).** "adapted to the federated setting~\cite{liu2021feddg}" reads as if our patient-split MLDG comes from FedDG. FedDG is the closest precedent (episodic meta-learning inside FL) but its meta-test data come from cross-client frequency-space augmentation, not a patient split. You chose the bare cite for Paul comment 3, so it was left as is. Suggested minimal change: "adapted to the federated setting, where FedDG~\cite{liu2021feddg} is the closest precedent".
+- **AEGIS on T1D-UOM.** The paper says AEGIS was run "on T1D-UOM via leave-one-patient-out" (Discussion) and lists it as "(15-min horizon, mmol/L)" in the by-time comparison. LOPO, 15 min and mmol/L are confirmed (full-text summary, June check). The dataset name is not in the abstract and the paper is closed access. Please confirm the data section says T1D-UOM (IEEE Xplore via UCL).
+- **Uncited bib entries (harmless, they do not print):** fang2026mthyponet, fedadv2022, fedcl2023, flda2023, james2025brist1dpaper, jeffries2026metabonetbench, li2021moon, and now idf2021 (dropped from the 8.4 million sentence, which the IDF Atlas does not support). Delete or cite as you prefer.
+- **Darpit vs Dave.** Scientific Reports and its erratum print the first author as given "Dave", family "Darpit"; the same person publishes elsewhere as Darpit Dave. The bib follows the published record. Say if you want it the other way.
+- **GPFormer protocol detail (optional).** GPFormer keeps only the first three days of each ReplaceBG subject (its Section II-A), so its 46-subject hold-out is 3 days per subject. The tab:oodprior note does not mention this. Add a clause if you think it matters for the comparison.

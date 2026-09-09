@@ -39,7 +39,7 @@ docs and drafts said Oxford), not simulated on one host.
 | Open items the author owes | `reviews/REQUIRED_FROM_YOU.md` ← check this every session |
 | Per-iteration change log | `reviews/iter{1..13}_revisions.md` (iter13 = the 2026-09 Paul/Ken comment round) |
 | Reviewer critiques (5) | `reviews/iter1_reviewer*.md`, `reviews/iter2_*.md` |
-| Reference verification | `reviews/refcheck_*.md` |
+| Reference verification | `reviews/refcheck_2026-09-09_full.md` (all 65 entries, five agents) and the older `reviews/refcheck_*.md` |
 | Older open-questions doc | `reviews/UNSURE.md` (superseded by REQUIRED_FROM_YOU.md for live items) |
 | Corrected results summary (the numbers come from here) | `../CHANGES.md` (repo root) |
 | Raw per-seed outputs of the clean retrain | `C:\Users\luyua\Desktop\release_bundle\output_clean_retrain\` (`final_results_summary.csv`; per-seed under `pod_results/clean_eval` and `pod_results/followup`) |
