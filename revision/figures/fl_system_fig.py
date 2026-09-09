@@ -88,7 +88,7 @@ ax.text(W - 0.10, 2.48, "\u2462 updated weights", ha="right", va="center",
         fontsize=7, color="#d95926", fontweight="bold")
 
 # ---------------- footer
-ax.text(W / 2, 0.44, "Four UK institutions \u2014 UCL, Manchester, Newcastle, Oxford \u2014 one client each.",
+ax.text(W / 2, 0.44, "Four UK institutions \u2014 UCL, Manchester, Newcastle, KCL \u2014 one client each.",
         ha="center", va="center", fontsize=6.8, color=INK2)
 ax.text(W / 2, 0.26, "Raw CGM data never leaves its institution; FedProx and MLDG change only step \u2461.",
         ha="center", va="center", fontsize=6.8, color=INK2)

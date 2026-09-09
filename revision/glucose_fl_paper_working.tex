@@ -78,10 +78,10 @@
 Luyuan Qi\textsuperscript{1},
 Paul Taylor\textsuperscript{1},
 Rui Sun\textsuperscript{2},
-Taiyu Zhu\textsuperscript{3,4},
-Jiahao Sun\textsuperscript{5},
-Pantelis Georgiou\textsuperscript{6},
-Simon Harper\textsuperscript{7},
+Taiyu Zhu\textsuperscript{3},
+Jiahao Sun\textsuperscript{4},
+Pantelis Georgiou\textsuperscript{5},
+Simon Harper\textsuperscript{6},
 Kezhi Li\textsuperscript{1*}
 \\
 \bigskip
@@ -91,20 +91,19 @@ Kezhi Li\textsuperscript{1*}
 \\
 \textbf{3} Department of Biostatistics \& Health Informatics, Institute of Psychiatry, Psychology \& Neuroscience, King's College London, London, United Kingdom
 \\
-\textbf{4} Department of Psychiatry, University of Oxford, Oxford, United Kingdom
+\textbf{4} [Flock.io Ltd]
 \\
-\textbf{5} [Flock.io Ltd]
+\textbf{5} Centre for Bio-Inspired Technology, Imperial College London, United Kingdom
 \\
-\textbf{6} Centre for Bio-Inspired Technology, Imperial College London, United Kingdom
-\\
-\textbf{7} University of Manchester, Manchester, United Kingdom
+\textbf{6} University of Manchester, Manchester, United Kingdom
 \\
 \bigskip
 
 * ken.li@ucl.ac.uk
-% NOTE (author): (a) Taiyu Zhu's affiliation listing to be confirmed with him
-% (per Ken's comment); (b) add department for Manchester if wanted;
-% (c) PLOS wants each author's ORCID (corresponding author's is mandatory) and a
+% NOTE (author): (a) Taiyu Zhu confirmed 2026-09-09: KCL only, Oxford removed;
+% (b) replace the "[Flock.io Ltd]" placeholder with a real affiliation line;
+% (c) add department for Manchester if wanted;
+% (d) PLOS wants each author's ORCID (corresponding author's is mandatory) and a
 % CRediT contribution per author, both entered in the submission system.
 
 \end{flushleft}
@@ -298,7 +297,7 @@ global model but no data, and clients that each wrap one dataset,
 communicating over HTTP using only the Python standard library. The results
 we report were produced by running this system live across four UK
 universities (University College London, the University of Manchester,
-Newcastle University, and the University of Oxford), exchanging nothing
+Newcastle University, and King's College London), exchanging nothing
 but model weights over the public internet. This exercises the conditions a
 federation faces across separate administrative domains, with separate
 hardware, network round-trips between rounds, and no shared filesystem,
@@ -494,7 +493,7 @@ aggregation.
 
 The federation is geographically distributed: the four clients are run at four
 different UK institutions (University College London, the University of
-Manchester, Newcastle University, and the University of Oxford), with one client
+Manchester, Newcastle University, and King's College London), with one client
 per institution, and the aggregation server hosted at one of the sites. All
 coordination happens
 over the public internet, so the system exercises the real conditions a clinical
@@ -1046,7 +1045,7 @@ held-in and OOD comparison, and its edge over FedAvg was larger than FedAvg's
 edge over local training. OOD, MLDG beat the average single-cohort model on
 every held-out cohort, FedAvg and FedProx matched it, and a cohort's in-domain
 accuracy did not predict how well its model transferred. These results were produced by a federation that ran across
-four universities, UCL, Manchester, Newcastle, and Oxford, training FedAvg,
+four universities, UCL, Manchester, Newcastle, and KCL, training FedAvg,
 FedProx, and MLDG under the same protocol over the public internet, with no
 raw data leaving any site. It is a working multi-institution system, not a
 simulation.
