@@ -897,33 +897,21 @@ values come from the same runs as Table~\ref{tab:main}.}
 \end{center}
 \end{table}
 
-\paragraph{The ordering holds on the Clarke error grid.} RMSE is the
-objective the strategies were trained for. The Clarke error grid
-\cite{clarke1987} scores the same forecasts by their clinical consequence,
-and it gives the same ordering (Table~\ref{tab:clarke}). At 30 minutes MLDG
-has the largest share of clinically accurate forecasts (zone A) of the three
-global strategies in every column, and it is above local training in every
-column. Its held-in average is $84.71\%$ against $83.80\%$ for local
-training ($+0.9$ points, $p = 0.058$, four of five seeds), and the gain is
-significant on every OOD cohort ($+0.3$ to $+0.9$ points, $p \le 0.043$,
-five of five seeds). FedAvg and FedProx do not beat local training on zone A
-held-in ($+0.40$ and $+0.06$ points, $p = 0.35$ and $0.81$). The dangerous
-zones D and E move the same way. MLDG has the lowest D+E share of the
-federated strategies in every column, and it cuts the held-in average from
-$3.57\%$ under local training to $3.08\%$ ($p = 0.028$). The cut is
-significant on ABC4D, ARISES, and T1D-UOM (five of five seeds,
-$p \le 0.009$) and on all three OOD cohorts ($p \le 0.024$). HUPA-UCM is the
-one exception. Its own local model has the fewest dangerous forecasts there
-($2.06\%$ vs $2.60\%$ for MLDG, $p = 0.07$). Nearly all dangerous forecasts
-are zone D, a missed excursion. Zone E, the wrong treatment, is below
-$0.05\%$ in every cell. The centralised baseline has the highest zone A share
-in every column ($0.7$ points above MLDG held-in, $p = 0.014$), but its D+E
-share is not significantly lower than MLDG's in any column ($p \ge 0.25$).
-Ditto ($\mu{=}0.1$), the best personalised strategy, reaches $84.48\%$ zone A
-held-in, above local training ($p = 0.037$) but below MLDG. At 60 minutes
-MLDG's zone A gain over local training grows to $+0.8$ points held-in
-($p = 0.015$, five of five seeds), and its D+E share is the lowest of every
-strategy, including the centralised baseline, on five of the seven cohorts.
+\paragraph{The ordering holds on the Clarke error grid.} Table~\ref{tab:clarke}
+scores the same 30-minute forecasts by their clinical consequence
+\cite{clarke1987}. MLDG has the largest share of clinically accurate
+forecasts (zone A) of the three global strategies in every column. Its gain
+over local training is $0.9$ points held-in ($p = 0.058$, four of five
+seeds) and $0.3$ to $0.9$ points on the OOD cohorts ($p \le 0.043$, five of
+five seeds), while FedAvg and FedProx do not beat local training held-in.
+MLDG also has the fewest clinically dangerous forecasts (zones D and E) of
+the three in every column, $3.08\%$ against $3.57\%$ for local training
+held-in ($p = 0.028$). HUPA-UCM is the one cohort where the local model does
+better. The centralised baseline has the highest zone A share in every
+column ($p = 0.014$ held-in) but is not significantly better than MLDG on
+the dangerous zones ($p \ge 0.25$). At 60 minutes MLDG still has the fewest
+dangerous forecasts of the three in every column, and its zone A gain over
+local training is significant held-in ($0.8$ points, $p = 0.015$).
 
 \begin{table}[!ht]
 \centering

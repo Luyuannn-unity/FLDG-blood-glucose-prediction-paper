@@ -79,3 +79,7 @@ all arms incl. Centralised on ABC4D, T1D-UOM, ReplaceBG, BrisT1D, Flair.
 `START_HERE.md` (tables 7 → 8, clinical-metrics item rewritten, next-run
 reminder updated), `reviews/REQUIRED_FROM_YOU.md`, `reviews/SUBMISSION_TODO.md`
 (D.1) updated. `reviews/UNSURE.md` untouched.
+
+## Follow-up (2026-09-09, same day)
+
+Author: the Clarke paragraph was too wordy for a secondary metric. Cut from 334 to about 160 words. Dropped: the FedAvg/FedProx zone-A deltas and p-values, the per-cohort list of significant D+E cuts, the zone D vs E remark, the Ditto sentence, and the 60-min "five of seven cohorts" claim. Kept: MLDG best zone A of the three global strategies in every column, the held-in and OOD gains with p-values and seed counts, the D+E held-in numbers, the HUPA-UCM exception, the centralised comparison, and one 60-min sentence (MLDG fewest D+E of the three in every column at 60 min, zone A gain +0.79 p=0.015). Every remaining number is still in contrasts.csv / clarke_summary.csv.
